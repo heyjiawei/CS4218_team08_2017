@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.Environment;
@@ -63,7 +64,7 @@ public class CatApplication implements Application {
 			int numOfFiles = args.length;
 
 			Path filePath;
-			Path[] filePathArray = new Path[numOfFiles];
+			ArrayList<Path> filePathList = new ArrayList<Path>(numOfFiles);
 			Path currentDir = Paths.get(Environment.currentDirectory);
 			boolean isFileReadable = false;
 
@@ -71,16 +72,16 @@ public class CatApplication implements Application {
 				filePath = currentDir.resolve(args[i]);
 				isFileReadable = checkIfFileIsReadable(filePath);
 				if (isFileReadable) {
-					filePathArray[i] = filePath;
+					filePathList.add(filePath);
 				}
 			}
 
 			// file could be read. perform cat command
-			if (filePathArray.length != 0) {
-				for (int j = 0; j < filePathArray.length - 1; j++) {
+			if (filePathList.size() != 0) {
+				for (int j = 0; j < filePathList.size() - 1; j++) {
 					try {
 						byte[] byteFileArray = Files
-								.readAllBytes(filePathArray[j]);
+								.readAllBytes(filePathList.get(j));
 						stdout.write(byteFileArray);
 					} catch (IOException e) {
 						throw new CatException(
