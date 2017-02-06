@@ -44,9 +44,11 @@ public class CatApplication implements Application {
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws CatException {
-
+		if (stdout == null) {
+			throw new CatException("No output stream provided");
+		}
 		if (args == null || args.length == 0) {
-			if (stdin == null || stdout == null) {
+			if (stdin == null) {
 				throw new CatException("Null Pointer Exception");
 			}
 			try {
