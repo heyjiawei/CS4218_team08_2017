@@ -60,38 +60,35 @@ public class CatApplication implements Application {
 				throw new CatException("Exception Caught");
 			}
 		} else {
-
 			int numOfFiles = args.length;
 
-			if (numOfFiles > 0) {
-				Path filePath;
-				Path[] filePathArray = new Path[numOfFiles];
-				Path currentDir = Paths.get(Environment.currentDirectory);
-				boolean isFileReadable = false;
+			Path filePath;
+			Path[] filePathArray = new Path[numOfFiles];
+			Path currentDir = Paths.get(Environment.currentDirectory);
+			boolean isFileReadable = false;
 
-				for (int i = 0; i < numOfFiles; i++) {
-					filePath = currentDir.resolve(args[i]);
-					isFileReadable = checkIfFileIsReadable(filePath);
-					if (isFileReadable) {
-						filePathArray[i] = filePath;
-					}
-				}
-
-				// file could be read. perform cat command
-				if (filePathArray.length != 0) {
-					for (int j = 0; j < filePathArray.length - 1; j++) {
-						try {
-							byte[] byteFileArray = Files
-									.readAllBytes(filePathArray[j]);
-							stdout.write(byteFileArray);
-						} catch (IOException e) {
-							throw new CatException(
-									"Could not write to output stream");
-						}
-					}
-
+			for (int i = 0; i < numOfFiles; i++) {
+				filePath = currentDir.resolve(args[i]);
+				isFileReadable = checkIfFileIsReadable(filePath);
+				if (isFileReadable) {
+					filePathArray[i] = filePath;
 				}
 			}
+
+			// file could be read. perform cat command
+			if (filePathArray.length != 0) {
+				for (int j = 0; j < filePathArray.length - 1; j++) {
+					try {
+						byte[] byteFileArray = Files
+								.readAllBytes(filePathArray[j]);
+						stdout.write(byteFileArray);
+					} catch (IOException e) {
+						throw new CatException(
+								"Could not write to output stream");
+					}
+				}
+			}
+
 		}
 	}
 
