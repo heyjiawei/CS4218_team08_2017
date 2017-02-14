@@ -1,15 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import sg.edu.nus.comp.cs4218.app.Wc;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.DateException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 public class WcApplication implements Wc {
@@ -107,19 +109,19 @@ public class WcApplication implements Wc {
 				}
 				
 				String nextChar = command.substring(startIndex, startIndex + 1);
-				if (nextChar.equals("m")) {
+				if ("m".equals(nextChar)) {
 					options[0] = true;
 					startIndex = startIndex + 1;
 					
-				} else if (nextChar.equals("w")) {
+				} else if ("w".equals(nextChar)) {
 					options[1] = true;
 					startIndex = startIndex + 1;
 					
-				} else if (nextChar.equals("l")) {
+				} else if ("l".equals(nextChar)) {
 					options[2] = true;
 					startIndex = startIndex + 1;
 				
-				} else if (nextChar.equals(" ")) {
+				} else if (" ".equals(nextChar)) {
 					dashPosition = command.indexOf("-", startIndex);
 					if (dashPosition > -1) {
 						startIndex = dashPosition;
@@ -135,32 +137,74 @@ public class WcApplication implements Wc {
 		return options;
 	}
 
+	/**
+	 * Naively assume that filename is in last arg position
+	 * @param args
+	 * @param stdin
+	 * @param isStdin
+	 * @return
+	 * @throws WcException
+	 */
 	private String getCount(String[] args, InputStream stdin, boolean isStdin) throws WcException {
 		// TODO Auto-generated method stub
 		/*
 		 * Reads the options, calls the necessary function
 		 * and returns appended count string
-		 * 1. check isStdin. If false, open file from last args
-		 * 2. if true, retrieve string from stdin
+		 * -check isStdin. If false, open file from last args
+		 * -if true, retrieve string from stdin
+		 * 1. for either input (stdin or args)
+		 * if-else with separatedOptions. if true, call that function and
+		 * append to countStr
+		 * 2. remove trailing whitespaces from countStr before returning countStr
 		 */
-		boolean[] separatedOptions = optionsSeparator(args);
+		boolean[] options = optionsSeparator(args);
+		String countStr = "";
 		if (isStdin) {
-			// retrieve string from stdin
+			if (options[0]) { // -m
+				countStr += printCharacterCountInStdin(stdin) + " ";
+			} 
+			if (options[1]) { // -w
+				countStr += printWordCountInStdin(stdin) + " ";
+			}
+			if (options[2]) { // -l
+				countStr += printNewlineCountInStdin(stdin);
+			}
 		} else {
-			//String filename = args[args.length-1];
-			
+			String filename = args[args.length-1];
+			if (options[0]) { // -m
+				countStr += printCharacterCountInFile(filename) + " ";
+			} 
+			if (options[1]) { // -w
+				countStr += printWordCountInFile(filename) + " ";
+			}
+			if (options[2]) { // -l
+				countStr += printNewlineCountInFile(filename);
+			}
 		}
-		return null;
+		return countStr.trim();
 	}
 
 	private boolean isInputStreamEmpty(InputStream stdin) {
-		// TODO Auto-generated method stub
-		/* checks if stdin contains any string
-		 * returns false if not empty
-		 */
+		try {
+			if (stdin.read() > -1) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return false;
 	}
 
+	/**
+	 * Naive implementation of checking if arguments contain filename
+	 * Currently assumes that last arg is filename
+	 * Uses "." to check if a file is provided
+	 * @param args
+	 * @return
+	 */
 	private boolean isFilenameProvided(String[] args) {
 		// TODO Auto-generated method stub
 		// Check if args length is correct for command with filename
@@ -169,7 +213,21 @@ public class WcApplication implements Wc {
 		// 2 assume last position in args[] contain filename
 		// 3 check that it is a file (isfile)
 		// throw error if file cannot be found
-		return true;
+		/*
+		 * testing considerations:
+		 * wc _ _ where filename has a space character (wrong filename)
+		 * but the last _ is a legit filename
+		 * wc 'test 2.txt' should work for filename test 2.txt
+		 * wc test q1.txt where q1.txt exist
+		 * wc _ filename with space character escaped (correct filename)
+		 */
+		if (args.length > 1) {
+			String filename = args[args.length-1];
+			if (filename.contains(".")) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private boolean isFileDirectoryValid(String[] args) throws WcException {
@@ -190,10 +248,10 @@ public class WcApplication implements Wc {
 
 	/**
 	 * Returns string containing the character count in file
-	 * @param args String containing command and arguments
+	 * @param filename String filename of file to be read
 	 */
 	@Override
-	public String printCharacterCountInFile(String args) {
+	public String printCharacterCountInFile(String filename) {
 		// TODO Auto-generated method stub
 		/*
 		 * should receive arg: wc -m filename.txt
@@ -201,27 +259,66 @@ public class WcApplication implements Wc {
 		 * 2 count character in file
 		 * 3 print out character count
 		 */
-		return null;
+		int charCount = 0;
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				charCount += line.getBytes().length;
+			}
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return String.valueOf(charCount);
 	}
 
 	/**
 	 * Returns string containing the word count in file
-	 * @param args String containing command and arguments
+	 * @param filename String filename of file to be read
 	 */
 	@Override
-	public String printWordCountInFile(String args) {
+	public String printWordCountInFile(String filename) {
 		// TODO Auto-generated method stub
-		return null;
+		int wordCount = 0;
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				wordCount += line.replaceAll("\\s+", " ").split(" ").length;
+			}
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return String.valueOf(wordCount);
 	}
 
 	/**
 	 * Returns string containing the newline count in file
-	 * @param args String containing command and arguments
+	 * @param filename String filename of file to be read
 	 */
 	@Override
-	public String printNewlineCountInFile(String args) {
+	public String printNewlineCountInFile(String filename) {
 		// TODO Auto-generated method stub
-		return null;
+		int lineCount = 0;
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				lineCount ++;
+			}
+			reader.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return String.valueOf(lineCount);
 	}
 
 	/**
@@ -229,7 +326,7 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printAllCountsInFile(String args) {
+	public String printAllCountsInFile(String args) { // Can I ignore this method?
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -239,9 +336,18 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printCharacterCountInStdin(String args) {
+	public String printCharacterCountInStdin(InputStream stdin) {
 		// TODO Auto-generated method stub
-		return null;
+		int charCount = 0;
+		try {
+			while (stdin.read() > -1) {
+				charCount ++;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return String.valueOf(charCount);
 	}
 
 	/**
@@ -249,9 +355,17 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printWordCountInStdin(String args) {
+	public String printWordCountInStdin(InputStream stdin) {
 		// TODO Auto-generated method stub
-		return null;
+		int wordCount = 0;
+		Scanner scanner = new Scanner(stdin);
+		scanner.useDelimiter("\\A");
+		while (scanner.hasNext()) {
+			wordCount++;
+			scanner.next();
+		}
+		scanner.close();
+		return String.valueOf(wordCount);
 	}
 
 	/**
@@ -259,9 +373,17 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printNewlineCountInStdin(String args) {
+	public String printNewlineCountInStdin(InputStream stdin) {
 		// TODO Auto-generated method stub
-		return null;
+		int lineCount = 0;
+		Scanner scanner = new Scanner(stdin);
+		scanner.useDelimiter("\\A");
+		while (scanner.hasNextLine()) {
+			lineCount++;
+			scanner.nextLine();
+		}
+		scanner.close();
+		return String.valueOf(lineCount);
 	}
 
 	/**
@@ -269,7 +391,7 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printAllCountsInStdin(String args) {
+	public String printAllCountsInStdin(InputStream stdin) { // Can I ignore this method?
 		// TODO Auto-generated method stub
 		return null;
 	}

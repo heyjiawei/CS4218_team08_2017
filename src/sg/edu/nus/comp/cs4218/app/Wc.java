@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs4218.app;
 
+import java.io.InputStream;
+
 import sg.edu.nus.comp.cs4218.Application;
 
 public interface Wc extends Application {
@@ -30,26 +32,26 @@ public interface Wc extends Application {
 
 	/**
 	 * Returns string containing the character count in Stdin
-	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Standard Input
 	 */
-	public String printCharacterCountInStdin(String args);
+	public String printCharacterCountInStdin(InputStream stdin);
 
 	/**
 	 * Returns string containing the word count in Stdin
-	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Standard Input
 	 */
-	public String printWordCountInStdin(String args);
+	public String printWordCountInStdin(InputStream stdin);
 
 	/**
 	 * Returns string containing the newline count in Stdin
-	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Standard Input
 	 */
-	public String printNewlineCountInStdin(String args);
+	public String printNewlineCountInStdin(InputStream stdin);
 
 	/**
 	 * Returns string containing all counts in Stdin
-	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Standard Input
 	 */
-	public String printAllCountsInStdin(String args);
+	public String printAllCountsInStdin(InputStream stdin);
 
 }
