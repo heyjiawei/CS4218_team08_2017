@@ -11,7 +11,6 @@ import sg.edu.nus.comp.cs4218.app.Date;
 import sg.edu.nus.comp.cs4218.exception.DateException;
 
 public class DateApplication implements Date {
-	private java.util.Date currentDate;
 
 	/**
 	 * Runs application with specified input data and specified output stream.
@@ -56,9 +55,8 @@ public class DateApplication implements Date {
 		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
 													Locale.ENGLISH);
 
-		currentDate = new java.util.Date();
-	    String strDate = dateformat.format(currentDate);
-		return strDate;
+		java.util.Date currentDate = new java.util.Date();
+		return dateformat.format(currentDate);
 	}
 
 }

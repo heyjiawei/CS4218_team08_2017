@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -59,9 +60,12 @@ public class WcApplication implements Wc {
 			throw new WcException("No input detected. Please add file(s) or ensure stdin is not empty");
 		}
 		
-		//write to stdout
-		PrintWriter writer = new PrintWriter(stdout);
-		writer.println(countStr);
+		try {
+			stdout.write(countStr.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private boolean[] optionsSeparator(String[] args) throws WcException {
@@ -92,9 +96,10 @@ public class WcApplication implements Wc {
 		 */
 		boolean[] options = new boolean[3];
 		String command = "";
-		for (int i = 0; i < args.length-1; i++) {
+		for (int i = 1; i < args.length; i++) {
 			command += args[i] + " ";
 		}
+
 		int startIndex = 0;
 		int dashPosition = command.indexOf('-');
 		if (dashPosition == -1) {
@@ -102,10 +107,11 @@ public class WcApplication implements Wc {
 			return options;
 			
 		} else {
-			startIndex = dashPosition;
+			startIndex = dashPosition + 1;
 			while (startIndex > -1 && startIndex < command.length()) {
 				if (startIndex + 1 == command.length()) {
-					throw new WcException("Illegal Option. Please put \"-m\", \"-w\" or \"-l\"");
+					break;
+					//throw new WcException("Illegal Option. Please put \"-m\", \"-w\" or \"-l\"");
 				}
 				
 				String nextChar = command.substring(startIndex, startIndex + 1);
@@ -124,7 +130,7 @@ public class WcApplication implements Wc {
 				} else if (" ".equals(nextChar)) {
 					dashPosition = command.indexOf("-", startIndex);
 					if (dashPosition > -1) {
-						startIndex = dashPosition;
+						startIndex = dashPosition + 1;
 					} else {
 						break;
 					}
@@ -169,6 +175,7 @@ public class WcApplication implements Wc {
 			if (options[2]) { // -l
 				countStr += printNewlineCountInStdin(stdin);
 			}
+
 		} else {
 			String filename = args[args.length-1];
 			if (options[0]) { // -m
@@ -187,9 +194,9 @@ public class WcApplication implements Wc {
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
 			if (stdin.read() > -1) {
-				return true;
-			} else {
 				return false;
+			} else {
+				return true;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -246,12 +253,19 @@ public class WcApplication implements Wc {
 	    }
 	}
 
+	private String getFilename(String args) {
+		// TODO Auto-generated method stub
+		// assume filename is the last token
+		String[] parts = args.split(" ");
+		return parts[parts.length - 1];
+	}
+
 	/**
 	 * Returns string containing the character count in file
-	 * @param filename String filename of file to be read
+	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printCharacterCountInFile(String filename) {
+	public String printCharacterCountInFile(String args) {
 		// TODO Auto-generated method stub
 		/*
 		 * should receive arg: wc -m filename.txt
@@ -259,15 +273,17 @@ public class WcApplication implements Wc {
 		 * 2 count character in file
 		 * 3 print out character count
 		 */
+		String filename = getFilename(args);
 		int charCount = 0;
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(filename));
-			String line = "";
+			String line;
 			while ((line = reader.readLine()) != null) {
-				charCount += line.getBytes().length;
+				charCount += line.getBytes().length + 1;
 			}
 			reader.close();
+			charCount -= 1;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -277,18 +293,24 @@ public class WcApplication implements Wc {
 
 	/**
 	 * Returns string containing the word count in file
-	 * @param filename String filename of file to be read
+	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printWordCountInFile(String filename) {
+	public String printWordCountInFile(String args) {
 		// TODO Auto-generated method stub
+		String filename = getFilename(args);
 		int wordCount = 0;
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(filename));
-			String line = "";
+			String line;
 			while ((line = reader.readLine()) != null) {
-				wordCount += line.replaceAll("\\s+", " ").split(" ").length;
+				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].length() > 0) {
+						wordCount += 1;
+					}
+				}
 			}
 			reader.close();
 		} catch (IOException e) {
@@ -300,20 +322,22 @@ public class WcApplication implements Wc {
 
 	/**
 	 * Returns string containing the newline count in file
-	 * @param filename String filename of file to be read
+	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printNewlineCountInFile(String filename) {
+	public String printNewlineCountInFile(String args) {
 		// TODO Auto-generated method stub
+		String filename = getFilename(args);
 		int lineCount = 0;
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(filename));
-			String line = "";
+			String line;
 			while ((line = reader.readLine()) != null) {
 				lineCount ++;
 			}
 			reader.close();
+			lineCount -= 1;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -326,9 +350,13 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printAllCountsInFile(String args) { // Can I ignore this method?
+	public String printAllCountsInFile(String args) {
 		// TODO Auto-generated method stub
-		return null;
+		String countStr = "";
+		countStr += printCharacterCountInFile(args) + " ";
+		countStr += printWordCountInFile(args) + " ";
+		countStr += printNewlineCountInFile(args);
+		return countStr;
 	}
 
 	/**
@@ -340,13 +368,17 @@ public class WcApplication implements Wc {
 		// TODO Auto-generated method stub
 		int charCount = 0;
 		try {
+			
 			while (stdin.read() > -1) {
-				charCount ++;
+				charCount += 1;
 			}
+			stdin.close();
+			stdin.reset();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		charCount++;
 		return String.valueOf(charCount);
 	}
 
@@ -359,7 +391,7 @@ public class WcApplication implements Wc {
 		// TODO Auto-generated method stub
 		int wordCount = 0;
 		Scanner scanner = new Scanner(stdin);
-		scanner.useDelimiter("\\A");
+		scanner.useDelimiter("\\s+");
 		while (scanner.hasNext()) {
 			wordCount++;
 			scanner.next();
@@ -375,14 +407,24 @@ public class WcApplication implements Wc {
 	@Override
 	public String printNewlineCountInStdin(InputStream stdin) {
 		// TODO Auto-generated method stub
-		int lineCount = 0;
-		Scanner scanner = new Scanner(stdin);
-		scanner.useDelimiter("\\A");
-		while (scanner.hasNextLine()) {
-			lineCount++;
-			scanner.nextLine();
+		BufferedInputStream is = new BufferedInputStream(stdin);
+		byte[] c = new byte[1024];
+        int lineCount = 0;
+        int readChars = 0;
+		try {
+			while ((readChars = is.read(c)) != -1) {
+				for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    lineCount++;
+	                }
+	            }
+			}
+			is.close();
+			stdin.reset();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		scanner.close();
 		return String.valueOf(lineCount);
 	}
 
@@ -391,9 +433,21 @@ public class WcApplication implements Wc {
 	 * @param args String containing command and arguments
 	 */
 	@Override
-	public String printAllCountsInStdin(InputStream stdin) { // Can I ignore this method?
+	public String printAllCountsInStdin(InputStream stdin) { 
 		// TODO Auto-generated method stub
-		return null;
+		int charCount = 0;
+		int wordCount = 0;
+		int lineCount = 0;
+		Scanner scanner = new Scanner(stdin);
+		String line;
+		while (scanner.hasNextLine()) {
+			line = scanner.nextLine();
+			charCount += line.length() + 1;
+			wordCount += line.split(" ").length;
+			lineCount++;
+			
+		}
+		return charCount + " " + wordCount + " " + lineCount;
 	}
 
 }

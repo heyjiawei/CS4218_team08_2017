@@ -23,60 +23,57 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.DateException;
 
 public class DateApplicationTest {
-	private java.util.Date currentDate;
 	DateApplication dateApp;
 	String printedDate;
 	InputStream in;
 	OutputStream out;
 
-//	@BeforeClass
-//	public static void setUpBeforeClass() throws Exception {
-//	}
-//
-//	@AfterClass
-//	public static void tearDownAfterClass() throws Exception {
-//	}
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+	}
 
 	@Before
 	public void setUp() throws Exception {
 		dateApp = new DateApplication();
 	}
 
-//	@After
-//	public void tearDown() throws Exception {
-//	}
+	@After
+	public void tearDown() throws Exception {
+	}
 	
 	@Test (expected = DateException.class)
 	public void testNullOutputStream() throws Exception {
-		in = new ByteArrayInputStream( "".getBytes() );
+		in = new ByteArrayInputStream("".getBytes());
 		dateApp.run(new String[]{"date"}, in, null);
 	}
 	
 	@Test (expected = DateException.class)
 	public void testNullInputStream() throws Exception {
-		out = new ByteArrayOutputStream( );
+		out = new ByteArrayOutputStream();
 		dateApp.run(new String[]{"date"}, null, out);
 	}
 	
 	@Test (expected = DateException.class)
-	public void testIllegalDateFormat() throws Exception {
-		fail("Not yet implemented");
-		// . expand on test cases of this category
+	public void testAdditionalArguments() throws Exception {
+//		fail("Not yet implemented");
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		dateApp.run(new String[]{"date today"}, in, out);
 	}
 
 	@Test
-	public void testPrintCurrentDateFormat() {
+	public void testPrintCurrentDate() {
 		fail("Not yet implemented");
-//		DateFormat dateformat = new SimpleDateFormat("EEE MMM d", 
-//				Locale.ENGLISH);
-//		currentDate = new java.util.Date();
-//		String strDate = dateformat.format(currentDate);
-//		printedDate = dateApp.printCurrentDate("date");
-//		String dateStr = printedDate.substring(0, 10);
-//		assertEquals(, dateStr);
-//		String localYearString = printedDate.substring(20);
-//		System.out.print(localYearString);
-//		System.out.println(printedDate);
+//		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
+//													Locale.ENGLISH);
+//		java.util.Date currentDate = new java.util.Date();
+//		String[] date = dateformat.format(currentDate).split(" ");
+//		String[] parts = dateApp.printCurrentDate("date").split(" ");
+//		assertEquals(date, parts);
 	}
 
 }
