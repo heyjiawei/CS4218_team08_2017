@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,6 +30,8 @@ import sg.edu.nus.comp.cs4218.exception.HeadException;
  */
 public class HeadApplication implements Application {
 
+	final private int DEFAULT_NUMBER_OF_LINES_TO_PRINT = 10;
+
 	/**
 	 * Runs the head application with the specified arguments.
 	 * 
@@ -55,7 +58,7 @@ public class HeadApplication implements Application {
 		if (stdout == null) {
 			throw new HeadException("No output stream provided");
 		}
-		Integer numberOfLinesToPrint = 10;
+		Integer numberOfLinesToPrint = DEFAULT_NUMBER_OF_LINES_TO_PRINT;
 		if (args == null || args.length == 0) {
 			if (stdin == null) {
 				throw new HeadException("No input stream provided");
@@ -125,7 +128,7 @@ public class HeadApplication implements Application {
 	 * @throws HeadException
 	 *             If the file is not readable
 	 */
-	private void printLinesFromInputStreamToOutputStream(Integer numberOfLines,
+	private void printLinesFromInputStreamToOutputStream(int numberOfLines,
 			InputStream stdin, OutputStream stdout) throws HeadException {
 		if (stdin == null) {
 			throw new HeadException("No input stream provided");
@@ -150,7 +153,7 @@ public class HeadApplication implements Application {
 	}
 	
 	/**
-	 * Prints N lines from the given input stream to the given output stream.
+	 * Prints N lines from the file at the given file path to the given output stream.
 	 * If there are less than N lines, print existing lines without raising an exception.
 	 * 
 	 * @param numberOfLines
@@ -176,8 +179,17 @@ public class HeadApplication implements Application {
 		}
 		Path pathToReadFrom = getReadableFilePath(filePathString);
 		try {
-			byte[] byteFileArray = Files.readAllBytes(pathToReadFrom);
-			stdout.write(byteFileArray);
+			FileReader fileReader = new FileReader(pathToReadFrom.toString());
+		    BufferedReader bufferedReader = new BufferedReader(fileReader);
+		    String lineToPrint;
+		    for (int i = 0; i < numberOfLines; i++) {
+				if ((lineToPrint = bufferedReader.readLine()) != null) {
+					stdout.write(lineToPrint.getBytes());
+				} else {
+					break;
+				}
+			}
+		    bufferedReader.close();
 		} catch (IOException e) {
 			throw new HeadException(
 					"Could not write to output stream");
