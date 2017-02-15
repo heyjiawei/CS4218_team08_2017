@@ -10,11 +10,15 @@ import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
+import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
+import sg.edu.nus.comp.cs4218.impl.app.DateApplication;
 import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
+import sg.edu.nus.comp.cs4218.impl.app.HeadApplication;
+import sg.edu.nus.comp.cs4218.impl.app.PwdApplication;
+import sg.edu.nus.comp.cs4218.impl.app.SedApplication;
+import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
+import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-//TODO
-//import sg.edu.nus.comp.cs4218.impl.app.HeadApplication;
-//import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
 
 /**
  * A Shell is a command interpreter and forms the backbone of the entire
@@ -205,14 +209,24 @@ public class ShellImpl implements Shell {
 			InputStream inputStream, OutputStream outputStream)
 			throws AbstractApplicationException, ShellException {
 		Application absApp = null;
-		if (("cat").equals(app)) {// cat [FILE]...
+		if (("cat").equalsIgnoreCase(app)) {// cat [FILE]...
 			absApp = new CatApplication();
-		} else if (("echo").equals(app)) {// echo [args]...
+		} else if (("cd").equalsIgnoreCase(app)) {
+			absApp = new CdApplication();
+		} else if (("echo").equalsIgnoreCase(app)) {// echo [args]...
 			absApp = new EchoApplication();
-//		} else if (("head").equals(app)) {// head [OPTIONS] [FILE]
-//			absApp = new HeadApplication();
-//		} else if (("tail").equals(app)) {// tail [OPTIONS] [FILE]
-//			absApp = new TailApplication();
+		} else if (("date").equalsIgnoreCase(app)) {
+			absApp = new DateApplication();
+		} else if (("head").equalsIgnoreCase(app)) {// head [OPTIONS] [FILE]
+			absApp = new HeadApplication();
+		} else if (("pwd").equalsIgnoreCase(app)) {
+			absApp = new PwdApplication();
+		} else if (("sed").equalsIgnoreCase(app)) {
+			absApp = new SedApplication();
+		} else if (("tail").equalsIgnoreCase(app)) {// tail [OPTIONS] [FILE]
+			absApp = new TailApplication();
+		} else if (("wc").equalsIgnoreCase(app)) {
+			absApp = new WcApplication();
 		} else { // invalid command
 			throw new ShellException(app + ": " + EXP_INVALID_APP);
 		}
