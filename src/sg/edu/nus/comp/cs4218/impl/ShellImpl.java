@@ -119,12 +119,21 @@ public class ShellImpl implements Shell {
 		Pattern patternBQp = Pattern.compile(patternBQ);
 
 		for (int i = 0; i < argsArray.length; i++) {
-			Matcher matcherBQ = patternBQp.matcher(argsArray[i]);
-			if (matcherBQ.find()) {// found backquoted
+			String arg = argsArray[i];
+			boolean singleQuoted = arg.startsWith("'") && arg.endsWith("'");
+			boolean doubleQuoted = arg.startsWith("\"") && arg.endsWith("\"");
+
+			if (singleQuoted || doubleQuoted) {
+				resultArr[i] = arg.substring(1, arg.length() - 1);
+			}
+
+			if (singleQuoted) continue;
+
+			Matcher matcherBQ = patternBQp.matcher(arg);
+			String replacedStr = new String(resultArr[i]);
+
+			while (matcherBQ.find()) { // found backquoted
 				String bqStr = matcherBQ.group(1);
-				// cmdVector.add(bqStr.trim());
-				// process back quote
-				// System.out.println("backquote" + bqStr);
 				OutputStream bqOutputStream = new ByteArrayOutputStream();
 				ShellImpl shell = new ShellImpl();
 				shell.parseAndEvaluate(bqStr, bqOutputStream);
@@ -135,10 +144,11 @@ public class ShellImpl implements Shell {
 						.replace("\r", "");
 
 				// replace substring of back quote with result
-				String replacedStr = argsArray[i].replace("`" + bqStr + "`",
+				replacedStr = replacedStr.replace("`" + bqStr + "`",
 						bqResult);
-				resultArr[i] = replacedStr;
 			}
+
+			resultArr[i] = replacedStr;
 		}
 		return resultArr;
 	}
