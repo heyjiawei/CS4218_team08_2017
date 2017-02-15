@@ -57,5 +57,4 @@ public class EchoApplication implements Application {
 			throw new EchoException("IOException");
 		}
 	}
-
 }

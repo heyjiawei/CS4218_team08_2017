@@ -8,11 +8,11 @@ import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
 /**
- * The echo command writes its arguments separated by spaces and terminates by a
- * newline on the standard output.
+ * The cd command changes the current working directory.
  * 
  * <p>
- * <b>Command format:</b> <code>echo [ARG]...</code>
+ * <b>Command format:</b> <code>cd PATH</code>
+ * <code>PATH</code> - relative directory path.
  * </p>
  */
 public class CdApplication implements Application {
