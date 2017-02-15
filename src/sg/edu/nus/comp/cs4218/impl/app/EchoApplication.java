@@ -42,10 +42,14 @@ public class EchoApplication implements Application {
 		try {
 			if (args.length > 0) {
 				for (int i = 0; i < args.length; i++) {
+					String argument = args[i];
+					if (argument == null) {
+						throw new EchoException("Null argument provided.");
+					}
 					if (i > 0) {
 						stdout.write(" ".getBytes());
 					}
-					stdout.write(args[i].getBytes());
+					stdout.write(argument.getBytes());
 				}
 			}
 			stdout.write("\n".getBytes());
