@@ -12,7 +12,10 @@ import sg.edu.nus.comp.cs4218.exception.CdException;
  * 
  * <p>
  * <b>Command format:</b> <code>cd PATH</code>
- * <code>PATH</code> - relative directory path.
+ * <dl>
+ * <dt>PATH</dt>
+ * <dd>relative directory path.</dd>
+ * </dl>
  * </p>
  */
 public class CdApplication implements Application {
