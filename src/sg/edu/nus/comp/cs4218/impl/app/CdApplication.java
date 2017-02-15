@@ -3,11 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import sg.edu.nus.comp.cs4218.Application;
-import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
 /**
