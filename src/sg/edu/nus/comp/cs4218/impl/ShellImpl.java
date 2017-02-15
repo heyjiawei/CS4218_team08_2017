@@ -53,8 +53,7 @@ public class ShellImpl implements Shell {
 		}
 	}
 
-	public void parseAndEvaluate(String cmdline, OutputStream stdout)
-			throws AbstractApplicationException, ShellException {
+	private Pattern[] getCallCommandPatterns() {
 		String patternNonKeyword = "\\s*[^\\n'\"`;|]+\\s*";
 		String patternSQ = "\\s*'[^\n']*'\\s*";
 		String patternBQ = "\\s*`[^\\n`]*`\\s*";
@@ -62,59 +61,56 @@ public class ShellImpl implements Shell {
 		String patternBQinDQ = "\\s*\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\"\\s*";
 
 		// Preserve order for performance
-		Pattern[] callCommandPatterns = {
+		return new Pattern[] {
 				Pattern.compile(patternNonKeyword),
 				Pattern.compile(patternSQ),
 				Pattern.compile(patternBQ),
 				Pattern.compile(patternDQ),
 				Pattern.compile(patternBQinDQ)
 		};
+	}
+
+	public void parseAndEvaluate(String cmdline, OutputStream stdout)
+			throws AbstractApplicationException, ShellException {
+		Pattern[] compiledPatterns = getCallCommandPatterns();
 		String substring = cmdline, subsequence = "";
 		int smallestStartIdx = 0, newEndIdx = 0;
 		boolean hasPipe = false;
-
 		while (smallestStartIdx != -1) {
 			smallestStartIdx = -1;
-
 			if (substring.trim().startsWith("|")) { // detected pipe operator
 				hasPipe = true;
-
 				// move "|" from substring to subsequence
 				subsequence = subsequence + "|";
 				substring = substring.substring(1);
 			} else if (substring.trim().startsWith(";")) { // detected semicolon operator
 				evaluateSubsequence(subsequence, hasPipe, stdout);
-
 				// reset values since it is now a new sequence
 				hasPipe = false;
 				subsequence = "";
 				substring = substring.substring(1);
 			}
-
-			for (Pattern pattern: callCommandPatterns) {
+			for (Pattern pattern: compiledPatterns) {
 				Matcher matcher = pattern.matcher(substring);
 				if (matcher.find()
 						&& (matcher.start() < smallestStartIdx || smallestStartIdx == -1)) {
 					smallestStartIdx = matcher.start();
 					newEndIdx = matcher.end();
-
-					if (smallestStartIdx == 0) break;
+					if (smallestStartIdx == 0) {
+						break;
+					}
 				}
 			}
-
 			if (smallestStartIdx != -1) {
 				if (smallestStartIdx != 0) {
 					throw new ShellException(ShellImpl.EXP_SYNTAX);
 				}
-
 				subsequence += substring.substring(0, newEndIdx);
 				substring = substring.substring(newEndIdx);
 			}
 		}
-
 		evaluateSubsequence(subsequence, hasPipe, stdout);
-
-		if (substring.trim().length() > 0) {
+		if (!substring.matches("^\\s*$")) {
 			throw new ShellException(ShellImpl.EXP_SYNTAX);
 		}
 	}
@@ -157,7 +153,9 @@ public class ShellImpl implements Shell {
 				resultArr[i] = arg.substring(1, arg.length() - 1);
 			}
 
-			if (singleQuoted) continue;
+			if (singleQuoted) {
+				continue;
+			}
 
 			Matcher matcherBQ = patternBQp.matcher(arg);
 			String replacedStr = new String(resultArr[i]);
