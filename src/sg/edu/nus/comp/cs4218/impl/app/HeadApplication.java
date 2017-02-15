@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.HeadException;
+import sg.edu.nus.comp.cs4218.exception.TailException;
 
 /**
  * The head command prints the first N lines of the file (or input stream).
@@ -139,14 +140,8 @@ public class HeadApplication implements Application {
 		try {
 			InputStreamReader stdinReader = new InputStreamReader(stdin, "UTF-8");
 			BufferedReader bufferedReader = new BufferedReader(stdinReader);
-			String lineToPrint;
-			for (int i = 0; i < numberOfLines; i++) {
-				if ((lineToPrint = bufferedReader.readLine()) != null) {
-					stdout.write(lineToPrint.getBytes());
-				} else {
-					break;
-				}
-			}
+			printLinesFromBufferedReaderToOutputStream(numberOfLines,
+					bufferedReader, stdout);
 		} catch (Exception exIO) {
 			throw new HeadException("Exception Caught");
 		}
@@ -181,14 +176,8 @@ public class HeadApplication implements Application {
 		try {
 			FileReader fileReader = new FileReader(pathToReadFrom.toString());
 		    BufferedReader bufferedReader = new BufferedReader(fileReader);
-		    String lineToPrint;
-		    for (int i = 0; i < numberOfLines; i++) {
-				if ((lineToPrint = bufferedReader.readLine()) != null) {
-					stdout.write(lineToPrint.getBytes());
-				} else {
-					break;
-				}
-			}
+		    printLinesFromBufferedReaderToOutputStream(numberOfLines,
+                    bufferedReader, stdout);
 		    bufferedReader.close();
 		} catch (IOException e) {
 			throw new HeadException(
@@ -196,6 +185,35 @@ public class HeadApplication implements Application {
 		}
 	}
 	
+	/**
+	 * Prints the last N lines from the given BufferedReader to the given output stream.
+	 * If there are less than N lines, print existing lines without raising an exception.
+	 *
+	 * @param numberOfLines
+	 *            The number of lines (N) to print.
+	 * @param bufferedReader
+	 *            A BufferedReader. The lines to print are read from this
+	 *            BufferedReader.
+	 * @param stdout
+	 *            An OutputStream. The output of the function is written to this
+	 *            OutputStream.
+	 *
+	 * @throws TailException
+	 *             If the file is not readable or writing to the output stream
+	 *             fails.
+	 */
+	private void printLinesFromBufferedReaderToOutputStream(int numberOfLines,
+			BufferedReader bufferedReader, OutputStream stdout) throws IOException {
+		String lineToPrint;
+	    for (int i = 0; i < numberOfLines; i++) {
+			if ((lineToPrint = bufferedReader.readLine()) != null) {
+				stdout.write(lineToPrint.getBytes());
+			} else {
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Returns a file path from the given path string if the path is for
 	 * a readable file.
