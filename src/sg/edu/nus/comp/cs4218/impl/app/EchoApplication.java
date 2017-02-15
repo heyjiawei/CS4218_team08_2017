@@ -40,14 +40,15 @@ public class EchoApplication implements Application {
 			throw new EchoException("OutputStream not provided");
 		}
 		try {
-			if (args.length == 0) {
-				stdout.write("\n\n".getBytes());
-			} else {
+			if (args.length > 0) {
 				for (int i = 0; i < args.length; i++) {
+					if (i > 0) {
+						stdout.write(" ".getBytes());
+					}
 					stdout.write(args[i].getBytes());
-					stdout.write("\n".getBytes());
 				}
 			}
+			stdout.write("\n".getBytes());
 		} catch (IOException e) {
 			throw new EchoException("IOException");
 		}
