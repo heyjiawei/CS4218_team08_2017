@@ -10,7 +10,7 @@ public interface Shell {
 	/**
 	 * Parses and evaluates user's command line.
 	 */	
-//	public void parseAndEvaluate(String cmdline, OutputStream stdout) throws AbstractApplicationException, ShellException;
+	public void parseAndEvaluate(String cmdline, OutputStream stdout) throws AbstractApplicationException, ShellException;
 	
 	/**
 	 * Evaluate pipe call with two commands

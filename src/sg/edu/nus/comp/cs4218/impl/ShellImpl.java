@@ -1,6 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +13,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 //TODO
 //import sg.edu.nus.comp.cs4218.impl.app.HeadApplication;
 //import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
@@ -36,6 +39,64 @@ public class ShellImpl implements Shell {
 			+ "as output redirection file.";
 	public static final String EXP_STDOUT = "Error writing to stdout.";
 	public static final String EXP_NOT_SUPPORTED = " not supported yet";
+
+	private String[] extractSubSequences(String str, String patternCall) {
+		String patternSeqEnd = "(" + patternCall + ";)";
+
+		ArrayList<String> subSequences = new ArrayList<String>();
+
+		Matcher matcher = Pattern.compile(patternSeqEnd).matcher(str);
+		int prevEnd = 0;
+
+		while (matcher.find()) {
+			String group = matcher.group();
+			if (!group.isEmpty()) {
+				subSequences.add(str.substring(prevEnd, matcher.end()).trim());
+				prevEnd = matcher.end();
+			}
+		}
+		subSequences.add(str.substring(prevEnd).trim());
+
+		return subSequences.toArray(new String[subSequences.size()]);
+	}
+
+	public void parseAndEvaluate(String cmdline, OutputStream stdout)
+			throws AbstractApplicationException, ShellException {
+		Vector<String> cmdVector = new Vector<String>();
+
+		String patternNonKeyword = "[^\\n'\"`;|]+";
+		String patternQuoted =
+				"'[^\\n']*'|`[^\\n`]*`|\"(?:`[^\\n`]*`|[^\\n\"`]*)*\"";
+		String patternCall =
+				"(" + patternNonKeyword + "|" + patternQuoted + ")*";
+
+		String patternPipeEnd = "\\|(" + patternCall + ")";
+		String patternMultiplePipeEnd = patternPipeEnd + patternPipeEnd;
+
+		String[] subSequences = extractSubSequences(cmdline, patternCall);
+
+		for (int i = 0; i < subSequences.length; i++) {
+			String subCmdline = subSequences[i];
+
+			boolean hasMultiplePipes = Pattern.compile(patternMultiplePipeEnd)
+					.matcher(subCmdline)
+					.find();
+
+			boolean hasPipe = Pattern.compile(patternPipeEnd)
+					.matcher(subCmdline)
+					.find();
+
+			if (hasMultiplePipes) {
+				// pipeMultipleCommands(subCmdline);
+			} else if (hasPipe) {
+				// pipeTwoCommands(subCmdline);
+			} else {
+				CallCommand call = new CallCommand(subCmdline);
+				call.parse();
+				call.evaluate(null, stdout);
+			}
+		}
+	}
 
 	/**
 	 * Searches for and processes the commands enclosed by back quotes for
@@ -75,7 +136,7 @@ public class ShellImpl implements Shell {
 				// System.out.println("backquote" + bqStr);
 				OutputStream bqOutputStream = new ByteArrayOutputStream();
 				ShellImpl shell = new ShellImpl();
-				//shell.parseAndEvaluate(bqStr, bqOutputStream);
+				shell.parseAndEvaluate(bqStr, bqOutputStream);
 
 				ByteArrayOutputStream outByte = (ByteArrayOutputStream) bqOutputStream;
 				byte[] byteArray = outByte.toByteArray();
@@ -287,7 +348,7 @@ public class ShellImpl implements Shell {
 				if (("").equals(readLine)) {
 					continue;
 				}
-				//shell.parseAndEvaluate(readLine, System.out);
+				shell.parseAndEvaluate(readLine, System.out);
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
