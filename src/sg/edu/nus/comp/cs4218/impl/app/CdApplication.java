@@ -43,23 +43,20 @@ public class CdApplication implements Application {
 			String homeDirectoryString = System.getProperty("user.home");
 			System.setProperty("user.dir", homeDirectoryString);
 		} else {
-			String filePathString = args[0];
-			File file = new File(filePathString);
-			if (file.isAbsolute()) {
-				throwIfInvalidDirectory(file);
-				System.setProperty("user.dir", filePathString);
+			String targetDirectoryPathString = args[0];
+			File targetDirectory = new File(targetDirectoryPathString);
+			if (targetDirectory.isAbsolute()) {
+				throwIfInvalidDirectory(targetDirectory);
+				System.setProperty("user.dir", targetDirectoryPathString);
 			} else {
-				String currentWorkingDirectoryString = System.getProperty("user.dir");
-				File currentWorkingDirectoryFile = new File(currentWorkingDirectoryString);
-				File newWorkingDirectoryFile = new File(currentWorkingDirectoryFile,
-						filePathString);
-				throwIfInvalidDirectory(file);
-				String newWorkingDirectoryFileString = newWorkingDirectoryFile.getPath();
+				// Do some processing to get an absolute path from the given string
+				String newWorkingDirectoryFileString =
+						getAbsoluteDirectoryPathFromRelativePath(targetDirectoryPathString);
 				System.setProperty("user.dir", newWorkingDirectoryFileString);
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks if a file is a valid directory.
 	 * 
@@ -72,5 +69,25 @@ public class CdApplication implements Application {
 		if (!file.isDirectory()) {
 			throw new CdException("String given is an invalid directory.");
 		}
+	}
+
+	/**
+	 * Obtain an absolute directory path from the current working directory
+	 * given a string representing a relative path.
+	 *
+	 * @param relativePathString
+	 *            The string representing a relative path
+	 * @return The string representing the absolute path of the directory
+	 * @throws CdException
+	 *             If the file is not a valid directory
+	 */
+	private String getAbsoluteDirectoryPathFromRelativePath(String relativePathString)
+			throws CdException {
+		String currentWorkingDirectoryString = System.getProperty("user.dir");
+		File currentWorkingDirectory = new File(currentWorkingDirectoryString);
+		File absolutePathDirectory = new File(currentWorkingDirectory,
+				relativePathString);
+		throwIfInvalidDirectory(absolutePathDirectory);
+		return absolutePathDirectory.getPath();
 	}
 }
