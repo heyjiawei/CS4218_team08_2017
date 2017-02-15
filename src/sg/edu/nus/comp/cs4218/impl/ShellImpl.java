@@ -1,8 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,52 +38,80 @@ public class ShellImpl implements Shell {
 	public static final String EXP_STDOUT = "Error writing to stdout.";
 	public static final String EXP_NOT_SUPPORTED = " not supported yet";
 
-	private String[] extractSubSequences(String str, String patternCall) {
-		String patternSeqEnd = "(" + patternCall + ";)";
-
-		ArrayList<String> subSequences = new ArrayList<String>();
-
-		Matcher matcher = Pattern.compile(patternSeqEnd).matcher(str);
-		int prevEnd = 0;
-
-		while (matcher.find()) {
-			String group = matcher.group();
-			if (!group.isEmpty()) {
-				subSequences.add(str.substring(prevEnd, matcher.end()).trim());
-				prevEnd = matcher.end();
-			}
+	private void evaluateSubsequence(String subsequence, boolean hasPipe, OutputStream stdout)
+			throws AbstractApplicationException, ShellException{
+		if (hasPipe) {
+			// pipeMultipleCommands(subsequence);
+		} else {
+			CallCommand call = new CallCommand(subsequence);
+			call.parse();
+			call.evaluate(System.in, stdout);
 		}
-		subSequences.add(str.substring(prevEnd).trim());
-
-		return subSequences.toArray(new String[subSequences.size()]);
 	}
 
 	public void parseAndEvaluate(String cmdline, OutputStream stdout)
 			throws AbstractApplicationException, ShellException {
-		String patternNonKeyword = "[^\\n'\"`;|]+";
-		String patternQuoted =
-				"'[^\\n']*'|`[^\\n`]*`|\"(?:`[^\\n`]*`|[^\\n\"`]*)*\"";
-		String patternCall =
-				"(" + patternNonKeyword + "|" + patternQuoted + ")*";
+		String patternNonKeyword = "\\s*[^\\n'\"`;|]+\\s*";
+		String patternSQ = "\\s*'[^\n']*'\\s*";
+		String patternBQ = "\\s*`[^\\n`]*`\\s*";
+		String patternDQ = "\\s*\"[^\\n\"`]*\"\\s*"; // Double quoted content
+		String patternBQinDQ = "\\s*\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\"\\s*";
 
-		String patternPipeEnd = "\\|(" + patternCall + ")";
+		// Preserve order for performance
+		Pattern[] callCommandPatterns = {
+				Pattern.compile(patternNonKeyword),
+				Pattern.compile(patternSQ),
+				Pattern.compile(patternBQ),
+				Pattern.compile(patternDQ),
+				Pattern.compile(patternBQinDQ)
+		};
+		String substring = cmdline, subsequence = "";
+		int smallestStartIdx = 0, newEndIdx = 0;
+		boolean hasPipe = false;
 
-		String[] subSequences = extractSubSequences(cmdline, patternCall);
+		while (smallestStartIdx != -1) {
+			smallestStartIdx = -1;
 
-		for (int i = 0; i < subSequences.length; i++) {
-			String subCmdline = subSequences[i];
+			if (substring.trim().startsWith("|")) { // detected pipe operator
+				hasPipe = true;
 
-			boolean hasPipe = Pattern.compile(patternPipeEnd)
-					.matcher(subCmdline)
-					.find();
+				// move "|" from substring to subsequence
+				subsequence = subsequence + "|";
+				substring = substring.substring(1);
+			} else if (substring.trim().startsWith(";")) { // detected semicolon operator
+				evaluateSubsequence(subsequence, hasPipe, stdout);
 
-			if (hasPipe) {
-				// pipeMultipleCommands(subCmdline);
-			} else {
-				CallCommand call = new CallCommand(subCmdline);
-				call.parse();
-				call.evaluate(System.in, stdout);
+				// reset values since it is now a new sequence
+				hasPipe = false;
+				subsequence = "";
+				substring = substring.substring(1);
 			}
+
+			for (Pattern pattern: callCommandPatterns) {
+				Matcher matcher = pattern.matcher(substring);
+				if (matcher.find()
+						&& (matcher.start() < smallestStartIdx || smallestStartIdx == -1)) {
+					smallestStartIdx = matcher.start();
+					newEndIdx = matcher.end();
+
+					if (smallestStartIdx == 0) break;
+				}
+			}
+
+			if (smallestStartIdx != -1) {
+				if (smallestStartIdx != 0) {
+					throw new ShellException(ShellImpl.EXP_SYNTAX);
+				}
+
+				subsequence += substring.substring(0, newEndIdx);
+				substring = substring.substring(newEndIdx);
+			}
+		}
+
+		evaluateSubsequence(subsequence, hasPipe, stdout);
+
+		if (substring.trim().length() > 0) {
+			throw new ShellException(ShellImpl.EXP_SYNTAX);
 		}
 	}
 
@@ -346,7 +372,7 @@ public class ShellImpl implements Shell {
 				if (readLine == null) {
 					break;
 				}
-				if (("").equals(readLine)) {
+				if (("").equals(readLine.trim())) {
 					continue;
 				}
 				shell.parseAndEvaluate(readLine, System.out);
