@@ -24,7 +24,8 @@ public class CdApplication implements Application {
 	 * Runs the cd application with the specified arguments.
 	 * 
 	 * @param args
-	 *            Array of arguments for the application.
+	 *            Array of arguments for the application. Only the first argument, which
+	 *            is assumed to be the file path string to change directory to, is used.
 	 * @param stdin
 	 *            An InputStream, not used.
 	 * @param stdout
