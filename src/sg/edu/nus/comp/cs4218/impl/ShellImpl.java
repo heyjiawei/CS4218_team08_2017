@@ -62,8 +62,6 @@ public class ShellImpl implements Shell {
 
 	public void parseAndEvaluate(String cmdline, OutputStream stdout)
 			throws AbstractApplicationException, ShellException {
-		Vector<String> cmdVector = new Vector<String>();
-
 		String patternNonKeyword = "[^\\n'\"`;|]+";
 		String patternQuoted =
 				"'[^\\n']*'|`[^\\n`]*`|\"(?:`[^\\n`]*`|[^\\n\"`]*)*\"";
@@ -71,29 +69,22 @@ public class ShellImpl implements Shell {
 				"(" + patternNonKeyword + "|" + patternQuoted + ")*";
 
 		String patternPipeEnd = "\\|(" + patternCall + ")";
-		String patternMultiplePipeEnd = patternPipeEnd + patternPipeEnd;
 
 		String[] subSequences = extractSubSequences(cmdline, patternCall);
 
 		for (int i = 0; i < subSequences.length; i++) {
 			String subCmdline = subSequences[i];
 
-			boolean hasMultiplePipes = Pattern.compile(patternMultiplePipeEnd)
-					.matcher(subCmdline)
-					.find();
-
 			boolean hasPipe = Pattern.compile(patternPipeEnd)
 					.matcher(subCmdline)
 					.find();
 
-			if (hasMultiplePipes) {
+			if (hasPipe) {
 				// pipeMultipleCommands(subCmdline);
-			} else if (hasPipe) {
-				// pipeTwoCommands(subCmdline);
 			} else {
 				CallCommand call = new CallCommand(subCmdline);
 				call.parse();
-				call.evaluate(null, stdout);
+				call.evaluate(System.in, stdout);
 			}
 		}
 	}
