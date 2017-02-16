@@ -85,7 +85,8 @@ public class CatApplication implements Application {
 						stdout.write(byteFileArray);
 					} catch (IOException e) {
 						throw new CatException(
-								"Could not write to output stream");
+								"Could not read from file or "
+								+ "could not write to output stream");
 					}
 				}
 			}
