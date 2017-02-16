@@ -205,9 +205,11 @@ public class HeadApplication implements Application {
 	private void printLinesFromBufferedReaderToOutputStream(int numberOfLines,
 			BufferedReader bufferedReader, OutputStream stdout) throws IOException {
 		String lineToPrint;
+		String newLine = System.getProperty("line.separator");
 	    for (int i = 0; i < numberOfLines; i++) {
 			if ((lineToPrint = bufferedReader.readLine()) != null) {
 				stdout.write(lineToPrint.getBytes());
+				stdout.write(newLine.getBytes());
 			} else {
 				break;
 			}
