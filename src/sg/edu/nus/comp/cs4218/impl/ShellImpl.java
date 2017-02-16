@@ -19,6 +19,7 @@ import sg.edu.nus.comp.cs4218.impl.app.SedApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
+import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 
 /**
  * A Shell is a command interpreter and forms the backbone of the entire
@@ -45,12 +46,19 @@ public class ShellImpl implements Shell {
 	private void evaluateSubsequence(String subsequence, boolean hasPipe, OutputStream stdout)
 			throws AbstractApplicationException, ShellException{
 		if (hasPipe) {
-			// pipeMultipleCommands(subsequence);
+			 pipeMultipleCommands(subsequence, stdout);
 		} else {
 			CallCommand call = new CallCommand(subsequence);
 			call.parse();
 			call.evaluate(System.in, stdout);
 		}
+	}
+
+	private void pipeMultipleCommands(String subsequence, OutputStream stdout) throws AbstractApplicationException, ShellException {
+		PipeCommand call = new PipeCommand(subsequence);
+		call.parse();
+		call.evaluate(System.in, stdout);
+		
 	}
 
 	private Pattern[] getCallCommandPatterns() {
