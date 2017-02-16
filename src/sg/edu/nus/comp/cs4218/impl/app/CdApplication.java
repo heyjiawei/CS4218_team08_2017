@@ -40,12 +40,20 @@ public class CdApplication implements Application {
 		if (args == null) {
 			throw new CdException("Null arguments");
 		}
+		String homeDirectoryString = System.getProperty("user.home");
+
 		// Go to $HOME directory if no arguments (like in standard shell)
 		if (args.length == 0) {
-			String homeDirectoryString = System.getProperty("user.home");
 			changeWorkingDirectoryAndUpdateEnvironment(homeDirectoryString);
 		} else {
 			String targetDirectoryPathString = args[0];
+
+			// handle tilde at the start of the file path
+			if (targetDirectoryPathString.startsWith("~")) {
+				targetDirectoryPathString = homeDirectoryString +
+						targetDirectoryPathString.substring(1);
+			}
+
 			File targetDirectory = new File(targetDirectoryPathString);
 			if (targetDirectory.isAbsolute()) {
 				throwIfInvalidDirectory(targetDirectory);
