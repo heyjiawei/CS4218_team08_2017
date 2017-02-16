@@ -35,6 +35,8 @@ public class PwdApplication implements Application {
 		try {
 			String currentWorkingDirectoryString = System.getProperty("user.dir");
 			stdout.write(currentWorkingDirectoryString.getBytes());
+			String newLine = System.getProperty("line.separator");
+			stdout.write(newLine.getBytes());
 		} catch (IOException e) {
 			throw new PwdException("IOException");
 		}
