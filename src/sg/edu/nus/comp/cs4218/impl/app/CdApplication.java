@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -101,8 +102,16 @@ public class CdApplication implements Application {
 	 *            directory to
 	 */
 	private void changeWorkingDirectoryAndUpdateEnvironment(
-			String newWorkingDirectoryPathString) {
-		System.setProperty("user.dir", newWorkingDirectoryPathString);
-		Environment.currentDirectory = newWorkingDirectoryPathString;
+			String newWorkingDirectoryPathString) throws CdException {
+		// get the canonical string
+		String canonicalPathString;
+		try {
+			canonicalPathString = new File(newWorkingDirectoryPathString).getCanonicalPath();
+		} catch (IOException e) {
+			throw new CdException("IOException: Invalid path string");
+		}
+
+		System.setProperty("user.dir", canonicalPathString);
+		Environment.currentDirectory = canonicalPathString;
 	}
 }
