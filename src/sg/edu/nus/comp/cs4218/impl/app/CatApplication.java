@@ -78,7 +78,7 @@ public class CatApplication implements Application {
 
 			// file could be read. perform cat command
 			if (filePathList.size() != 0) {
-				for (int j = 0; j < filePathList.size() - 1; j++) {
+				for (int j = 0; j < filePathList.size(); j++) {
 					try {
 						byte[] byteFileArray = Files
 								.readAllBytes(filePathList.get(j));
@@ -89,7 +89,13 @@ public class CatApplication implements Application {
 					}
 				}
 			}
-
+			try {
+				String newLine = System.getProperty("line.separator");
+				stdout.write(newLine.getBytes());
+			} catch (IOException e) {
+				throw new CatException(
+						"Could not write to output stream");
+			}
 		}
 	}
 
