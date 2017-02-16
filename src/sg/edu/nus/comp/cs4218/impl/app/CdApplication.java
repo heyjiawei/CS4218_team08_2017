@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import sg.edu.nus.comp.cs4218.Application;
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
 /**
@@ -41,18 +42,18 @@ public class CdApplication implements Application {
 		// Go to $HOME directory if no arguments (like in standard shell)
 		if (args.length == 0) {
 			String homeDirectoryString = System.getProperty("user.home");
-			System.setProperty("user.dir", homeDirectoryString);
+			changeWorkingDirectoryAndUpdateEnvironment(homeDirectoryString);
 		} else {
 			String targetDirectoryPathString = args[0];
 			File targetDirectory = new File(targetDirectoryPathString);
 			if (targetDirectory.isAbsolute()) {
 				throwIfInvalidDirectory(targetDirectory);
-				System.setProperty("user.dir", targetDirectoryPathString);
+				changeWorkingDirectoryAndUpdateEnvironment(targetDirectoryPathString);
 			} else {
 				// Do some processing to get an absolute path from the given string
 				String newWorkingDirectoryFileString =
 						getAbsoluteDirectoryPathFromRelativePath(targetDirectoryPathString);
-				System.setProperty("user.dir", newWorkingDirectoryFileString);
+				changeWorkingDirectoryAndUpdateEnvironment(newWorkingDirectoryFileString);
 			}
 		}
 	}
@@ -89,5 +90,19 @@ public class CdApplication implements Application {
 				relativePathString);
 		throwIfInvalidDirectory(absolutePathDirectory);
 		return absolutePathDirectory.getPath();
+	}
+
+	/**
+	 * Changes the current working directory and updates the relevant
+	 * Environment variable appropriately.
+	 *
+	 * @param newWorkingDirectoryPathStrin
+	 *            The string representing the path to change the working
+	 *            directory to
+	 */
+	private void changeWorkingDirectoryAndUpdateEnvironment(
+			String newWorkingDirectoryPathString) {
+		System.setProperty("user.dir", newWorkingDirectoryPathString);
+		Environment.currentDirectory = newWorkingDirectoryPathString;
 	}
 }
