@@ -41,15 +41,46 @@ public class PipeCommandTest {
 	public void tearDown() throws Exception {
 	}
 
+	
 	@Test
-	public void test() throws AbstractApplicationException, ShellException {
-		String cmd = "echo \"cd\" | grep c";
+	public void testPipeOne() throws AbstractApplicationException, ShellException {
+		String cmd = "echo \"cd\" | wc";
 		
 		shell.parseAndEvaluate(cmd, outputStream);
 		
 		output = outputStream.toString();
 		
-		assertEquals("cd", output);
+		assertEquals("3 1 1", output);
+	}
+	
+	@Test
+	public void testSplitCommand() throws AbstractApplicationException, ShellException {
+		String cmd = "echo \"cd\" | grep c";
+		PipeCommand pipeCommand = new PipeCommand(cmd);
+		pipeCommand.parse();
+		
+		assertEquals("echo \"cd\"", pipeCommand.firstSequence);
+		assertEquals("grep c", pipeCommand.restSequence);
+
+	}
+	
+	@Test
+	public void testFindPipeOperatorPos() throws AbstractApplicationException, ShellException {
+		String cmd = "echo \"cd\" | grep c";
+		int firstPipeOpPos = PipeCommand.findFirstPipeOperatorPosition(cmd);
+		assertEquals(10, firstPipeOpPos);
+		
+		cmd = "echo \"c|d\" | grep c";
+		firstPipeOpPos = PipeCommand.findFirstPipeOperatorPosition(cmd);
+		assertEquals(11, firstPipeOpPos);
+		
+		cmd = "echo \"c|d\"";
+		firstPipeOpPos = PipeCommand.findFirstPipeOperatorPosition(cmd);
+		assertEquals(-1, firstPipeOpPos);
+		
+		cmd = "echo 'c|d' | grep c";
+		firstPipeOpPos = PipeCommand.findFirstPipeOperatorPosition(cmd);
+		assertEquals(11, firstPipeOpPos);
 		
 
 	}
