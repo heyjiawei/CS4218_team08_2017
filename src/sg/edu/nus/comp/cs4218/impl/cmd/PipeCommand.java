@@ -36,10 +36,18 @@ public class PipeCommand implements Command {
 		ByteArrayInputStream inForRest = new ByteArrayInputStream(firstOutputStream.toByteArray());
 		
 		System.out.println(restSequence);
-		CallCommand call2 = new CallCommand(restSequence);
-		call2.parse();
-		call2.evaluate(inForRest, stdout);
 		
+		int nextPipeOpPos = findFirstPipeOperatorPosition(restSequence);
+		if (nextPipeOpPos != -1) {
+			// recursively execute pipe command
+			PipeCommand call2 = new PipeCommand(restSequence);
+			call2.parse();
+			call2.evaluate(inForRest, stdout);
+		} else {
+			CallCommand call2 = new CallCommand(restSequence);
+			call2.parse();
+			call2.evaluate(inForRest, stdout);
+		}
 	}
 	
 	static String convertStreamToString(InputStream is) {

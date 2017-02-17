@@ -54,6 +54,17 @@ public class PipeCommandTest {
 	}
 	
 	@Test
+	public void testPipeTwo() throws AbstractApplicationException, ShellException {
+		String cmd = "echo \"cd\" | head | tail";
+		
+		shell.parseAndEvaluate(cmd, outputStream);
+		
+		output = outputStream.toString();
+		
+		assertEquals("cd\n", output);
+	}
+	
+	@Test
 	public void testSplitCommand() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | grep c";
 		PipeCommand pipeCommand = new PipeCommand(cmd);
@@ -61,6 +72,14 @@ public class PipeCommandTest {
 		
 		assertEquals("echo \"cd\"", pipeCommand.firstSequence);
 		assertEquals("grep c", pipeCommand.restSequence);
+		
+		
+		cmd = "echo \"test\" | cat | cat";
+		pipeCommand = new PipeCommand(cmd);
+		pipeCommand.parse();
+		
+		assertEquals("echo \"test\"", pipeCommand.firstSequence);
+		assertEquals("cat | cat", pipeCommand.restSequence);
 
 	}
 	
