@@ -16,6 +16,9 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 public class WcApplication implements Wc {
+	private int charCount = 0;
+	private int wordCount = 0;
+	private int lineCount = 0;
 
 	/**
 	 * Runs application with specified input data and specified output stream.
@@ -23,38 +26,21 @@ public class WcApplication implements Wc {
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) 
 			throws AbstractApplicationException {
-		// TODO Auto-generated method stub
-		/*
-		 * 1 Check for args.length > 0
-		 * 2 check stdin != null
-		 * 3 check stdout != null
-		 * 4 check for invalid command
-		 * 5 create var count
-		 * 6 if else to send args and/or stdin to relevant function
-		 * 7 append results to count var
-		 * 8 write to stdout
-		 */
 		if (stdout == null) {
 			throw new WcException("No output stream provided");
 		}
 		if (stdin == null) {
-			// is the checking of stdin == null necessary?
-			// Will there be a case InputStream will not be passed?
 			throw new WcException("No input stream provided");
 		}
-		// Check if filename is provided
-		// 1 check if args length > 1
-		// 2 assume last position in args[] contain filename
-		// 3 check that it is a file (isfile)
-		// throw error if file cannot be found
-		String countStr = "";
-		if (isFilenameProvided(args)) {
-			if (isFileDirectoryValid(args)) {
-				countStr = getCount(args, null, false);
-			}
 		
-		} else if (!isInputStreamEmpty(stdin)) {
-			countStr = getCount(args, stdin, true);
+		String countStr = "";
+		boolean[] options = optionsSeparator(args);
+		if (isFileDirectoryValid(args)) {
+			countStr = callOption(args, options, null, false);
+		}
+		
+		if (!isInputStreamEmpty(stdin)) {
+			countStr = callOption(args, options, stdin, true);
 			
 		} else {
 			throw new WcException("No input detected. Please add file(s) or ensure stdin is not empty");
@@ -143,15 +129,9 @@ public class WcApplication implements Wc {
 		return options;
 	}
 
-	/**
-	 * Naively assume that filename is in last arg position
-	 * @param args
-	 * @param stdin
-	 * @param isStdin
-	 * @return
-	 * @throws WcException
-	 */
-	private String getCount(String[] args, InputStream stdin, boolean isStdin) throws WcException {
+	
+	private String callOption(String[] args, boolean[] options, 
+								InputStream stdin, boolean isStdin) throws WcException {
 		// TODO Auto-generated method stub
 		/*
 		 * Reads the options, calls the necessary function
@@ -163,29 +143,40 @@ public class WcApplication implements Wc {
 		 * append to countStr
 		 * 2. remove trailing whitespaces from countStr before returning countStr
 		 */
-		boolean[] options = optionsSeparator(args);
+//		boolean[] options = optionsSeparator(args);
+		String commandLine = "";
 		String countStr = "";
+		for (int i = 0; i < args.length; i++) {
+			commandLine += args[i] + " ";
+		}
+		commandLine.trim();
+		
 		if (isStdin) {
+			if (!Arrays.asList(options).contains(false)) {
+				countStr = printAllCountsInStdin(commandLine, stdin);
+			}
 			if (options[0]) { // -m
-				countStr += printCharacterCountInStdin(stdin) + " ";
+				countStr += printCharacterCountInStdin(commandLine, stdin) + " ";
 			} 
 			if (options[1]) { // -w
-				countStr += printWordCountInStdin(stdin) + " ";
+				countStr += printWordCountInStdin(commandLine, stdin) + " ";
 			}
 			if (options[2]) { // -l
-				countStr += printNewlineCountInStdin(stdin);
+				countStr += printNewlineCountInStdin(commandLine, stdin);
 			}
 
 		} else {
-			String filename = args[args.length-1];
+			if (!Arrays.asList(options).contains(false)) {
+				countStr = printAllCountsInStdin(commandLine, stdin);
+			}
 			if (options[0]) { // -m
-				countStr += printCharacterCountInFile(filename) + " ";
+				countStr += printCharacterCountInFile(commandLine) + " ";
 			} 
 			if (options[1]) { // -w
-				countStr += printWordCountInFile(filename) + " ";
+				countStr += printWordCountInFile(commandLine) + " ";
 			}
 			if (options[2]) { // -l
-				countStr += printNewlineCountInFile(filename);
+				countStr += printNewlineCountInFile(commandLine);
 			}
 		}
 		return countStr.trim();
@@ -204,41 +195,19 @@ public class WcApplication implements Wc {
 		}
 		return false;
 	}
-
-	/**
-	 * Naive implementation of checking if arguments contain filename
-	 * Currently assumes that last arg is filename
-	 * Uses "." to check if a file is provided
-	 * @param args
-	 * @return
-	 */
-	private boolean isFilenameProvided(String[] args) {
-		// TODO Auto-generated method stub
-		// Check if args length is correct for command with filename
-		// 
-		// 1 check if args length > 1
-		// 2 assume last position in args[] contain filename
-		// 3 check that it is a file (isfile)
-		// throw error if file cannot be found
-		/*
-		 * testing considerations:
-		 * wc _ _ where filename has a space character (wrong filename)
-		 * but the last _ is a legit filename
-		 * wc 'test 2.txt' should work for filename test 2.txt
-		 * wc test q1.txt where q1.txt exist
-		 * wc _ filename with space character escaped (correct filename)
-		 */
-		if (args.length > 1) {
-			String filename = args[args.length-1];
-			if (filename.contains(".")) {
-				return true;
-			}
-		}
-		return false;
-	}
 	
+	// TODO handle "this bad file.txt"
 	private boolean isFileDirectoryValid(String[] args) throws WcException {
 		// Check if filename or directory is valid
+		// check if args length >= 1
+		// check if the args[args.length-1] contains " or ' => filename with space
+		// loop backwards to check for " or ' => start of filename
+		// wc -l "this bad filename".txt
+		// check if args[args.length-1] is a valid file
+		
+		if (args.length == 0) {
+			return false;
+		} 
 		String filename = args[args.length-1];
 		File tmpDir = new File(filename);
 	    boolean isDir = tmpDir.exists() && tmpDir.isDirectory();
@@ -249,7 +218,8 @@ public class WcApplication implements Wc {
 	    if (isDir || isFile) {
 	    	return true;
 	    } else {
-	    	throw new WcException("No such file or directory");
+//	    	throw new WcException("No such file or directory");
+	    	return false;
 	    }
 	}
 
@@ -259,6 +229,31 @@ public class WcApplication implements Wc {
 		String[] parts = args.split(" ");
 		return parts[parts.length - 1];
 	}
+	
+	private void processCountInFile(String input) {
+		String filename = getFilename(input);
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				this.charCount += line.getBytes().length;
+				this.lineCount++;
+				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].length() > 0) {
+						this.wordCount += 1;
+					}
+				}
+			}
+			reader.close();
+			this.lineCount -= 1;
+			this.charCount += this.lineCount;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Returns string containing the character count in file
@@ -266,29 +261,8 @@ public class WcApplication implements Wc {
 	 */
 	@Override
 	public String printCharacterCountInFile(String args) {
-		// TODO Auto-generated method stub
-		/*
-		 * should receive arg: wc -m filename.txt
-		 * 1 retrieve filename
-		 * 2 count character in file
-		 * 3 print out character count
-		 */
-		String filename = getFilename(args);
-		int charCount = 0;
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				charCount += line.getBytes().length + 1;
-			}
-			reader.close();
-			charCount -= 1;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return String.valueOf(charCount);
+		processCountInFile(args);
+		return String.valueOf(this.charCount);
 	}
 
 	/**
@@ -297,27 +271,8 @@ public class WcApplication implements Wc {
 	 */
 	@Override
 	public String printWordCountInFile(String args) {
-		// TODO Auto-generated method stub
-		String filename = getFilename(args);
-		int wordCount = 0;
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				String[] parts = line.replaceAll("\\s+", " ").split(" ");
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].length() > 0) {
-						wordCount += 1;
-					}
-				}
-			}
-			reader.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return String.valueOf(wordCount);
+		processCountInFile(args);
+		return String.valueOf(this.wordCount);
 	}
 
 	/**
@@ -326,23 +281,8 @@ public class WcApplication implements Wc {
 	 */
 	@Override
 	public String printNewlineCountInFile(String args) {
-		// TODO Auto-generated method stub
-		String filename = getFilename(args);
-		int lineCount = 0;
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				lineCount ++;
-			}
-			reader.close();
-			lineCount -= 1;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return String.valueOf(lineCount);
+		processCountInFile(args);
+		return String.valueOf(this.lineCount);
 	}
 
 	/**
@@ -351,73 +291,52 @@ public class WcApplication implements Wc {
 	 */
 	@Override
 	public String printAllCountsInFile(String args) {
-		// TODO Auto-generated method stub
-		String countStr = "";
-		countStr += printCharacterCountInFile(args) + " ";
-		countStr += printWordCountInFile(args) + " ";
-		countStr += printNewlineCountInFile(args);
-		return countStr;
+		processCountInFile(args);
+		return this.charCount + " " + 
+				this.wordCount + " " +
+				this.lineCount;
 	}
-
-	/**
-	 * Returns string containing the character count in Stdin
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printCharacterCountInStdin(InputStream stdin) {
-		// TODO Auto-generated method stub
-		int charCount = 0;
-		try {
-			
-			while (stdin.read() > -1) {
-				charCount += 1;
-			}
-			stdin.close();
-			stdin.reset();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		charCount++;
-		return String.valueOf(charCount);
-	}
-
-	/**
-	 * Returns string containing the word count in Stdin
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printWordCountInStdin(InputStream stdin) {
-		// TODO Auto-generated method stub
-		int wordCount = 0;
-		Scanner scanner = new Scanner(stdin);
-		scanner.useDelimiter("\\s+");
-		while (scanner.hasNext()) {
-			wordCount++;
-			scanner.next();
-		}
-		scanner.close();
-		return String.valueOf(wordCount);
-	}
-
-	/**
-	 * Returns string containing the newline count in Stdin
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printNewlineCountInStdin(InputStream stdin) {
-		// TODO Auto-generated method stub
+	
+//	private String removeOptions(String args) {
+//		int lineStartPos = -1;
+//		String[] parts = args.split(" ");
+//		for (int i = 0; i < parts.length; i++) {
+//			if (parts[i].indexOf('-') == 0) {
+//				continue;
+//			} else {
+//				lineStartPos = i;
+//				break;
+//			}
+//		}
+//		
+//		String line = "";
+//		for (int i = lineStartPos; i < parts.length; i++) {
+//			line += parts[i] + " ";
+//		}
+//		return line.trim();
+//	}
+	
+	private void processCountInStdin(InputStream stdin) {
 		BufferedInputStream is = new BufferedInputStream(stdin);
 		byte[] c = new byte[1024];
-        int lineCount = 0;
         int readChars = 0;
 		try {
 			while ((readChars = is.read(c)) != -1) {
-				for (int i = 0; i < readChars; ++i) {
-	                if (c[i] == '\n') {
-	                    lineCount++;
-	                }
-	            }
+				String line = new String(c, 0, readChars);
+				this.charCount += line.length();
+				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+				
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].length() > 0) {
+						this.wordCount++;
+					}
+				}
+				
+				int pos = -1;
+				while ((pos = line.indexOf("\n")) != -1) {
+					this.lineCount++;
+					line = line.substring(pos + 1);
+				}
 			}
 			is.close();
 			stdin.reset();
@@ -425,29 +344,52 @@ public class WcApplication implements Wc {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return String.valueOf(lineCount);
+	}
+
+	/**
+	 * Returns string containing the character count in Stdin
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
+	 */
+	@Override
+	public String printCharacterCountInStdin(String args, InputStream stdin) {
+		processCountInStdin(stdin);
+		return String.valueOf(this.charCount);
+	}
+
+	/**
+	 * Returns string containing the word count in Stdin
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
+	 */
+	@Override
+	public String printWordCountInStdin(String args, InputStream stdin) {
+		processCountInStdin(stdin);
+		return String.valueOf(this.wordCount);
+	}
+
+	/**
+	 * Returns string containing the newline count in Stdin
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
+	 */
+	@Override
+	public String printNewlineCountInStdin(String args, InputStream stdin) {
+		processCountInStdin(stdin);
+		return String.valueOf(this.lineCount);
 	}
 
 	/**
 	 * Returns string containing all counts in Stdin
 	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
 	@Override
-	public String printAllCountsInStdin(InputStream stdin) { 
-		// TODO Auto-generated method stub
-		int charCount = 0;
-		int wordCount = 0;
-		int lineCount = 0;
-		Scanner scanner = new Scanner(stdin);
-		String line;
-		while (scanner.hasNextLine()) {
-			line = scanner.nextLine();
-			charCount += line.length() + 1;
-			wordCount += line.split(" ").length;
-			lineCount++;
-			
-		}
-		return charCount + " " + wordCount + " " + lineCount;
+	public String printAllCountsInStdin(String args, InputStream stdin) { 
+		processCountInStdin(stdin);
+		return this.charCount + " " + 
+				this.wordCount + " " + 
+				this.lineCount;
 	}
 
 }
