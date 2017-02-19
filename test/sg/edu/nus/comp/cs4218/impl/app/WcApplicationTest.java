@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.WcException;
 
 public class WcApplicationTest {
 	WcApplication wcApp;
@@ -89,86 +90,106 @@ public class WcApplicationTest {
 		assertEquals("31 6 4", count);
 	}
 	
-//	@Test
-//	public void testSingleOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-m", "test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31", new String(byteArray));
-////		String charCount = wcApp.printCharacterCountInFile("wc -m testDir1/testDir2/test.txt");
-//	}
-//	
-//	@Test
-//	public void testJoinedOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-lm", "test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31 4", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testDisjointedAllOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-wl", "-m", "test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31 6 4", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testNoOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31 6 4", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testSingleOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("how many \n lines here \n do you see?".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-l"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("2", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testJoinedOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-lm"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("33 2", new String(byteArray));
-//	}
-//
-//	@Test
-//	public void testDisjointedAllOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc", "-wm", "-l"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("34 6 2", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testNoOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("34 6 2", new String(byteArray));
-//		
-//	}
+	@Test
+	public void testSingleOptionSimpleFile() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-m", "test.txt"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("31", new String(byteArray));
+//		String charCount = wcApp.printCharacterCountInFile("wc -m testDir1/testDir2/test.txt");
+	}
 	
+	@Test
+	public void testJoinedOptionSimpleFile() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-lm", "test.txt"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("31 4", new String(byteArray));
+	}
+	
+	@Test
+	public void testDisjointedAllOptionSimpleFile() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-wl", "-m", "test.txt"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("31 6 4", new String(byteArray));
+	}
+	
+	@Test
+	public void testNoOptionSimpleFile() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"test.txt"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("31 6 4", new String(byteArray));
+	}
+	
+	@Test
+	public void testSingleOptionStdin() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("how many \n lines here \n do you see?".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-l"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("2", new String(byteArray));
+	}
+	
+	@Test
+	public void testJoinedOptionStdin() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-lm"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("33 2", new String(byteArray));
+	}
+
+	@Test
+	public void testDisjointedAllOptionStdin() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-wm", "-l"}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("33 6 2", new String(byteArray));
+	}
+	
+	@Test
+	public void testNoOptionStdin() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{}, in, out);
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		
+		assertEquals("33 6 2", new String(byteArray));
+		
+	}
+	
+	@Test (expected = WcException.class)
+	public void testNoStdinInputProvided() throws Exception {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{}, in, out);
+	}
+	
+	@Test (expected = WcException.class)
+	public void testInvalidFileName() throws Exception {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-l", "this test.txt"}, in, out);
+	}
+	
+	@Test (expected = WcException.class)
+	public void testInvalidOptions() throws Exception {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		wcApp.run(new String[]{"-lm -c", "test.txt"}, in, out);
+	}
 }

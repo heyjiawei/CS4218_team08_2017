@@ -19,6 +19,7 @@ public class WcApplication implements Wc {
 	private int charCount = 0;
 	private int wordCount = 0;
 	private int lineCount = 0;
+	private boolean isCountProcessed = false;
 
 	/**
 	 * Runs application with specified input data and specified output stream.
@@ -37,9 +38,8 @@ public class WcApplication implements Wc {
 		boolean[] options = optionsSeparator(args);
 		if (isFileDirectoryValid(args)) {
 			countStr = callOption(args, options, null, false);
-		}
-		
-		if (!isInputStreamEmpty(stdin)) {
+			
+		} else if (!isInputStreamEmpty(stdin)) {
 			countStr = callOption(args, options, stdin, true);
 			
 		} else {
@@ -82,7 +82,7 @@ public class WcApplication implements Wc {
 		 */
 		boolean[] options = new boolean[3];
 		String command = "";
-		for (int i = 1; i < args.length; i++) {
+		for (int i = 0; i < args.length; i++) {
 			command += args[i] + " ";
 		}
 
@@ -152,9 +152,9 @@ public class WcApplication implements Wc {
 		commandLine.trim();
 		
 		if (isStdin) {
-			if (!Arrays.asList(options).contains(false)) {
-				countStr = printAllCountsInStdin(commandLine, stdin);
-			}
+//			if (!Arrays.asList(options).contains(false)) {
+//				countStr = printAllCountsInStdin(commandLine, stdin);
+//			}
 			if (options[0]) { // -m
 				countStr += printCharacterCountInStdin(commandLine, stdin) + " ";
 			} 
@@ -166,9 +166,9 @@ public class WcApplication implements Wc {
 			}
 
 		} else {
-			if (!Arrays.asList(options).contains(false)) {
-				countStr = printAllCountsInStdin(commandLine, stdin);
-			}
+//			if (!(Arrays.asList(options).contains(false))) {
+//				countStr = printAllCountsInStdin(commandLine, stdin);
+//			}
 			if (options[0]) { // -m
 				countStr += printCharacterCountInFile(commandLine) + " ";
 			} 
@@ -185,6 +185,7 @@ public class WcApplication implements Wc {
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
 			if (stdin.read() > -1) {
+				stdin.reset();
 				return false;
 			} else {
 				return true;
@@ -231,6 +232,9 @@ public class WcApplication implements Wc {
 	}
 	
 	private void processCountInFile(String input) {
+		if (this.isCountProcessed) {
+			return;
+		}
 		String filename = getFilename(input);
 		BufferedReader reader;
 		try {
@@ -249,6 +253,7 @@ public class WcApplication implements Wc {
 			reader.close();
 			this.lineCount -= 1;
 			this.charCount += this.lineCount;
+			this.isCountProcessed = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -317,6 +322,9 @@ public class WcApplication implements Wc {
 //	}
 	
 	private void processCountInStdin(InputStream stdin) {
+		if (this.isCountProcessed) {
+			return;
+		}
 		BufferedInputStream is = new BufferedInputStream(stdin);
 		byte[] c = new byte[1024];
         int readChars = 0;
@@ -340,6 +348,7 @@ public class WcApplication implements Wc {
 			}
 			is.close();
 			stdin.reset();
+			this.isCountProcessed = true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
