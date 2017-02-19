@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import sg.edu.nus.comp.cs4218.Application;
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.PwdException;
 
 /**
@@ -32,8 +33,11 @@ public class PwdApplication implements Application {
 	 */
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws PwdException {
+		if (stdout == null) {
+			throw new PwdException("No output stream provided");
+		}
 		try {
-			String currentWorkingDirectoryString = System.getProperty("user.dir");
+			String currentWorkingDirectoryString = Environment.currentDirectory;
 			stdout.write(currentWorkingDirectoryString.getBytes());
 			String newLine = System.getProperty("line.separator");
 			stdout.write(newLine.getBytes());
