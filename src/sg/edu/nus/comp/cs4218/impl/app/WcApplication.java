@@ -157,19 +157,18 @@ public class WcApplication implements Wc {
 				return true;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
+		return true;
 	}
 	
-	private boolean isFileDirectoryValid(String[] args) throws WcException {		
+	private boolean isFileDirectoryValid(String[] args) {		
 		if (args.length == 0) {
 			return false;
 		} 
 		this.filename = args[args.length-1];
 
-		File file = new File(filename);
+		File file = new File(this.filename);
 	    boolean isFile = file.exists() && file.isFile();
 	    
 	    if (isFile) {
