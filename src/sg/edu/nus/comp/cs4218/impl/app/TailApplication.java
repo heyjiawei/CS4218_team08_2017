@@ -76,13 +76,25 @@ public class TailApplication implements Application {
 			try {
 				numberOfLinesToPrint = Integer.parseInt(firstArgument);
 				
+				if (numberOfLinesToPrint < 0) {
+					throw new TailException("Illegal line count: "
+							+ numberOfLinesToPrint);
+				}
+
 				// assume first argument is number of lines to print
 				if (args.length > 1) {
 					// get path of file to read from
 					String filePathString = args[1];
-					
+
+					if (filePathString == null) {
+						throw new TailException("Second argument provided is null");
+					}
+
 					printLastNLinesFromFileToOutputStream(numberOfLinesToPrint,
 							filePathString, stdout);
+				} else {
+					printLastNLinesFromInputStreamToOutputStream(
+							numberOfLinesToPrint, stdin, stdout);
 				}
 			} catch (NumberFormatException e) {
 				// first argument is assumed to be the path of the file to read from

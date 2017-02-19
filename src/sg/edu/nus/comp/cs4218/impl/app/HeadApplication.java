@@ -75,13 +75,25 @@ public class HeadApplication implements Application {
 			try {
 				numberOfLinesToPrint = Integer.parseInt(firstArgument);
 				
+				if (numberOfLinesToPrint < 0) {
+					throw new HeadException("Illegal line count: "
+							+ numberOfLinesToPrint);
+				}
+
 				// assume first argument is number of lines to print
 				if (args.length > 1) {
 					// get path of file to read from
 					String filePathString = args[1];
-					
+
+					if (filePathString == null) {
+						throw new HeadException("Second argument provided is null");
+					}
+
 					printLinesFromFileToOutputStream(numberOfLinesToPrint,
 							filePathString, stdout);
+				} else {
+					printLinesFromInputStreamToOutputStream(numberOfLinesToPrint,
+							stdin, stdout);
 				}
 			} catch (NumberFormatException e) {
 				// first argument is assumed to be the path of the file to read from
