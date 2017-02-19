@@ -221,9 +221,11 @@ public class TailApplication implements Application {
 		String newLine = System.getProperty("line.separator");
 		Integer numberOfLinesThatWillBePrinted = lastNLines.size();
 		for (int i = 0; i < numberOfLinesThatWillBePrinted; i++) {
+			if (i != 0) {
+				stdout.write(newLine.getBytes());
+			}
 			lineToPrint = lastNLines.remove(0);
 			stdout.write(lineToPrint.getBytes());
-			stdout.write(newLine.getBytes());
 		}
 	}
 	

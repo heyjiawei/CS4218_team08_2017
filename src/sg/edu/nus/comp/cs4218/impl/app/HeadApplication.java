@@ -208,8 +208,10 @@ public class HeadApplication implements Application {
 		String newLine = System.getProperty("line.separator");
 	    for (int i = 0; i < numberOfLines; i++) {
 			if ((lineToPrint = bufferedReader.readLine()) != null) {
+				if (i != 0) {
+					stdout.write(newLine.getBytes());
+				}
 				stdout.write(lineToPrint.getBytes());
-				stdout.write(newLine.getBytes());
 			} else {
 				break;
 			}
