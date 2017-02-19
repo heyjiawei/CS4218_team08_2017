@@ -1,7 +1,14 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.app.Sed;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -32,6 +39,168 @@ public class SedApplication implements Sed {
 		 * (make sure replaced var is appended to stdout)
 		 */
 	}
+	
+//	private String getInputFromFile(String filename) {
+//		String line = "";
+//		String output = "";
+//		BufferedReader reader;
+//		try {
+//			reader = new BufferedReader(new FileReader(filename));
+//			while ((line = reader.readLine()) != null) {
+//				output += line;
+//			}
+//			reader.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return line;
+//	}
+	
+//	private String getInputFromStdin(InputStream stdin) {
+//		String line = "";
+//		BufferedInputStream is = new BufferedInputStream(stdin);
+//		byte[] c = new byte[1024];
+//        int readChars = 0;
+//		try {
+//			while ((readChars = is.read(c)) != -1) {
+//				line += new String(c, 0, readChars);
+//			}
+//			is.close();
+////			stdin.reset();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return line;
+//	}
+	
+	private String getDelimiter(String args) {
+		int indexOfS = args.indexOf('s');
+		return args.substring(indexOfS + 1, indexOfS + 2);
+	}
+	
+	private Pattern getRegexPattern(String args, String delimiter) {
+		String[] parts = args.split(delimiter);
+		return Pattern.compile(parts[1]);
+	}
+	
+	private String replaceFromStdin(String args, InputStream stdin, boolean isReplaceFirst) {
+		String output = "";
+		String line = "";
+		String delimiter = getDelimiter(args);
+		Pattern pattern = getRegexPattern(args, delimiter);
+		String replacement = args.split(delimiter)[2];
+		
+		BufferedInputStream is = new BufferedInputStream(stdin);
+		byte[] c = new byte[1024];
+        int readChars = 0;
+		try {
+			while ((readChars = is.read(c)) != -1) {
+				line = new String(c, 0, readChars);
+				String[] parts = line.split("\n");
+				
+				for (int i = 0; i < parts.length; i++) {
+					Matcher matcher = pattern.matcher(parts[i]);
+					if (isReplaceFirst) {
+						output += matcher.replaceFirst(replacement);
+					} else {
+						output += matcher.replaceAll(replacement);
+					}
+					
+					output += "\n";
+				}
+				
+				if (line.lastIndexOf('\n') < (line.length() - 1)) {
+					output = output.substring(0, output.length()-1);
+				}
+			}
+			
+//			while ((readChars = is.read(c)) != -1) {
+//				line += new String(c, 0, readChars);
+//				Matcher matcher = pattern.matcher(line);
+//				String replacement = args.split(delimiter)[2];
+//				
+//				if (isReplaceFirst) {
+//					output += matcher.replaceFirst(replacement);
+//				} else {
+//					output += matcher.replaceAll(replacement);
+//				}
+//				
+//				if (line.indexOf('\n') != -1) {
+//					output += "\n";
+//				}
+//			}
+			is.close();
+//			stdin.reset();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return output;
+	}
+	
+	private String replaceFromFile(String args, boolean isReplaceFirst) {
+		String[] argsParts = args.split("\\s+");
+		String filename = argsParts[argsParts.length - 1];
+		String output = "";
+		String line;
+		String delimiter = getDelimiter(args);
+		Pattern pattern = getRegexPattern(args, delimiter);
+		String replacement = args.split(delimiter)[2];
+		
+		BufferedReader reader;
+		char[] c = new char[1024];
+		int readChars = 0;
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			while ((readChars = reader.read(c)) != -1) {
+				line = new String(c, 0, readChars);
+				String[] parts = line.split("\n");
+				
+				for (int i = 0; i < parts.length; i++) {
+					Matcher matcher = pattern.matcher(parts[i]);
+					if (isReplaceFirst) {
+						output += matcher.replaceFirst(replacement);
+					} else {
+						output += matcher.replaceAll(replacement);
+					}
+					
+					output += "\n";
+				}
+				
+				if (line.lastIndexOf('\n') < (line.length() - 1)) {
+					output = output.substring(0, output.length()-1);
+				}
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return output;
+	}
+
+//	private String replace(String args, InputStream stdin, boolean isReplaceFirst) {
+//		String line;
+//		if (stdin == null) {
+//			String[] argsParts = args.split("\\s+");
+//			line = getInputFromFile(argsParts[argsParts.length - 1]);
+//			
+//		} else {
+//			line = getInputFromStdin(stdin);
+//		}
+//		
+//		int indexOfS = args.indexOf('s');
+//		String delimiter = args.substring(indexOfS, indexOfS + 1);
+//		String[] parts = args.split(delimiter);
+//		Pattern pattern = Pattern.compile(parts[1]);
+//		Matcher matcher = pattern.matcher(line);
+//		
+//		if (isReplaceFirst) {
+//			return matcher.replaceFirst(parts[2]);
+//		} else {
+//			return matcher.replaceAll(parts[2]);
+//		}
+//	}
+
 
 	/**
 	 * Returns string containing lines with the first matched substring replaced
@@ -53,7 +222,7 @@ public class SedApplication implements Sed {
 		 * 6. replace first substring in line and append to replaced var
 		 * 7. returned replaced var
 		 */
-		return null;
+		return replaceFromFile(args, true);
 	}
 
 	/**
@@ -76,16 +245,17 @@ public class SedApplication implements Sed {
 		 * 6. replace all substring in line and append to replaced var
 		 * 7. returned replaced var
 		 */
-		return null;
+		return replaceFromFile(args, false);
 	}
 
 	/**
 	 * Returns string containing lines with first matched substring replaced in
 	 * Stdin
 	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
 	@Override
-	public String replaceFirstSubStringFromStdin(String args) {
+	public String replaceFirstSubStringFromStdin(String args, InputStream stdin) {
 		// TODO Auto-generated method stub
 		/* args = sed s/regex/replacement/ line read from stdin with new
 		 * line denoted by \n
@@ -100,16 +270,17 @@ public class SedApplication implements Sed {
 		 * 6. after replacing all string in stdin array, join array with newline 
 		 * and return new string
 		 */
-		return null;
+		return replaceFromStdin(args, stdin, true);
 	}
 
 	/**
 	 * Returns string containing lines with all matched substring replaced in
 	 * Stdin
 	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
 	@Override
-	public String replaceAllSubstringsInStdin(String args) {
+	public String replaceAllSubstringsInStdin(String args, InputStream stdin) {
 		// TODO Auto-generated method stub
 		/* args = sed s/regex/replacement/ line read from stdin with new
 		 * line denoted by \n
@@ -124,7 +295,7 @@ public class SedApplication implements Sed {
 		 * 6. after replacing all string in stdin array, join array with newline 
 		 * and return new string
 		 */
-		return null;
+		return replaceFromStdin(args, stdin, true);
 	}
 
 	/**
