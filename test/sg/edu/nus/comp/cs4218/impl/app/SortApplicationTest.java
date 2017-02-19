@@ -27,8 +27,77 @@ public class SortApplicationTest {
 	}
 
 	@Test
-	public void test() {
+	public void testSortStringsSimple() {
 		fail("Not yet implemented");
 	}
 
+	@Test
+	public void testSortStringsCapital() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortNumbers() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortSpecialChars() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortSimpleCapital() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortSimpleNumbers() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortSimpleSpecialChars() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortCapitalNumbers() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortCapitalSpecialChars() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testSortNumbersSpecialChars() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testSortSimpleCapitalNumber() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testSortSimpleCapitalSpecialChars() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testSortSimpleNumbersSpecialChars() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testSortCapitalNumbersSpecialChars() {
+		fail("Not yet implemented");
+	}
+	
+	@Test
+	public void testSortAll() {
+		fail("Not yet implemented");
+	}
 }
