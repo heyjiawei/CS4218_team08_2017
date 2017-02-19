@@ -22,6 +22,7 @@ public class HeadApplicationTest {
 	private ByteArrayOutputStream outputStream;
 	private HeadApplication headApplication;
 	private final String testFilesPath = "test_inputs/head/";
+	private final String newLine = System.getProperty("line.separator");
 
 	@Before
 	public void setUp() throws Exception {
@@ -194,7 +195,8 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithLessLinesThanDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String testString = "test string\n\n\n string test";
+		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String testString = "test string" + threeNewLines + "string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
@@ -205,8 +207,10 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithMoreLinesThanDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String testString = "test string\n\n\n\n\n\n\n\n\n\n\n\n\nstring test";
-		String expectedOutputString = "test string\n\n\n\n\n\n\n\n\n";
+		String thirteenNewLines = new String(new char[13]).replace("\0", newLine);
+		String testString = "test string" + thirteenNewLines + "string test";
+		String nineNewLines = new String(new char[9]).replace("\0", newLine);
+		String expectedOutputString = "test string" + nineNewLines;
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
@@ -216,8 +220,10 @@ public class HeadApplicationTest {
 	
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
-		String testString = "test string\n\n\n\n\n\n string test";
-		String expectedOutputString = "test string\n\n\n\n\n";
+		String sixNewLines = new String(new char[6]).replace("\0", newLine);
+		String testString = "test string" + sixNewLines + " string test";
+		String fiveNewLines = new String(new char[5]).replace("\0", newLine);
+		String expectedOutputString = "test string" + fiveNewLines;
 		String[] args = {"6"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
@@ -227,7 +233,8 @@ public class HeadApplicationTest {
 	
 	public void testInputFromStdInWithLessLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
-		String testString = "test string\n\n\n string test";
+		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String testString = "test string" + threeNewLines + " string test";
 		String[] args = {"20"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
