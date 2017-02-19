@@ -90,13 +90,6 @@ public class CatApplication implements Application {
 					}
 				}
 			}
-			try {
-				String newLine = System.getProperty("line.separator");
-				stdout.write(newLine.getBytes());
-			} catch (IOException e) {
-				throw new CatException(
-						"Could not write to output stream");
-			}
 		}
 	}
 
