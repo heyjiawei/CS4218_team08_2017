@@ -93,7 +93,7 @@ public class CdApplication implements Application {
 	 */
 	private String getAbsoluteDirectoryPathFromRelativePath(String relativePathString)
 			throws CdException {
-		String currentWorkingDirectoryString = System.getProperty("user.dir");
+		String currentWorkingDirectoryString = Environment.currentDirectory;
 		File currentWorkingDirectory = new File(currentWorkingDirectoryString);
 		File absolutePathDirectory = new File(currentWorkingDirectory,
 				relativePathString);
