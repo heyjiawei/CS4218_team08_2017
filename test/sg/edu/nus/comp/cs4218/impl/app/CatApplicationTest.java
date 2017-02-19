@@ -62,7 +62,8 @@ public class CatApplicationTest {
 
 	@Test(expected = CatException.class)
 	public void testThrowWhenNonexistentFilePathGiven() throws CatException {
-		String[] args = {"nonExistentFilePath"};
+		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
+		String[] args = {nonexistentFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
 		catApplication.run(args, inputStream, outputStream);
@@ -148,7 +149,7 @@ public class CatApplicationTest {
 	
 	@Test
 	public void testInputFromStdIn() throws CatException, IOException {
-		String testString = "test string\n\n\n string test\n";
+		String testString = "test string\n\n\n string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
