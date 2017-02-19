@@ -4,16 +4,14 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -24,22 +22,10 @@ public class CatApplicationTest {
 	private ByteArrayOutputStream outputStream;
 	private CatApplication catApplication;
 	private final String testFilesPath = "test_inputs/cat/";
-	
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
 		catApplication = new CatApplication();
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test(expected = CatException.class)
@@ -178,6 +164,21 @@ public class CatApplicationTest {
 		outputStream = new ByteArrayOutputStream();
 		catApplication.run(args, inputStream, outputStream);
 		assertEquals(testString, outputStream.toString());
+	}
+	
+	@Test
+	public void testOneValidAbsoluteFilePath() throws CatException, IOException {
+		String currentDirectory = System.getProperty("user.dir");
+		String filePathString = testFilesPath + "lorem_ipsum_short.txt";
+		String absoluteFilePathString = currentDirectory +
+				File.separator + filePathString;
+		String fileString;
+		String[] args = {absoluteFilePathString};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		catApplication.run(args, inputStream, outputStream);
+		fileString = convertFileToString(absoluteFilePathString);
+		assertEquals(fileString, outputStream.toString());
 	}
 	
 	/**
