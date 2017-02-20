@@ -46,19 +46,17 @@ public class ShellImpl implements Shell {
 	private void evaluateSubsequence(String subsequence, boolean hasPipe, OutputStream stdout)
 			throws AbstractApplicationException, ShellException{
 		if (hasPipe) {
-			 pipeMultipleCommands(subsequence, stdout);
+			 String outputString = pipeMultipleCommands(subsequence);
+			 try {
+				stdout.write(outputString.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			CallCommand call = new CallCommand(subsequence);
 			call.parse();
 			call.evaluate(System.in, stdout);
 		}
-	}
-
-	private void pipeMultipleCommands(String subsequence, OutputStream stdout) throws AbstractApplicationException, ShellException {
-		PipeCommand call = new PipeCommand(subsequence);
-		call.parse();
-		call.evaluate(System.in, stdout);
-		
 	}
 
 	private Pattern[] getCallCommandPatterns() {
@@ -400,5 +398,25 @@ public class ShellImpl implements Shell {
 				System.out.println(e.getMessage());
 			}
 		}
+	}
+
+	@Override
+	public String pipeTwoCommands(String args) {
+		return pipeMultipleCommands(args);
+	}
+
+	@Override
+	public String pipeMultipleCommands(String args) {
+		ByteArrayOutputStream pipeOutputStream = new ByteArrayOutputStream();
+		PipeCommand call = new PipeCommand(args);
+		call.parse();
+		try {
+			call.evaluate(System.in, pipeOutputStream);
+		} catch (AbstractApplicationException e) {
+			return "Application Exception during pipe operation.";
+		} catch (ShellException e) {
+			return "Shell Exception during pipe operation.";
+		}
+		return pipeOutputStream.toString();
 	}
 }
