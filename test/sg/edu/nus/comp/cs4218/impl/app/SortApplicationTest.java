@@ -138,7 +138,7 @@ public class SortApplicationTest {
 	public void testSortSimpleNumbers() throws IOException {
 		String simpleNumbersFilePath = testFilesPath + "simple_numbers.txt";
 		String sortedSimpleNumbersFilePath = testFilesPath +
-				"12_lines_simple_numbers_sorted.txt";
+				"simple_numbers_sorted.txt";
 		String sortedString = sortApplication.sortSimpleNumbers(simpleNumbersFilePath);
 		String sortedSimpleNumbersString = convertFileToString(sortedSimpleNumbersFilePath);
 		assertEquals(sortedSimpleNumbersString, sortedString);
