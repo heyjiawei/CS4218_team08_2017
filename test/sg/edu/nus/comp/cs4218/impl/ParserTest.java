@@ -11,7 +11,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class ParserTest {
 
-	private final String newLine = System.getProperty("line.separator");
+	private final Parser parser = new Parser();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -22,14 +22,14 @@ public class ParserTest {
 
 		thrown.expect(ShellException.class);
 		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
-		Parser.parse(cmd);
+		parser.parse(cmd);
 	}
 
 	@Test
 	public void testParseCallCommand() throws ShellException {
 		String cmd = "echo";
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertEquals(1, sequences.length);
 	}
 
@@ -38,7 +38,7 @@ public class ParserTest {
 		String cmd = "echo";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -47,7 +47,7 @@ public class ParserTest {
 		String cmd = "echo 'a'";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -56,7 +56,7 @@ public class ParserTest {
 		String cmd = "echo \"a\"";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -65,7 +65,7 @@ public class ParserTest {
 		String cmd = "echo `a`";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -74,7 +74,7 @@ public class ParserTest {
 		String cmd = "echo \"echo `a`\"";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -83,7 +83,7 @@ public class ParserTest {
 		String cmd = "echo 'echo `a`'";
 		String[] callCommands = { cmd };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -92,7 +92,7 @@ public class ParserTest {
 		String cmd = "echo 'echo `a`' b \"c\" `d` ";
 		String[] callCommands = { cmd.trim() };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -101,7 +101,7 @@ public class ParserTest {
 		String cmd = "echo hi | echo bye | echo yes";
 		String[] callCommands = { "echo hi", "echo bye", "echo yes" };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -110,7 +110,7 @@ public class ParserTest {
 		String cmd = "echo \"bye|bye\"";
 		String[] callCommands = { "echo \"bye|bye\"" };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -119,7 +119,7 @@ public class ParserTest {
 		String cmd = "echo hi ; echo bye ; echo yes";
 		String[][] correctSequences = { { "echo hi" }, { "echo bye" }, { "echo yes" } };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 
 		assertEquals(correctSequences.length, sequences.length);
 		for (int index = 0; index < correctSequences.length; index++) {
@@ -132,7 +132,7 @@ public class ParserTest {
 		String cmd = "echo \"bye;bye\"";
 		String[] callCommands = { "echo \"bye;bye\"" };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
 	}
 
@@ -141,7 +141,7 @@ public class ParserTest {
 		String cmd = "echo hi ; echo bye | echo no; echo yes";
 		String[][] correctSequences = { { "echo hi" }, { "echo bye", "echo no" }, { "echo yes" } };
 
-		String[][] sequences = Parser.parse(cmd);
+		String[][] sequences = parser.parse(cmd);
 
 		assertEquals(correctSequences.length, sequences.length);
 		for (int index = 0; index < correctSequences.length; index++) {

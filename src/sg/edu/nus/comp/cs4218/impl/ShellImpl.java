@@ -76,7 +76,7 @@ public class ShellImpl implements Shell {
 
 	public void parseAndEvaluate(String cmdline, OutputStream stdout)
 			throws AbstractApplicationException, ShellException {
-		String[][] sequences = Parser.parse(cmdline);
+		String[][] sequences = new Parser().parse(cmdline);
 		for (String[] subsequence : sequences) {
 			evaluateSubsequence(subsequence, stdout);
 		}

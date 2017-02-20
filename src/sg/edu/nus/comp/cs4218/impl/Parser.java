@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Parser {
+public final class Parser {
 
-	private static Pattern[] getCallCommandPatterns() {
+	private Pattern[] getCallCommandPatterns() {
 		String patternNonKeyword = "\\s*[^\\n'\"`;|]+\\s*";
 		String patternSQ = "\\s*'[^\n']*'\\s*";
 		String patternBQ = "\\s*`[^\\n`]*`\\s*";
@@ -26,7 +26,7 @@ public class Parser {
 		};
 	}
 
-	private static Matcher getPatternMatch(Pattern[] patterns, String subcommand) {
+	private Matcher getPatternMatch(Pattern[] patterns, String subcommand) {
 		for (Pattern pattern: patterns) {
 			Matcher matcher = pattern.matcher(subcommand);
 			if (matcher.find() && matcher.start() == 0) {
@@ -37,7 +37,7 @@ public class Parser {
 		return null;
 	}
 
-	public static String[][] parse(String cmdline) throws ShellException {
+	public String[][] parse(String cmdline) throws ShellException {
 		Pattern[] compiledPatterns = getCallCommandPatterns();
 		String substring = cmdline.trim(), command = "";
 		int newEndIdx = 0;
