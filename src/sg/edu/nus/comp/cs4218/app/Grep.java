@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs4218.app;
 
+import java.io.InputStream;
+
 import sg.edu.nus.comp.cs4218.Application;
 
 public interface Grep extends Application {
@@ -8,8 +10,9 @@ public interface Grep extends Application {
 	 * Returns string containing lines which match the specified pattern in
 	 * Stdin
 	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing stdin
 	 */
-	public String grepFromStdin(String args);
+	public String grepFromStdin(String args, InputStream stdin);
 
 	/**
 	 * Returns string containing lines which match the specified pattern in the
