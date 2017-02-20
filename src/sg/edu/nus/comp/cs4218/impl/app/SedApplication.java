@@ -16,6 +16,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 
 public class SedApplication implements Sed {
 	private String filename = null;
+	private String delimiter = null;
 
 	/**
 	 * Runs application with specified input data and specified output stream.
@@ -32,60 +33,92 @@ public class SedApplication implements Sed {
 			throw new SedException("No output stream provided");
 		}
 		String output = "";
-		if (isValidDelimiter(args) &&
-			isValidRegex(args) && 
-			isValidReplacement(args)) {
+		String commandLine = "";
+		for (int i = 0; i < args.length; i++) {
+			commandLine += args[i] + " ";
+		}
+		commandLine = commandLine.trim();
+		this.delimiter = getDelimiter(args[0]);
+//		boolean hasSufficientDelimiter = ;
+//		boolean isValidRegex = ;
+//		boolean isValidReplacement = ;
+		if (hasSufficientDelimiter(args[0]) &&
+			isValidRegex(args[0]) && 
+			isValidReplacement(args[0])) {
 			if (isFileDirectoryValid(args)) {
-				output = replaceStringInFile(args);
+				if (args[0].endsWith("g")) {
+					output = replaceAllSubstringsInFile(commandLine);
+				} else if (args[0].endsWith(this.delimiter)) {
+					output = replaceFirstSubStringInFile(commandLine);
+				} else {
+					throw new SedException("Invalid flag");
+				}
 				
 			} else if (!isInputStreamEmpty(stdin)) {
-				output = replaceStringInStdin(args, stdin);
+				if (args[0].endsWith("g")) {
+					output = replaceAllSubstringsInStdin(commandLine, stdin);
+				} else if (args[0].endsWith(delimiter)) {
+					output = replaceFirstSubStringFromStdin(commandLine, stdin);
+				} else {
+					throw new SedException("Invalid flag");
+				}
 				
 			} else {
 				throw new SedException("No input detected. Please ensure filename is correct or stdin is not empty");
 			}
-		} //else {
-//			String commandLine = "";
-//			for (int i = 0; i < args.length; i++) {
-//				commandLine += args[i] + " ";
-//			}
-//			if (!isValidRegex) { 
-//				replaceSubstringWithInvalidRegex(commandLine.trim());
-//			} else if (!isValidReplacement) {
-//				replaceSubstringWithInvalidReplacement(commandLine.trim());
-//			}
-		//}
+		}
+		if (!hasSufficientDelimiter(args[0])) {
+			throw new SedException("Incorrect delimiter count");
+		}
+		if (!isValidReplacement(args[0])) {
+			output = replaceSubstringWithInvalidReplacement(commandLine);
+		}
+		if (!isValidRegex(args[0])) {
+			output = replaceSubstringWithInvalidRegex(commandLine);
+		}
 		try {
 			stdout.write(output.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private String replaceStringInStdin(String[] args, InputStream stdin) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	private String replaceStringInFile(String[] args) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private boolean isValidDelimiter(String[] args) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private boolean isValidReplacement(String[] args) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private boolean isValidRegex(String[] args) {
-		String delimiter = getDelimiter(args[0]);
+	private boolean hasSufficientDelimiter(String string) throws SedException{
+		String delimiter = getDelimiter(string);
+		int delimiterCount = 0;
+		int delimiterIndex;
+		String tmpStr = string;
+		while ((delimiterIndex = tmpStr.indexOf(delimiter)) > -1) {
+			delimiterCount++;
+			tmpStr = tmpStr.substring(delimiterIndex + 1);
+		}
 		
-		return false;
+		if (delimiterCount == 3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean isValidReplacement(String string) throws SedException {
+		String delimiter = getDelimiter(string);
+		String replacement = string.split(delimiter)[2];
+		try {
+			Pattern.compile(replacement);
+		} catch (PatternSyntaxException e) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isValidRegex(String string) throws SedException {
+		String delimiter = getDelimiter(string);
+		try {
+			getRegexPattern(string, delimiter);
+		} catch (PatternSyntaxException e) {
+			return false;
+		}
+		return true;
 	}
 
 	private boolean isInputStreamEmpty(InputStream stdin) {
@@ -152,12 +185,21 @@ public class SedApplication implements Sed {
 //	}
 	
 	private String getDelimiter(String args) throws SedException {
-		int indexOfS = args.indexOf('s');
-		String delimiter = args.substring(indexOfS + 1, indexOfS + 2);
-		if (delimiter.matches("[\n|\\]")) {
-			throw new SedException("Invalid delimiter. Delimter consist of newline or backslash");
+		if (this.delimiter != null) {
+			return this.delimiter;
 		} else {
-			return delimiter;
+			int indexOfS = args.indexOf('s');
+			if (indexOfS > -1) {
+				String delimiter = args.substring(indexOfS + 1, indexOfS + 2);
+				if (delimiter.matches("[\n|\\|\\s]")) {
+					throw new SedException("Invalid delimiter. Delimter cannot consist newline or backslash");
+				} else {
+					this.delimiter = delimiter;
+					return this.delimiter;
+				}
+			} else {
+				throw new SedException("Invalid sed command. Cannot detect delimiter");
+			}
 		}
 	}
 	
@@ -169,14 +211,15 @@ public class SedApplication implements Sed {
 	private String replaceFromStdin(String args, InputStream stdin, boolean isReplaceFirst) {
 		String output = "";
 		String line = "";
-		String delimiter = getDelimiter(args);
-		Pattern pattern = getRegexPattern(args, delimiter);
-		String replacement = args.split(delimiter)[2];
 		
 		BufferedInputStream is = new BufferedInputStream(stdin);
 		byte[] c = new byte[1024];
         int readChars = 0;
 		try {
+			String delimiter = getDelimiter(args);
+			Pattern pattern = getRegexPattern(args, delimiter);
+			String replacement = args.split(delimiter)[2];
+			
 			while ((readChars = is.read(c)) != -1) {
 				line = new String(c, 0, readChars);
 				String[] parts = line.split("\n");
@@ -216,6 +259,8 @@ public class SedApplication implements Sed {
 //			stdin.reset();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (SedException e) {
+			e.printStackTrace();
 		}
 		return output;
 	}
@@ -225,14 +270,14 @@ public class SedApplication implements Sed {
 		String filename = argsParts[argsParts.length - 1];
 		String output = "";
 		String line;
-		String delimiter = getDelimiter(args);
-		Pattern pattern = getRegexPattern(args, delimiter);
-		String replacement = args.split(delimiter)[2];
 		
 		BufferedReader reader;
 		char[] c = new char[1024];
 		int readChars = 0;
 		try {
+			String delimiter = getDelimiter(args);
+			Pattern pattern = getRegexPattern(args, delimiter);
+			String replacement = args.split(delimiter)[2];
 			reader = new BufferedReader(new FileReader(filename));
 			while ((readChars = reader.read(c)) != -1) {
 				line = new String(c, 0, readChars);
@@ -255,6 +300,8 @@ public class SedApplication implements Sed {
 			}
 			reader.close();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SedException e) {
 			e.printStackTrace();
 		}
 		
@@ -388,7 +435,7 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidReplacement(String args) {
-		return "Invalid replacement string";
+		return "Invalid replacement string. Replacement consist either backslash, $ sign or delimiter";
 	}
 
 	/**
@@ -397,7 +444,7 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidRegex(String args) {
-		return "Invalid regex pattern";
+		return "Invalid regex pattern. Regex consist either backslash, $ sign or delimiter";
 	}
 
 }
