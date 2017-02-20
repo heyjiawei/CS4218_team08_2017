@@ -97,15 +97,17 @@ public class CatApplicationTest {
 				outputStream.toString());
 	}
 
-	@Test(expected = CatException.class)
-	public void testThrowWhenProvideOneValidAndOneNonExistentFilePath()
+	@Test
+	public void testPrintValidWhenProvideOneValidAndOneNonExistentFilePath()
 			throws CatException, IOException {
-		String firstFilePathString = testFilesPath + "lorem_ipsum_short.txt";
-		String secondFilePathString = testFilesPath + "nonexistent_file.txt";
+		String firstFilePathString = testFilesPath + "nonexistent_file.txt";
+		String secondFilePathString = testFilesPath + "lorem_ipsum_short.txt";
 		String[] args = {firstFilePathString, secondFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
 		catApplication.run(args, inputStream, outputStream);
+		String secondFileString = convertFileToString(secondFilePathString);
+		assertEquals(secondFileString, outputStream.toString());
 	}
 	
 	@Test
