@@ -41,9 +41,10 @@ public class GrepApplicationTest {
 	    writer.println("grep_test.txt:");
 	    writer.println("grep_test.txt:31 characters");
 	    writer.println("grep: not exist.txt: No such file or directory");
+	    writer.close();
 	    
 	    File file = new File(System.getProperty("user.dir") + 
-	    				"/testing_grep_folder/grep_test.txt");
+	    				"/testing_grep_folder/grep test.txt");
 	    if (file.getParentFile().mkdir()) {
 	        file.createNewFile();
 	    } else {
@@ -99,8 +100,8 @@ public class GrepApplicationTest {
 	
 	@Test
 	public void testGrepFromMultipleFiles() {
-		String output = grepApp.grepFromMultipleFiles("ch. grep_test.txt testing_grep_folder/grep_test.txt");
-		assertEquals("grep_test.txt:31 characters\ntesting_grep_folder/grep_test.txt:31 characters", output);
+		String output = grepApp.grepFromMultipleFiles("ch. grep_test.txt \"testing_grep_folder/grep test.txt\"");
+		assertEquals("grep_test.txt:31 characters\ntesting_grep_folder/grep test.txt:31 characters", output);
 	}
 	
 	@Test
@@ -150,6 +151,11 @@ public class GrepApplicationTest {
 		grepApp.run(new String[]{"\\s* ", "-test.txt"}, in, out);
 	}
 	
+	/**
+	 * Reads from file respective to source folder.
+	 * @param filename String filename (optional prepending of directory) to read from
+	 * @return String output from file
+	 */
 	private String getOutputFromFile(String filename) {
 		String line = "";
 		char[] c = new char[1024];
