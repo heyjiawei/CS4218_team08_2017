@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.app;
 
 import sg.edu.nus.comp.cs4218.Application;
 
-public interface Cal extends Application {
+public interface Cal extends Application { // NOPMD - Provided interface
 
 	/**
 	 * Print the calendar of the current month
