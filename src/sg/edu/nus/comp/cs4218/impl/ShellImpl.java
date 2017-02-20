@@ -19,13 +19,12 @@ import sg.edu.nus.comp.cs4218.impl.app.SedApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
-import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 
 /**
  * A Shell is a command interpreter and forms the backbone of the entire
  * program. Its responsibility is to interpret commands that the user type and
  * to run programs that the user specify in her command lines.
- * 
+ *
  * <p>
  * <b>Command format:</b>
  * <code>&lt;Pipe&gt; | &lt;Sequence&gt; | &lt;Call&gt;</code>
@@ -43,82 +42,95 @@ public class ShellImpl implements Shell {
 	public static final String EXP_STDOUT = "Error writing to stdout.";
 	public static final String EXP_NOT_SUPPORTED = " not supported yet";
 
-	private void evaluateSubsequence(String subsequence, boolean hasPipe, OutputStream stdout)
-			throws AbstractApplicationException, ShellException{
-		if (hasPipe) {
-			 String outputString = pipeMultipleCommands(subsequence);
-			 try {
-				stdout.write(outputString.getBytes());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			CallCommand call = new CallCommand(subsequence);
+	private void evaluateSubsequence(String[] callCommands, OutputStream stdout)
+			throws AbstractApplicationException, ShellException {
+		if (callCommands.length == 1) {
+			CallCommand call = new CallCommand(callCommands[0]);
 			call.parse();
 			call.evaluate(System.in, stdout);
+		} else {
+			evaluatePipe(callCommands, stdout);
 		}
 	}
 
-	private Pattern[] getCallCommandPatterns() {
-		String patternNonKeyword = "\\s*[^\\n'\"`;|]+\\s*";
-		String patternSQ = "\\s*'[^\n']*'\\s*";
-		String patternBQ = "\\s*`[^\\n`]*`\\s*";
-		String patternDQ = "\\s*\"[^\\n\"`]*\"\\s*"; // Double quoted content
-		String patternBQinDQ = "\\s*\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\"\\s*";
+	private void evaluatePipe(String[] callCommands, OutputStream stdout)
+			throws AbstractApplicationException, ShellException {
+		CallCommand call;
+		InputStream pipeIn = System.in;
+		ByteArrayOutputStream pipeOut;
 
-		// Preserve order for performance
-		return new Pattern[] {
-				Pattern.compile(patternNonKeyword),
-				Pattern.compile(patternSQ),
-				Pattern.compile(patternBQ),
-				Pattern.compile(patternDQ),
-				Pattern.compile(patternBQinDQ)
-		};
+		for (int index = 0; index < callCommands.length - 1; index++) {
+			pipeOut = new ByteArrayOutputStream();
+
+			call = new CallCommand(callCommands[index]);
+			call.parse();
+			call.evaluate(pipeIn, pipeOut);
+
+			pipeIn = new ByteArrayInputStream(pipeOut.toByteArray());
+		}
+
+		call = new CallCommand(callCommands[callCommands.length - 1]);
+		call.parse();
+		call.evaluate(pipeIn, stdout);
 	}
 
 	public void parseAndEvaluate(String cmdline, OutputStream stdout)
 			throws AbstractApplicationException, ShellException {
-		Pattern[] compiledPatterns = getCallCommandPatterns();
-		String substring = cmdline, subsequence = "";
-		int smallestStartIdx = 0, newEndIdx = 0;
-		boolean hasPipe = false;
-		while (smallestStartIdx != -1) {
-			smallestStartIdx = -1;
-			if (substring.trim().startsWith("|")) { // detected pipe operator
-				hasPipe = true;
-				// move "|" from substring to subsequence
-				subsequence = subsequence + "|";
-				substring = substring.substring(1);
-			} else if (substring.trim().startsWith(";")) { // detected semicolon operator
-				evaluateSubsequence(subsequence, hasPipe, stdout);
-				// reset values since it is now a new sequence
-				hasPipe = false;
-				subsequence = "";
-				substring = substring.substring(1);
-			}
-			for (Pattern pattern: compiledPatterns) {
-				Matcher matcher = pattern.matcher(substring);
-				if (matcher.find()
-						&& (matcher.start() < smallestStartIdx || smallestStartIdx == -1)) {
-					smallestStartIdx = matcher.start();
-					newEndIdx = matcher.end();
-					if (smallestStartIdx == 0) {
-						break;
-					}
-				}
-			}
-			if (smallestStartIdx != -1) {
-				if (smallestStartIdx != 0) {
-					throw new ShellException(ShellImpl.EXP_SYNTAX);
-				}
-				subsequence += substring.substring(0, newEndIdx);
-				substring = substring.substring(newEndIdx);
-			}
+		String[][] sequences = Parser.parse(cmdline);
+		for (String[] subsequence : sequences) {
+			evaluateSubsequence(subsequence, stdout);
 		}
-		evaluateSubsequence(subsequence, hasPipe, stdout);
-		if (!substring.matches("^\\s*$")) {
-			throw new ShellException(ShellImpl.EXP_SYNTAX);
+	}
+
+	/**
+	 * Evaluate pipe call with two commands
+	 * @param args String containing the command, input arguments and the pipe operator
+	 */
+	public String pipeTwoCommands(String args) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		try {
+			Shell shell = new ShellImpl();
+			shell.parseAndEvaluate(args, out);
+		} catch (AbstractApplicationException|ShellException e) {
+			return e.getMessage();
 		}
+
+		return out.toString();
+	}
+
+	/**
+	 * Evaluate pipe call with more than two commands
+	 * @param args String containing the commands, input arguments and the pipe operators
+	 */
+	public String pipeMultipleCommands(String args) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		try {
+			Shell shell = new ShellImpl();
+			shell.parseAndEvaluate(args, out);
+		} catch (AbstractApplicationException|ShellException e) {
+			return e.getMessage();
+		}
+
+		return out.toString();
+	}
+
+	/**
+	 * Evaluate pipe call with one part generating an exception
+	 * @param args String containing the commands, input arguments and the pipe operator/s
+	 */
+	public String pipeWithException(String args) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		try {
+			Shell shell = new ShellImpl();
+			shell.parseAndEvaluate(args, out);
+		} catch (AbstractApplicationException|ShellException e) {
+			return e.getMessage();
+		}
+
+		return out.toString();
 	}
 
 	/**
@@ -127,12 +139,12 @@ public class ShellImpl implements Shell {
 	 * input is returned unchanged. If back quotes are found, the back quotes
 	 * and its enclosed commands substituted with the output from processing the
 	 * commands enclosed in the back quotes.
-	 * 
+	 *
 	 * @param argsArray
 	 *            String array of the individual commands.
-	 * 
+	 *
 	 * @return String array with the back quotes command processed.
-	 * 
+	 *
 	 * @throws AbstractApplicationException
 	 *             If an exception happens while processing the content in the
 	 *             back quotes.
@@ -190,7 +202,7 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to run the application as specified by the application
 	 * command keyword and arguments.
-	 * 
+	 *
 	 * @param app
 	 *            String containing the keyword that specifies what application
 	 *            to run.
@@ -202,7 +214,7 @@ public class ShellImpl implements Shell {
 	 *            needed.
 	 * @param outputStream
 	 *            OutputStream for the application to print its output to.
-	 * 
+	 *
 	 * @throws AbstractApplicationException
 	 *             If an exception happens while running any of the
 	 *             application(s).
@@ -240,12 +252,12 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to creates an inputStream based on the file name or file
 	 * path.
-	 * 
+	 *
 	 * @param inputStreamS
 	 *            String of file name or file path
-	 * 
+	 *
 	 * @return InputStream of file opened
-	 * 
+	 *
 	 * @throws ShellException
 	 *             If file is not found.
 	 */
@@ -264,12 +276,12 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to creates an outputStream based on the file name or file
 	 * path.
-	 * 
+	 *
 	 * @param outputStreamS
 	 *            String of file name or file path.
-	 * 
+	 *
 	 * @return OutputStream of file opened.
-	 * 
+	 *
 	 * @throws ShellException
 	 *             If file destination cannot be opened or inaccessible.
 	 */
@@ -287,10 +299,10 @@ public class ShellImpl implements Shell {
 
 	/**
 	 * Static method to close an inputStream.
-	 * 
+	 *
 	 * @param inputStream
 	 *            InputStream to be closed.
-	 * 
+	 *
 	 * @throws ShellException
 	 *             If inputStream cannot be closed successfully.
 	 */
@@ -308,10 +320,10 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to close an outputStream. If outputStream provided is
 	 * System.out, it will be ignored.
-	 * 
+	 *
 	 * @param outputStream
 	 *            OutputStream to be closed.
-	 * 
+	 *
 	 * @throws ShellException
 	 *             If outputStream cannot be closed successfully.
 	 */
@@ -329,7 +341,7 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to write output of an outputStream to another outputStream,
 	 * usually System.out.
-	 * 
+	 *
 	 * @param outputStream
 	 *            Source outputStream to get stream from.
 	 * @param stdout
@@ -352,12 +364,12 @@ public class ShellImpl implements Shell {
 	/**
 	 * Static method to pipe data from an outputStream to an inputStream, for
 	 * the evaluation of the Pipe Commands.
-	 * 
+	 *
 	 * @param outputStream
 	 *            Source outputStream to get stream from.
-	 * 
+	 *
 	 * @return InputStream with data piped from the outputStream.
-	 * 
+	 *
 	 * @throws ShellException
 	 *             If exception is thrown during piping.
 	 */
@@ -369,7 +381,7 @@ public class ShellImpl implements Shell {
 
 	/**
 	 * Main method for the Shell Interpreter program.
-	 * 
+	 *
 	 * @param args
 	 *            List of strings arguments, unused.
 	 */
@@ -398,25 +410,5 @@ public class ShellImpl implements Shell {
 				System.out.println(e.getMessage());
 			}
 		}
-	}
-
-	@Override
-	public String pipeTwoCommands(String args) {
-		return pipeMultipleCommands(args);
-	}
-
-	@Override
-	public String pipeMultipleCommands(String args) {
-		ByteArrayOutputStream pipeOutputStream = new ByteArrayOutputStream();
-		PipeCommand call = new PipeCommand(args);
-		call.parse();
-		try {
-			call.evaluate(System.in, pipeOutputStream);
-		} catch (AbstractApplicationException e) {
-			return "Application Exception during pipe operation.";
-		} catch (ShellException e) {
-			return "Shell Exception during pipe operation.";
-		}
-		return pipeOutputStream.toString();
 	}
 }
