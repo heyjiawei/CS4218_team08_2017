@@ -70,7 +70,11 @@ public class CatApplication implements Application {
 
 			for (int i = 0; i < numOfFiles; i++) {
 				filePath = currentDir.resolve(args[i]);
-				isFileReadable = checkIfFileIsReadable(filePath);
+				try {
+					isFileReadable = checkIfFileIsReadable(filePath);
+				} catch (CatException e) {
+					continue;
+				}
 				if (isFileReadable) {
 					filePathList.add(filePath);
 				}
@@ -89,6 +93,8 @@ public class CatApplication implements Application {
 								+ "could not write to output stream");
 					}
 				}
+			} else {
+				throw new CatException("No valid input files provided.");
 			}
 		}
 	}
