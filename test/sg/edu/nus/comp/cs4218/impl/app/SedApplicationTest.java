@@ -24,21 +24,6 @@ public class SedApplicationTest {
 	SedApplication sedApp;
 	InputStream in;
 	OutputStream out;
-	
-	/*
-	 * 1 test with different limiters. E.g. instead of s/regex/replacement
-	 * test with s.regex.replacement
-	 * 2 invalid testing with limiter inside regex
-	 * 3 invalid testing with limiter inside replacement string
-	 * 4 inputstream reads from file
-	 * 5 inputstream reads arguments
-	 * 6 outputstream to file
-	 * 7 outputstream to stdin (print on screen)
-	 * 8 invaild regex expression
-	 * 9 invalid replacement
-	 * 10 surrounded with quotes e.g. sed 's/day/night/' <old >new
-	 * 
-	 */
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -105,38 +90,38 @@ public class SedApplicationTest {
 	public void tearDown() throws Exception {
 	}
 
-//	@Test
-//	public void testReplaceFirstSubStringInFile() {
-//		String output = sedApp.replaceFirstSubStringInFile("sxdayxshinex sed_test.txt");
-//		assertEquals(getOutputFromFile("sed_test_replace_first.txt"), output);
-//	}
-//	
-//	@Test
-//	public void testReplaceAllSubstringsInFile() {
-//		String output = sedApp.replaceAllSubstringsInFile("s!day!night!g sed_test.txt");
-//		assertEquals(getOutputFromFile("sed_test_replace_all.txt"), output);
-//	}
-//	
-//	@Test
-//	public void testReplaceFirstSubStringFromStdin() {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		String output = sedApp.replaceFirstSubStringFromStdin("sxdayxshinex", in);
-//		assertEquals("sunshine monday", output);
-//	}
-//	
-//	@Test
-//	public void testReplaceAllSubstringsInStdin() {
-//		in = new ByteArrayInputStream("sunday\nmonday".getBytes());
-//		String output = sedApp.replaceFirstSubStringFromStdin("sxdayxshinexg", in);
-//		assertEquals("sunshine\nmonshine", output);
-//	}
-//	
+	@Test
+	public void testReplaceFirstSubStringInFile() {
+		String output = sedApp.replaceFirstSubStringInFile("sxdayxshinex sed_test.txt");
+		assertEquals(getOutputFromFile("sed_test_replace_first.txt"), output);
+	}
+	
+	@Test
+	public void testReplaceAllSubstringsInFile() {
+		String output = sedApp.replaceAllSubstringsInFile("s!day!night!g sed_test.txt");
+		assertEquals(getOutputFromFile("sed_test_replace_all.txt"), output);
+	}
+	
+	@Test
+	public void testReplaceFirstSubStringFromStdin() {
+		in = new ByteArrayInputStream("sunday monday".getBytes());
+		String output = sedApp.replaceFirstSubStringFromStdin("sxdayxshinex", in);
+		assertEquals("sunshine monday", output);
+	}
+	
+	@Test
+	public void testReplaceAllSubstringsInStdin() {
+		in = new ByteArrayInputStream("sunday\nmonday".getBytes());
+		String output = sedApp.replaceFirstSubStringFromStdin("sxdayxshinexg", in);
+		assertEquals("sunshine\nmonshine", output);
+	}
+	
 	@Test
 	public void testRunReplaceFirstSubStringInFile() {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
 		try {
-			sedApp.run(new String[]{"s\\.day\\.shine\\.", "sed_test.txt"}, in, out);
+			sedApp.run(new String[]{"s.day.shine.", "sed_test.txt"}, in, out);
 		} catch (AbstractApplicationException e) {
 			e.printStackTrace();
 		}
@@ -144,74 +129,114 @@ public class SedApplicationTest {
 		assertEquals(getOutputFromFile("sed_test_replace_first.txt"), new String(byteArray));
 	}
 	
-//	@Test (expected = SedException.class)
-//	public void testThrowNoReplacementException() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{}, in, out);
-//	}
-//	
-//	@Test (expected = SedException.class)
-//	public void testThrowInvalidDelimiterException() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{"s day night "}, in, out);
-//	}
-//	
-//	@Test (expected = SedException.class)
-//	public void testThrowUnableToDetectDelimiter() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{"c.day.night."}, in, out);
-//	}
-//	
-//	@Test (expected = SedException.class)
-//	public void testThrowIncorrectDelimiterCount() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{"s. . night g"}, in, out);
-//	}
-// 	
-//	@Test (expected = SedException.class)
-//	public void testThrowInvalidFlag() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{"s:day:night:d"}, in, out);
-//	}
-//	@Test
-//	public void testRunWithInvalidReplacement() {
-//		in = new ByteArrayInputStream("sunday monday".getBytes());
-//		out = new ByteArrayOutputStream();
-//		try {
-//			sedApp.run(new String[]{"sxdayx\\x"}, in, out);
-//		} catch (AbstractApplicationException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		assertEquals("Invalid replacement string. Replacement consist either backslash, $ sign or delimiter", 
-//				new String(byteArray));
-//	}
-// failing
-//	@Test 
-//	public void testRunWithInvalidRegex() {
-//		in = new ByteArrayInputStream("sunday monday $$100".getBytes());
-//		out = new ByteArrayOutputStream();
-//		try {
-//			sedApp.run(new String[]{"sx$xnightxg"}, in, out);
-//		} catch (AbstractApplicationException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		assertEquals("Invalid regex pattern. Regex consist either backslash, $ sign or delimiter", 
-//				new String(byteArray));
-//	}
-//	
-//	@Test (expected = SedException.class)
-//	public void testInvalidFileException() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		sedApp.run(new String[]{"s/day/night/g", "file.txt"}, in, out);
-//	}
+	@Test
+	public void testRunReplaceAllSubStringInFile() {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			sedApp.run(new String[]{"s|day|night|g", "sed_test.txt"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		assertEquals(getOutputFromFile("sed_test_replace_all.txt"), new String(byteArray));
+	}
+	
+	@Test
+	public void testRunReplaceFirstSubStringInStdin() {
+		in = new ByteArrayInputStream("sunday monday\nFRIDAY".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			sedApp.run(new String[]{"sxdayxshinex"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		assertEquals("sunshine monday\nFRIDAY", new String(byteArray));
+	}
+	
+	@Test
+	public void testRunReplaceAllSubStringInStdin() {
+		in = new ByteArrayInputStream("sunday monday\nFRIDAY".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			sedApp.run(new String[]{"s,day,shine,g"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		assertEquals("sunshine monshine\nFRIDAY", new String(byteArray));
+	}
+	
+	@Test (expected = SedException.class)
+	public void testThrowNoReplacementException() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{}, in, out);
+	}
+	
+	@Test (expected = SedException.class)
+	public void testThrowInvalidDelimiterException() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("sunday monday".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s day night g"}, in, out);
+	}
+	
+	@Test (expected = SedException.class)
+	public void testThrowUnableToDetectDelimiter() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("sunday monday".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"c.day.night."}, in, out);
+	}
+	
+	@Test (expected = SedException.class)
+	public void testThrowIncorrectDelimiterCount() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("sunday monday".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s. . night g"}, in, out);
+	}
+ 	
+	@Test (expected = SedException.class)
+	public void testThrowInvalidFlag() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("sunday monday".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s:day:night:d"}, in, out);
+	}
+
+	@Test 
+	public void testRunWithInvalidRegex() {
+		in = new ByteArrayInputStream("sunday monday $$100".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			sedApp.run(new String[]{"sx\\xnightxg"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		assertEquals("Invalid regex pattern. Regex consist of a backslash", 
+				new String(byteArray));
+	}
+	
+	@Test
+	public void testRunWithInvalidReplacement() {
+		in = new ByteArrayInputStream("sunday monday $$100".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			sedApp.run(new String[]{"s:day:\\:"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		assertEquals("Invalid replacement string. Replacement of a backslash", 
+				new String(byteArray));
+	}
+	
+	@Test (expected = SedException.class)
+	public void testInvalidFileException() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s/day/night/g", "file.txt"}, in, out);
+	}
 	
 	private String getOutputFromFile(String filename) {
 		String line = "";
