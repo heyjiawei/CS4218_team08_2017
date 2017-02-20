@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.app;
 
 import sg.edu.nus.comp.cs4218.Application;
 
-public interface Date extends Application{
-	
+public interface Date extends Application { // NOPMD - Provided interface
+
 	/**
 	 * Print the current date and time
 	 * @param args String containing command

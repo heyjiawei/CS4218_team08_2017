@@ -27,12 +27,9 @@ public class PipeCommand implements Command {
 	@Override
 	public void evaluate(InputStream stdin, OutputStream stdout) throws AbstractApplicationException, ShellException {
 		ByteArrayOutputStream firstOutputStream = new ByteArrayOutputStream();
-		System.out.println(firstSequence);
 		CallCommand call = new CallCommand(firstSequence);
 		call.parse();
 		call.evaluate(stdin, firstOutputStream);
-		System.out.println(firstOutputStream.toString().getBytes()[2]);
-		System.out.println("\n".getBytes()[0]);
 		ByteArrayInputStream inForRest = new ByteArrayInputStream(firstOutputStream.toByteArray());
 		
 		System.out.println(restSequence);

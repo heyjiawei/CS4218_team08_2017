@@ -16,19 +16,19 @@ public interface Shell {
 	 * Evaluate pipe call with two commands
 	 * @param args String containing the command, input arguments and the pipe operator
 	 */
-//	public String pipeTwoCommands(String args);
+	public String pipeTwoCommands(String args);
 
 	/**
 	 * Evaluate pipe call with more than two commands
 	 * @param args String containing the commands, input arguments and the pipe operators
 	 */
-//	public String pipeMultipleCommands(String args);
+	public String pipeMultipleCommands(String args);
 
 	/**
 	 * Evaluate pipe call with one part generating an exception
 	 * @param args String containing the commands, input arguments and the pipe operator/s
 	 */
-//	public String pipeWithException(String args);
+	public String pipeWithException(String args);
 
 	/**
 	 * Evaluate globbing with no files or directories

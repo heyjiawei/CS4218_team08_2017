@@ -16,53 +16,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 
 public class PipeCommandTest {
-
-	ShellImpl shell;
-	BufferedReader bReader;
-	ByteArrayOutputStream outputStream;
-	String output;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-		shell = new ShellImpl();
-		outputStream = new ByteArrayOutputStream();
-
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
-	
-	@Test
-	public void testPipeOne() throws AbstractApplicationException, ShellException {
-		String cmd = "echo \"cd\" | wc";
-		
-		shell.parseAndEvaluate(cmd, outputStream);
-		
-		output = outputStream.toString();
-		
-		assertEquals("3 1 1", output);
-	}
-	
-	@Test
-	public void testPipeTwo() throws AbstractApplicationException, ShellException {
-		String cmd = "echo \"cd\" | head | tail";
-		
-		shell.parseAndEvaluate(cmd, outputStream);
-		
-		output = outputStream.toString();
-		
-		assertEquals("cd\n", output);
-	}
 	
 	@Test
 	public void testSplitCommand() throws AbstractApplicationException, ShellException {

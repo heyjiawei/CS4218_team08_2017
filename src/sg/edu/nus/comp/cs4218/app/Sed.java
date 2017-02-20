@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import sg.edu.nus.comp.cs4218.Application;
 
-public interface Sed extends Application {
+public interface Sed extends Application { // NOPMD - Provided interface
 
 	/**
 	 * Returns string containing lines with the first matched substring replaced

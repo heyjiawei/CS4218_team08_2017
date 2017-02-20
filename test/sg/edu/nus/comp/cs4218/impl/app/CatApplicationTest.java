@@ -12,8 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import org.junit.rules.ExpectedException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
 public class CatApplicationTest {
@@ -23,49 +25,67 @@ public class CatApplicationTest {
 	private CatApplication catApplication;
 	private final String testFilesPath = "test_inputs/cat/";
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
 	@Before
 	public void setUp() throws Exception {
 		catApplication = new CatApplication();
 	}
 
-	@Test(expected = CatException.class)
+	@Test
 	public void testThrowWhenStdOutputNull() throws CatException {
 		String[] args = {"test", "arguments"};
 		inputStream = new ByteArrayInputStream("".getBytes());
 		outputStream = null;
+
+		thrown.expect(CatException.class);
+		thrown.expectMessage("No output stream provided");
 		catApplication.run(args, inputStream, outputStream);
 	}
 
-	@Test(expected = CatException.class)
+	@Test
 	public void testThrowWhenArgsAndStdInputNull() throws CatException {
 		String[] args = null;
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
+
+		thrown.expect(CatException.class);
+		thrown.expectMessage("Null Pointer Exception");
 		catApplication.run(args, inputStream, outputStream);
 	}
 
-	@Test(expected = CatException.class)
+	@Test
 	public void testThrowWhenIllegalFilePathGiven() throws CatException {
 		String[] args = {"illegalFilePath*?"};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
+
+		thrown.expect(CatException.class);
+		thrown.expectMessage("Could not read file");
 		catApplication.run(args, inputStream, outputStream);
 	}
 
-	@Test(expected = CatException.class)
+	@Test
 	public void testThrowWhenDirectoryGivenAsFilePath() throws CatException {
 		String[] args = {"/"};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
+
+		thrown.expect(CatException.class);
+		thrown.expectMessage("This is a directory");
 		catApplication.run(args, inputStream, outputStream);
 	}
 
-	@Test(expected = CatException.class)
+	@Test
 	public void testThrowWhenNonexistentFilePathGiven() throws CatException {
 		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
 		String[] args = {nonexistentFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
+
+		thrown.expect(CatException.class);
+		thrown.expectMessage("Could not read file");
 		catApplication.run(args, inputStream, outputStream);
 	}
 
