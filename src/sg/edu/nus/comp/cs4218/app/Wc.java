@@ -32,26 +32,30 @@ public interface Wc extends Application {
 
 	/**
 	 * Returns string containing the character count in Stdin
-	 * @param stdin InputStream containing Standard Input
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
-	public String printCharacterCountInStdin(InputStream stdin);
+	public String printCharacterCountInStdin(String args, InputStream stdin);
 
 	/**
 	 * Returns string containing the word count in Stdin
-	 * @param stdin InputStream containing Standard Input
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
-	public String printWordCountInStdin(InputStream stdin);
+	public String printWordCountInStdin(String args, InputStream stdin);
 
 	/**
 	 * Returns string containing the newline count in Stdin
-	 * @param stdin InputStream containing Standard Input
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
-	public String printNewlineCountInStdin(InputStream stdin);
+	public String printNewlineCountInStdin(String args, InputStream stdin);
 
 	/**
-	 * Returns string containing all counts in Stdin
-	 * @param stdin InputStream containing Standard Input
+	 * Returns string containing all counts in args
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing Stdin
 	 */
-	public String printAllCountsInStdin(InputStream stdin);
+	public String printAllCountsInStdin(String args, InputStream stdin);
 
 }
