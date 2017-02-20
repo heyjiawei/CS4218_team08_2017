@@ -3,6 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,6 +18,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CalException;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
+
 public class CalApplicationTest {
 	CalApplication calApp;
 	InputStream in;
@@ -25,6 +31,7 @@ public class CalApplicationTest {
 	 * 1. default refers to cal command line with no [-m] [[month] year]
 	 * 2. each month has a span of 20 characters width
 	 * 3. 2 spaces between months
+	 * 4. follow the alignment showed below rather instead of the alignment in Terminal
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -158,46 +165,122 @@ public class CalApplicationTest {
 	@Test
 	public void testPrintCal() {
 		fail("Not yet implemented");
+		// How to do this? won't the current month keep changing?
 	}
 	
 	@Test
 	public void testPrintCalWithMondayFirst() {
 		fail("Not yet implemented");
+		// How to do this? won't the current month keep changing?
 	}
 	
 	@Test
 	public void testPrintCalForMonthYear() {
-		
+		String output = calApp.printCalForMonthYear("1 16");
+		assertEquals(getOutputFromFile("cal_jan_2016.txt"), output);
 	}
 	
 	@Test
 	public void testPrintCalForYear() {
-		
+		String output = calApp.printCalForYear("2017");
+		assertEquals(getOutputFromFile("cal_2017.txt"), output);
 	}
 
 	@Test
 	public void testPrintCalForMonthYearMondayFirst() {
-		
+		String output = calApp.printCalForMonthYearMondayFirst("-m 12 17");
+		assertEquals(getOutputFromFile("cal_monday_dec_2017.txt"), output);
 	}
 
 	@Test
 	public void testPrintCalForYearMondayFirst() {
-		
-	}
-	
-	@Test //option means -option. Only -m is allowed
-	public void testThrowInvalidOption() {
-		
+		String output = calApp.printCalForYearMondayFirst("-m 2017");
+		assertEquals(getOutputFromFile("cal_monday_2017.txt"), output);
 	}
 	
 	@Test
-	public void testThrowInvalidMonth() {
-		
+	public void testRunPrintCalForMonthYear() {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			calApp.run(new String[]{"1", "2016"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		String expected = getOutputFromFile("cal_jan_2016.txt");
+		assertEquals(expected, new String(byteArray));
 	}
 	
 	@Test
-	public void testThrowInvalidYear() {
-		
+	public void testRunPrintCalForYear() {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			calApp.run(new String[]{"17"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		String expected = getOutputFromFile("cal_2017.txt");
+		assertEquals(expected, new String(byteArray));
+	}
+	
+	@Test
+	public void testRunPrintCalForMonthYearMondayFirst() {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			calApp.run(new String[]{"-m", "1", "2016"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		String expected = getOutputFromFile("cal_monday_jan_2016.txt");
+		assertEquals(expected, new String(byteArray));
+	}
+	
+	@Test
+	public void testRunPrintCalForYearMondayFirst() {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		try {
+			calApp.run(new String[]{"-m", "17"}, in, out);
+		} catch (AbstractApplicationException e) {
+			e.printStackTrace();
+		}
+		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+		String expected = getOutputFromFile("cal_monday_2017.txt");
+		assertEquals(expected, new String(byteArray));
+	}
+	
+	// option refers to -m. Only -m is allowed
+	@Test (expected = CalException.class)
+	public void testThrowInvalidOption() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"-c"}, in, out);
+	}
+	
+	@Test (expected = CalException.class)
+	public void testThrowInvalidMonthLowerbound() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"0 2017"}, in, out);
+	}
+	
+	@Test (expected = CalException.class)
+	public void testThrowInvalidMonthUpperbound() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"13 17"}, in, out);
+	}
+	
+	@Test (expected = CalException.class)
+	public void testThrowInvalidYear() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"12 0"}, in, out);
 	}
 	
 	/**
