@@ -1,5 +1,9 @@
 /bin
 
+# Temporary folders used for testing
+/test_globbing
+/test_ioredirection
+
 # Covers JetBrains IntelliJ
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
