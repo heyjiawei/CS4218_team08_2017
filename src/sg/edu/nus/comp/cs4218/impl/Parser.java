@@ -12,39 +12,39 @@ import java.util.regex.Pattern;
 public final class Parser {
 
 	// For parsing purposes, all patterns will start from beginning of string
-	private final String patternNonKeyword = "^\\s*[^\\n'\"`;|]+\\s*";
-	private final String patternDash = "^\\s*(-[A-Za-z]*)\\s*";
-	private final String patternSQ = "^\\s*(\'[^\\n']*\')\\s*";
-	private final String patternBQ = "^\\s*(`[^\\n`]*`)\\s*";
-	private final String patternDQ = "^\\s*(\"[^\\n\"`]*\")\\s*";
-	private final String patternBQinDQ = "^\\s*(\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\")\\s*";
-	private final String patternUQ = "^\\s*([^\\s\"'`\\n;|<>]*)\\s*";
+	private final static String PATTERN_NON_KW = "^\\s*[^\\n'\"`;|]+\\s*";
+	private final static String PATTERN_DASH = "^\\s*(-[A-Za-z]*)\\s*";
+	private final static String PATTERN_SQ = "^\\s*(\'[^\\n']*\')\\s*";
+	private final static String PATTERN_BQ = "^\\s*(`[^\\n`]*`)\\s*";
+	private final static String PATTERN_DQ = "^\\s*(\"[^\\n\"`]*\")\\s*";
+	private final static String PATTERN_BQ_IN_DQ = "^\\s*(\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\")\\s*";
+	private final static String PATTERN_UQ = "^\\s*([^\\s\"'`\\n;|<>]*)\\s*";
 
-	private final String patternPipe = "^\\s*\\|";
-	private final String patternSemicolon = "^\\s*;";
-	private final String patternRedir = "^\\s*[<>]\\s*";
+	private final static String PATTERN_PIPE = "^\\s*\\|";
+	private final static String PATTERN_SEMICOLON = "^\\s*;";
+	private final static String PATTERN_REDIR = "^\\s*[<>]\\s*";
 
 	private Pattern[] getCallCommandArgumentPatterns() {
 		// Preserve order for performance
 		return new Pattern[] {
-				Pattern.compile(patternRedir),
-				Pattern.compile(patternDash),
-				Pattern.compile(patternSQ),
-				Pattern.compile(patternBQ),
-				Pattern.compile(patternDQ),
-				Pattern.compile(patternBQinDQ),
-				Pattern.compile(patternUQ),
+				Pattern.compile(PATTERN_REDIR),
+				Pattern.compile(PATTERN_DASH),
+				Pattern.compile(PATTERN_SQ),
+				Pattern.compile(PATTERN_BQ),
+				Pattern.compile(PATTERN_DQ),
+				Pattern.compile(PATTERN_BQ_IN_DQ),
+				Pattern.compile(PATTERN_UQ),
 		};
 	}
 
 	private Pattern[] getCallCommandPatterns() {
 		// Preserve order for performance
 		return new Pattern[] {
-				Pattern.compile(patternNonKeyword),
-				Pattern.compile(patternSQ),
-				Pattern.compile(patternBQ),
-				Pattern.compile(patternDQ),
-				Pattern.compile(patternBQinDQ)
+				Pattern.compile(PATTERN_NON_KW),
+				Pattern.compile(PATTERN_SQ),
+				Pattern.compile(PATTERN_BQ),
+				Pattern.compile(PATTERN_DQ),
+				Pattern.compile(PATTERN_BQ_IN_DQ)
 		};
 	}
 
@@ -73,8 +73,8 @@ public final class Parser {
 		ArrayList<String> callCommands = new ArrayList<>();
 		ArrayList<String[]> sequences = new ArrayList<>();
 		boolean finishedParsing = false;
-		Pattern patternPipe = Pattern.compile(this.patternPipe),
-				patternSemicolon = Pattern.compile(this.patternSemicolon);
+		Pattern patternPipe = Pattern.compile(this.PATTERN_PIPE),
+				patternSemicolon = Pattern.compile(this.PATTERN_SEMICOLON);
 		Matcher matcherPipe, matcherSemicolon;
 
 		while (!finishedParsing) {
