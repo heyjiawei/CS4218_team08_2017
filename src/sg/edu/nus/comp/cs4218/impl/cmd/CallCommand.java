@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.cmd;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.Parser;
 import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 
 /**
@@ -102,234 +104,35 @@ public class CallCommand implements Command {
 	 *             redirection file path.
 	 */
 	public void parse() throws ShellException {
-		Vector<String> cmdVector = new Vector<String>();
-		Boolean result = true;
-		int endIdx = 0;
-		String str = " " + cmdline + " ";
-		try {
-			endIdx = extractArgs(str, cmdVector);
-			cmdVector.add(""); // reserved for input redir
-			cmdVector.add(""); // reserved for output redir
-			endIdx = extractInputRedir(str, cmdVector, endIdx);
-			endIdx = extractOutputRedir(str, cmdVector, endIdx);
-			// System.out.println(cmdVector.toString());
-		} catch (ShellException e) {
-			result = false;
-		}
-		if (str.substring(endIdx).trim().isEmpty()) {
-			result = true;
-		} else {
-			result = false;
-		}
-		if (!result) {
-			this.app = cmdVector.get(0);
-			error = true;
-			if (("").equals(errorMsg)) {
-				errorMsg = ShellImpl.EXP_SYNTAX;
-			}
-			throw new ShellException(errorMsg);
+		Vector<String> cmdVector = new Parser().parseCallCommand(this.cmdline);
+
+		if (cmdVector.isEmpty()) {
+			// Should not happen if cmdline was correctly parsed by Parser.
+			throw new ShellException(ShellImpl.EXP_INVALID_APP);
 		}
 
-		String[] cmdTokensArray = cmdVector
-				.toArray(new String[cmdVector.size()]);
-		this.app = cmdTokensArray[0];
-		int nTokens = cmdTokensArray.length;
+		this.app = cmdVector.get(0);
 
-		// process inputRedir and/or outputRedir
-		if (nTokens >= 3) { // last 2 for inputRedir & >outputRedir
-			this.inputStreamS = cmdTokensArray[nTokens - 2].trim();
-			this.outputStreamS = cmdTokensArray[nTokens - 1].trim();
-			if (!("").equals(inputStreamS)
-					&& inputStreamS.equals(outputStreamS)) {
-				error = true;
-				errorMsg = ShellImpl.EXP_SAME_REDIR;
-				throw new ShellException(errorMsg);
-			}
-			this.argsArray = Arrays.copyOfRange(cmdTokensArray, 1,
-					cmdTokensArray.length - 2);
-		} else {
-			this.argsArray = new String[0];
-		}
-	}
+		Vector<String> argsVector = new Vector<>();
+		Iterator<String> cmdIterator = cmdVector.iterator();
 
-	/**
-	 * Parses the sub-command's arguments to the call command and splits it into
-	 * its different components, namely the application name and the arguments
-	 * (if any), based on rules: Unquoted: any char except for whitespace
-	 * characters, quotes, newlines, semicolons ";", "|", "<" and ">". Double
-	 * quoted: any char except \n, ", ` Single quoted: any char except \n, '
-	 * Back quotes in Double Quote for command substitution: DQ rules for
-	 * outside BQ + `anything but \n` in BQ.
-	 * 
-	 * @param str
-	 *            String of command to split.
-	 * @param cmdVector
-	 *            Vector of String to store the split arguments into.
-	 * 
-	 * @return endIdx Index of string where the parsing of arguments stopped
-	 *         (due to no more matches).
-	 * 
-	 * @throws ShellException
-	 *             If an error in the syntax of the command is detected while
-	 *             parsing.
-	 */
-	int extractArgs(String str, Vector<String> cmdVector) throws ShellException {
-		String patternDash = "[\\s]+(-[A-Za-z]*)[\\s]";
-		String patternUQ = "[\\s]+([^\\s\"'`\\n;|<>]*)[\\s]";
-		String patternDQ = "[\\s]+(\"[^\\n\"`]*\")[\\s]";
-		String patternSQ = "[\\s]+(\'[^\\n']*\')[\\s]";
-		String patternBQ = "[\\s]+(`[^\\n`]*`)[\\s]";
-		String patternBQinDQ = "[\\s]+(\"[^\\n\"`]*`[^\\n]*`[^\\n\"`]*\")[\\s]";
-		String[] patterns = { patternDash, patternUQ, patternDQ, patternSQ,
-				patternBQ, patternBQinDQ };
-		String substring;
-		int newStartIdx = 0, smallestStartIdx, smallestPattIdx, newEndIdx = 0;
-		do {
-			substring = str.substring(newEndIdx);
-			smallestStartIdx = -1;
-			smallestPattIdx = -1;
-			if (substring.trim().startsWith("<")
-					|| substring.trim().startsWith(">")) {
-				break;
-			}
-			for (int i = 0; i < patterns.length; i++) {
-				Pattern pattern = Pattern.compile(patterns[i]);
-				Matcher matcher = pattern.matcher(substring);
-				if (matcher.find()
-						&& (matcher.start() < smallestStartIdx || smallestStartIdx == -1)) {
-					smallestPattIdx = i;
-					smallestStartIdx = matcher.start();
-				}
-			}
-			if (smallestPattIdx != -1) { // if a pattern is found
-				Pattern pattern = Pattern.compile(patterns[smallestPattIdx]);
-				Matcher matcher = pattern.matcher(str.substring(newEndIdx));
-				if (matcher.find()) {
-					String matchedStr = matcher.group(1);
-					newStartIdx = newEndIdx + matcher.start();
-					if (newStartIdx != newEndIdx) {
-						error = true;
-						errorMsg = ShellImpl.EXP_SYNTAX;
-						throw new ShellException(errorMsg);
-					} // check if there's any invalid token not detected
-					cmdVector.add(matchedStr);
-					newEndIdx = newEndIdx + matcher.end() - 1;
-				}
-			}
-		} while (smallestPattIdx != -1);
-		return newEndIdx;
-	}
+		this.app = cmdIterator.next();
 
-	/**
-	 * Extraction of input redirection from cmdLine with two slots at end of
-	 * cmdVector reserved for <inputredir and >outredir. For valid inputs,
-	 * assumption that input redir and output redir are always at the end of the
-	 * command and input stream first the output stream if both are in the args
-	 * 
-	 * @param str
-	 *            String of command to split.
-	 * @param cmdVector
-	 *            Vector of String to store the found result into.
-	 * @param endIdx
-	 *            Index of str to start parsing from.
-	 * 
-	 * @return endIdx Index of string where the parsing of arguments stopped
-	 *         (due to no more matches).
-	 * 
-	 * @throws ShellException
-	 *             When more than one input redirection string is found, or when
-	 *             invalid syntax is encountered..
-	 */
-	int extractInputRedir(String str, Vector<String> cmdVector, int endIdx)
-			throws ShellException {
-		String substring = str.substring(endIdx);
-		String strTrm = substring.trim();
-		if (strTrm.startsWith(">") || strTrm.isEmpty()) {
-			return endIdx;
-		}
-		if (!strTrm.startsWith("<")) {
-			throw new ShellException(EXP_SYNTAX);
-		}
+		String arg;
 
-		int newEndIdx = endIdx;
-		Pattern inputRedirP = Pattern
-				.compile("[\\s]+<[\\s]+(([^\\n\"`'<>]*))[\\s]");
-		Matcher inputRedirM;
-		String inputRedirS = "";
-		int cmdVectorIndex = cmdVector.size() - 2;
+		while (cmdIterator.hasNext()) {
+			arg = cmdIterator.next();
 
-		while (!substring.trim().isEmpty()) {
-			inputRedirM = inputRedirP.matcher(substring);
-			inputRedirS = "";
-			if (inputRedirM.find()) {
-				if (!cmdVector.get(cmdVectorIndex).isEmpty()) {
-					throw new ShellException(EXP_SYNTAX);
-				}
-				inputRedirS = inputRedirM.group(1);
-				cmdVector.set(cmdVectorIndex, inputRedirS);
-				newEndIdx = newEndIdx + inputRedirM.end() - 1;
+			if (arg.equals("<")) {
+				this.inputStreamS = cmdIterator.next();
+			} else if(arg.equals(">")) {
+				this.outputStreamS = cmdIterator.next();
 			} else {
-				break;
+				argsVector.add(arg);
 			}
-			substring = str.substring(newEndIdx);
-		}
-		return newEndIdx;
-	}
-
-	/**
-	 * Extraction of output redirection from cmdLine with two slots at end of
-	 * cmdVector reserved for <inputredir and >outredir. For valid inputs,
-	 * assumption that input redir and output redir are always at the end of the
-	 * command and input stream first the output stream if both are in the args.
-	 * 
-	 * @param str
-	 *            String of command to split.
-	 * @param cmdVector
-	 *            Vector of String to store the found result into.
-	 * @param endIdx
-	 *            Index of str to start parsing from.
-	 * 
-	 * @return endIdx Index of string where the parsing of arguments stopped
-	 *         (due to no more matches).
-	 * 
-	 * @throws ShellException
-	 *             When more than one input redirection string is found, or when
-	 *             invalid syntax is encountered..
-	 */
-	int extractOutputRedir(String str, Vector<String> cmdVector, int endIdx)
-			throws ShellException {
-		String substring = str.substring(endIdx);
-		String strTrm = substring.trim();
-		if (strTrm.isEmpty()) {
-			return endIdx;
-		}
-		if (!strTrm.startsWith(">")) {
-			throw new ShellException(EXP_SYNTAX);
 		}
 
-		int newEndIdx = endIdx;
-		Pattern inputRedirP = Pattern
-				.compile("[\\s]+>[\\s]+(([^\\n\"`'<>]*))[\\s]");
-		Matcher inputRedirM;
-		String inputRedirS = "";
-		int cmdVectorIdx = cmdVector.size() - 1;
-		while (!substring.trim().isEmpty()) {
-
-			inputRedirM = inputRedirP.matcher(substring);
-			inputRedirS = "";
-			if (inputRedirM.find()) {
-				if (!cmdVector.get(cmdVectorIdx).isEmpty()) {
-					throw new ShellException(EXP_SYNTAX);
-				}
-				inputRedirS = inputRedirM.group(1);
-				cmdVector.set(cmdVectorIdx, inputRedirS);
-				newEndIdx = newEndIdx + inputRedirM.end() - 1;
-			} else {
-				break;
-			}
-			substring = str.substring(newEndIdx);
-		}
-		return newEndIdx;
+		this.argsArray = argsVector.toArray(new String[argsVector.size()]);
 	}
 
 	/**

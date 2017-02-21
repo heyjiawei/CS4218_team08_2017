@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+import java.util.Vector;
+
 public class ParserTest {
 
 	private final Parser parser = new Parser();
@@ -17,8 +19,17 @@ public class ParserTest {
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
-	public void testParseInvalidSyntax() throws ShellException {
+	public void testParseInvalidPipeSyntax() throws ShellException {
 		String cmd = "echo \"cd\" | | |";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parse(cmd);
+	}
+
+	@Test
+	public void testParseInvalidQuoteSyntax() throws ShellException {
+		String cmd = "echo \"cd";
 
 		thrown.expect(ShellException.class);
 		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
@@ -147,5 +158,90 @@ public class ParserTest {
 		for (int index = 0; index < correctSequences.length; index++) {
 			assertArrayEquals(correctSequences[index], sequences[index]);
 		}
+	}
+
+	@Test
+	public void testParseCallCommandArguments() throws ShellException {
+		String cmd = "echo a 'b' \"c\" `d` \"`echo 'e'`\"";
+		String[] correctSequences = { "echo", "a", "'b'", "\"c\"", "`d`", "\"`echo 'e'`\"" };
+
+		Vector<String> parsed = parser.parseCallCommand(cmd);
+		String[] sequences = parsed.toArray(new String[parsed.size()]);
+
+		assertArrayEquals(correctSequences, sequences);
+	}
+
+	@Test
+	public void testParseCallCommandInvalidArguments() throws ShellException {
+		String cmd = "echo -1";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandArgumentsNoWhitespace() throws ShellException {
+		String cmd = "echo a'b'\"c\"`d`\"`echo 'e'`\"";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandRedirection() throws ShellException {
+		String cmd = "grep \"Interesting String\" < text1.txt > result.txt";
+		String[] correctSequences = { "grep", "\"Interesting String\"", "<", "text1.txt", ">", "result.txt" };
+
+		Vector<String> parsed = parser.parseCallCommand(cmd);
+		String[] sequences = parsed.toArray(new String[parsed.size()]);
+
+		assertArrayEquals(correctSequences, sequences);
+	}
+
+	@Test
+	public void testParseCallCommandRedirectionNoWhitespace() throws ShellException {
+		String cmd = "grep \"Interesting String\"<text1.txt>result.txt";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandRedirectionNoInputFile() throws ShellException {
+		String cmd = "grep \"Interesting String\" < ";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandRedirectionNoOutputFile() throws ShellException {
+		String cmd = "echo \"Interesting String\" > ";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandRedirectionMultipleInputFile() throws ShellException {
+		String cmd = "grep \"Interesting String\" < result.txt < result2.txt";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_MULTIPLE_FILE_REDIR);
+		parser.parseCallCommand(cmd);
+	}
+
+	@Test
+	public void testParseCallCommandRedirectionMultipleOutputFile() throws ShellException {
+		String cmd = "echo \"Interesting String\" > result.txt > result2.txt";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_MULTIPLE_FILE_REDIR);
+		parser.parseCallCommand(cmd);
 	}
 }
