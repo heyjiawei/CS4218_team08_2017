@@ -116,6 +116,11 @@ public class CallCommand implements Command {
 			}
 		}
 
+		if (!this.inputStreamS.isEmpty() &&
+				this.inputStreamS.equals(this.outputStreamS)) {
+			throw new ShellException(ShellImpl.EXP_SAME_REDIR);
+		}
+
 		this.argsArray = argsVector.toArray(new String[argsVector.size()]);
 	}
 

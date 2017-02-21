@@ -104,6 +104,15 @@ public class CallCommandTest {
 	}
 
 	@Test
+	public void testParseSameInputOutputRedirection() throws ShellException {
+		call.cmdline = "  grep 'a' < result.txt > result.txt";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SAME_REDIR);
+		call.parse();
+	}
+
+	@Test
 	public void testEvaluateNoInputOutputStream()
 			throws AbstractApplicationException, ShellException {
 		call.app = "cat";
