@@ -244,4 +244,15 @@ public class ParserTest {
 		thrown.expectMessage(ShellImpl.EXP_MULTIPLE_FILE_REDIR);
 		parser.parseCallCommand(cmd);
 	}
+
+	@Test
+	public void testParseCallCommandRedirectionBeforeApplication() throws ShellException {
+		String cmd = "> result.txt < text1.txt grep \"Interesting String\"";
+		String[] correctSequences = { ">", "result.txt", "<", "text1.txt", "grep", "\"Interesting String\"" };
+
+		Vector<String> parsed = parser.parseCallCommand(cmd);
+		String[] sequences = parsed.toArray(new String[parsed.size()]);
+
+		assertArrayEquals(correctSequences, sequences);
+	}
 }
