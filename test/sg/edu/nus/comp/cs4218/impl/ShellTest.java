@@ -57,7 +57,7 @@ public class ShellTest {
 		String cmd = "echo `echo `echo cat` cat`";
 		
 		thrown.expect(ShellException.class);
-		thrown.expectMessage(CallCommand.EXP_SYNTAX);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
 		
 		shell.parseAndEvaluate(cmd, outputStream);
 		
