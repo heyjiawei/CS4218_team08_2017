@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 import sg.edu.nus.comp.cs4218.Application;
 
-public interface Wc extends Application {
+public interface Wc extends Application { // NOPMD - Provided interface
 
 	/**
 	 * Returns string containing the character count in file

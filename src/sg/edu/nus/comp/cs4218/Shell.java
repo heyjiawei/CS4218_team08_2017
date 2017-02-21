@@ -28,7 +28,7 @@ public interface Shell {
 	 * Evaluate pipe call with one part generating an exception
 	 * @param args String containing the commands, input arguments and the pipe operator/s
 	 */
-//	public String pipeWithException(String args);
+	public String pipeWithException(String args);
 
 	/**
 	 * Evaluate globbing with no files or directories

@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.app;
 
 import sg.edu.nus.comp.cs4218.Application;
 
-public interface Sort extends Application {
+public interface Sort extends Application { // NOPMD - Provided interface
 
 	/**
 	 * Returns a sorted string containing only simple letters
