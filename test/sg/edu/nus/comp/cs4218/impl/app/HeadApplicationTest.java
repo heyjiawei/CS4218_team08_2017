@@ -165,6 +165,20 @@ public class HeadApplicationTest {
 				convertFileToString(expectedOutputFilePathString);
 		assertEquals(expectedOutputFileString, outputStream.toString());
 	}
+
+	@Test
+	public void testValidFilePathWithEqualLinesToSpecifiedOutputLineCount()
+			throws HeadException, IOException {
+		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFileString;
+		String[] args = {"16", inputFilePathString};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		headApplication.run(args, inputStream, outputStream);
+		expectedOutputFileString =
+				convertFileToString(inputFilePathString);
+		assertEquals(expectedOutputFileString, outputStream.toString());
+	}
 	
 	@Test
 	public void testValidFileSeparatedByEmptyLinesWithDefaultOutputLineCount()
@@ -203,7 +217,7 @@ public class HeadApplicationTest {
 		headApplication.run(args, inputStream, outputStream);
 		assertEquals(testString, outputStream.toString());
 	}
-	
+
 	@Test
 	public void testInputFromStdInWithMoreLinesThanDefaultOutputLineCount()
 			throws HeadException, IOException {
@@ -217,7 +231,7 @@ public class HeadApplicationTest {
 		headApplication.run(args, inputStream, outputStream);
 		assertEquals(expectedOutputString, outputStream.toString());
 	}
-	
+
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
 		String sixNewLines = new String(new char[6]).replace("\0", newLine);

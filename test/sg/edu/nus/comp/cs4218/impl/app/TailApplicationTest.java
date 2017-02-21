@@ -151,7 +151,7 @@ public class TailApplicationTest {
 	}
 	
 	@Test
-	public void testValidFilePathWithMoreLinesThanSpecifiedOutputLineCount() 
+	public void testValidFilePathWithMoreLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
 		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = testFilesPath +
@@ -166,6 +166,20 @@ public class TailApplicationTest {
 		assertEquals(expectedOutputFileString, outputStream.toString());
 	}
 	
+	@Test
+	public void testValidFilePathWithEqualLinesToSpecifiedOutputLineCount()
+			throws TailException, IOException {
+		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFileString;
+		String[] args = {"16", inputFilePathString};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		tailApplication.run(args, inputStream, outputStream);
+		expectedOutputFileString =
+				convertFileToString(inputFilePathString);
+		assertEquals(expectedOutputFileString, outputStream.toString());
+	}
+
 	@Test
 	public void testValidFileSeparatedByEmptyLinesWithDefaultOutputLineCount()
 			throws TailException, IOException {
