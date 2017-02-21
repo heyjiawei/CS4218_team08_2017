@@ -201,14 +201,14 @@ public class WcApplicationTest {
 	public void testThrowNoStdinInputProvidedException() throws Exception {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		wcApp.run(new String[]{}, in, out);
+		wcApp.run(new String[]{""}, in, out);
 	}
 	
 	@Test (expected = WcException.class)
 	public void testThrowInvalidFileNameException() throws Exception {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		wcApp.run(new String[]{"-l", "this test.txt"}, in, out);
+		wcApp.run(new String[]{"this"}, in, out);
 	}
 	
 	@Test (expected = WcException.class)

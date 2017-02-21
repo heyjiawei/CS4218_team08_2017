@@ -150,8 +150,7 @@ public class WcApplication implements Wc {
 
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
-			if (stdin.read() > -1) {
-				stdin.reset();
+			if (stdin.available() > 0) {
 				return false;
 			} else {
 				return true;
@@ -215,6 +214,39 @@ public class WcApplication implements Wc {
 		}
 	}
 
+	private void processCountInStdin(InputStream stdin) {
+		if (this.isCountProcessed) {
+			return;
+		}
+		BufferedInputStream is = new BufferedInputStream(stdin);
+		byte[] c = new byte[1024];
+	    int readChars = 0;
+		try {
+			while ((readChars = is.read(c)) != -1) {
+				String line = new String(c, 0, readChars);
+				this.charCount += line.length();
+				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+				
+				for (int i = 0; i < parts.length; i++) {
+					if (parts[i].length() > 0) {
+						this.wordCount++;
+					}
+				}
+				
+				int pos = -1;
+				while ((pos = line.indexOf("\n")) != -1) {
+					this.lineCount++;
+					line = line.substring(pos + 1);
+				}
+			}
+			is.close();
+			stdin.reset();
+			this.isCountProcessed = true;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * Returns string containing the character count in file
 	 * @param args String containing command and arguments
@@ -257,39 +289,6 @@ public class WcApplication implements Wc {
 				this.lineCount;
 	}
 	
-	private void processCountInStdin(InputStream stdin) {
-		if (this.isCountProcessed) {
-			return;
-		}
-		BufferedInputStream is = new BufferedInputStream(stdin);
-		byte[] c = new byte[1024];
-        int readChars = 0;
-		try {
-			while ((readChars = is.read(c)) != -1) {
-				String line = new String(c, 0, readChars);
-				this.charCount += line.length();
-				String[] parts = line.replaceAll("\\s+", " ").split(" ");
-				
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].length() > 0) {
-						this.wordCount++;
-					}
-				}
-				
-				int pos = -1;
-				while ((pos = line.indexOf("\n")) != -1) {
-					this.lineCount++;
-					line = line.substring(pos + 1);
-				}
-			}
-			is.close();
-			stdin.reset();
-			this.isCountProcessed = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Returns string containing the character count in Stdin
 	 * @param args String containing command and arguments
