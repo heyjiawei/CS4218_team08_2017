@@ -413,7 +413,7 @@ public class SortApplicationTest {
 			throws AbstractApplicationException, IOException {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath +
-				"all_treat_first_word_as_number_sortedl_sorted.txt";
+				"all_treat_first_word_as_number_sorted.txt";
 		String[] args = {"-n", allFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
