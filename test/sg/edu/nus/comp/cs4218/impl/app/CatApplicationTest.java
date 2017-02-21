@@ -16,6 +16,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.junit.rules.ExpectedException;
+
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
 public class CatApplicationTest {
@@ -24,6 +26,7 @@ public class CatApplicationTest {
 	private ByteArrayOutputStream outputStream;
 	private CatApplication catApplication;
 	private final String testFilesPath = "test_inputs/cat/";
+	private final String newLine = System.getProperty("line.separator");
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -171,7 +174,8 @@ public class CatApplicationTest {
 	
 	@Test
 	public void testInputFromStdIn() throws CatException, IOException {
-		String testString = "test string\n\n\n string test";
+		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String testString = "test string" + threeNewLines + " string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
@@ -191,7 +195,7 @@ public class CatApplicationTest {
 	
 	@Test
 	public void testOneValidAbsoluteFilePath() throws CatException, IOException {
-		String currentDirectory = System.getProperty("user.dir");
+		String currentDirectory = Environment.currentDirectory;
 		String filePathString = testFilesPath + "lorem_ipsum_short.txt";
 		String absoluteFilePathString = currentDirectory +
 				File.separator + filePathString;
