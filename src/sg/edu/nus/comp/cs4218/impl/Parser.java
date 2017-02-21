@@ -220,7 +220,7 @@ public final class Parser {
 	public Vector<String> parseCallCommand(String cmdline)
 			throws ShellException {
 		Pattern[] compiledPatterns = getCallCommandArgumentPatterns();
-		String substring = cmdline + ' ', atom;
+		String substring = cmdline + " ", atom;
 		int newEndIdx;
 		Vector<String> atoms = new Vector<>();
 
@@ -233,7 +233,12 @@ public final class Parser {
 			if (!atom.endsWith(" ")) {
 				throw new ShellException(ShellImpl.EXP_SYNTAX + substring);
 			}
-			atoms.add(atom.trim());
+
+			atom = atom.trim();
+
+			if (!atom.isEmpty()) {
+				atoms.add(atom.trim());
+			}
 		}
 
 		if (!substring.matches("^\\s*$")) {
