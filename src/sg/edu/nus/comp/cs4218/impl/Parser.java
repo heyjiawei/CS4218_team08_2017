@@ -24,6 +24,12 @@ public final class Parser {
 	private final static String PATTERN_SEMICOLON = "^\\s*;";
 	private final static String PATTERN_REDIR = "^\\s*[<>]\\s*";
 
+	/**
+	 * Gets the compiled regexes used for parsing arguments for a single call
+	 * command.
+	 *
+	 * @return Array of patterns.
+	 */
 	private Pattern[] getCallCommandArgumentPatterns() {
 		// Preserve order for performance
 		return new Pattern[] {
@@ -37,6 +43,11 @@ public final class Parser {
 		};
 	}
 
+	/**
+	 * Gets the compiled regexes used for parsing a single call command.
+	 *
+	 * @return Array of patterns.
+	 */
 	private Pattern[] getCallCommandPatterns() {
 		// Preserve order for performance
 		return new Pattern[] {
@@ -48,6 +59,15 @@ public final class Parser {
 		};
 	}
 
+	/**
+	 * From the provided patterns, find one that matches the subcommand
+	 *
+	 * @param patterns
+	 *            Array of patterns to be matched with.
+	 * @param subcommand
+	 *            String to be used for matching
+	 * @return The matcher for the first matched pattern, or null if unmatched.
+	 */
 	private Matcher getPatternMatch(Pattern[] patterns, String subcommand) {
 		for (Pattern pattern: patterns) {
 			Matcher matcher = pattern.matcher(subcommand);
@@ -59,6 +79,16 @@ public final class Parser {
 		return null;
 	}
 
+	/**
+	 * Checks for empty command.
+	 *
+	 * @param cmd
+	 *            Command to be checked.
+	 * @param restOfCmd
+	 *            Rest of the unparsed command string.
+	 * @throws ShellException
+	 *            If the command is empty.
+	 */
 	private void checkEmptyCommand(String cmd, String restOfCmd)
 			throws ShellException {
 		if (cmd.trim().isEmpty()) {
@@ -66,6 +96,20 @@ public final class Parser {
 		}
 	}
 
+	/**
+	 * Parses a string into a 2D array. The first level of the array is for
+	 * the subsequences which are separated by semicolons. While the second
+	 * level of the array is for the call commands within that subsequence,
+	 * there will be multiple call commands when pipe operators are used in
+	 * the subsequence.
+	 *
+	 * @param cmdline
+	 *            String to be parsed.
+	 * @return
+	 *            2D array of call commands.
+	 * @throws ShellException
+	 *            If an exception happens while parsing the string.
+	 */
 	public String[][] parse(String cmdline) throws ShellException {
 		Pattern[] compiledPatterns = getCallCommandPatterns();
 		String substring = cmdline, command = "";
@@ -116,6 +160,16 @@ public final class Parser {
 		return sequences.toArray(new String[sequences.size()][]);
 	}
 
+	/**
+	 * Checks for valid syntax being used for redirection in a call command.
+	 * - Multiple files for input/output redirection is not supported.
+	 * - Input/Output redirection operators must be followed by a non-operator.
+	 *
+	 * @param atoms
+	 *            Vector of atoms in the call command.
+	 * @throws ShellException
+	 *            If an exception happens while checking the atoms.
+	 */
 	private void checkValidRedirection(Vector<String> atoms)
 			throws ShellException {
 		boolean hasInputRedir = false, hasOutputRedir = false;
@@ -150,6 +204,19 @@ public final class Parser {
 		}
 	}
 
+	/**
+	 * Parses a string into a String Vector of atoms in the call command.
+	 * Input/Output redirection operators are treated as a single atom. All
+	 * atoms are trimmed. Quoted atoms will retain the quotation symbols for
+	 * backquote processing.
+	 *
+	 * @param cmdline
+	 *            String to be parsed.
+	 * @return
+	 *            String Vector of atoms.
+	 * @throws ShellException
+	 *            If an exception happens while parsing the string.
+	 */
 	public Vector<String> parseCallCommand(String cmdline)
 			throws ShellException {
 		Pattern[] compiledPatterns = getCallCommandArgumentPatterns();
