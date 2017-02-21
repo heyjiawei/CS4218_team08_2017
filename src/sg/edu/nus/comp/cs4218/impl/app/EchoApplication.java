@@ -33,14 +33,14 @@ public class EchoApplication implements Application {
 	 */
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws EchoException {
-		if (args == null) {
-			throw new EchoException("Null arguments");
-		}
 		if (stdout == null) {
 			throw new EchoException("OutputStream not provided");
 		}
+		if (args == null && stdin == null) {
+			throw new EchoException("No input provided");
+		}
 		try {
-			if (args.length > 0) {
+			if (args != null) {
 				for (int i = 0; i < args.length; i++) {
 					String argument = args[i];
 					if (argument == null) {
@@ -50,6 +50,12 @@ public class EchoApplication implements Application {
 						stdout.write(" ".getBytes());
 					}
 					stdout.write(argument.getBytes());
+				}
+			} else {
+				byte[] buffer = new byte[1024];
+				int numberOfBytesRead;
+				while ((numberOfBytesRead = stdin.read(buffer)) != -1) {
+					stdout.write(buffer, 0, numberOfBytesRead);
 				}
 			}
 			stdout.write("\n".getBytes());
