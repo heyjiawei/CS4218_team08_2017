@@ -13,7 +13,6 @@ import org.junit.rules.ExpectedException;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 
 public class ShellTest {
 	ByteArrayOutputStream outputStream;
@@ -99,6 +98,15 @@ public class ShellTest {
 		output = shell.pipeMultipleCommands(cmd);
 
 		assertEquals("yes" + newLine, output);
+	}
+
+	@Test
+	public void testPipeWithException() throws AbstractApplicationException, ShellException {
+		String cmd = "head '   ' | echo unreachable";
+
+		output = shell.pipeWithException(cmd);
+
+		assertEquals("head: Could not read file", output);
 	}
 
 	@Test
