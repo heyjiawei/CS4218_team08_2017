@@ -113,14 +113,14 @@ public class CalApplicationTest {
 	    writer.println("30 31");
 	    writer.close();
 	    
-	    writer = new PrintWriter("cal_jan_2016.txt", "UTF-8");
-	    writer.println("January 16");
+	    writer = new PrintWriter("cal_feb_2016.txt", "UTF-8");
+	    writer.println("February 16");
 	    writer.println("Su Mo Tu We Th Fr Sa");
-	    writer.println("          1  2  3  4");
-	    writer.println(" 5  6  7  8  9 10 11");
-	    writer.println("12 13 14 15 16 17 18");
-	    writer.println("19 20 21 22 23 24 25");
-	    writer.println("26 27 28 29 30 31");
+	    writer.println("                   1");
+	    writer.println(" 2  3  4  5  6  7  8");
+	    writer.println(" 9 10 11 12 13 14 15");
+	    writer.println("16 17 18 19 20 21 22");
+	    writer.println("23 24 25 26 27 28 29");
 	    writer.close();
 	    
 	    writer = new PrintWriter("cal_monday_jan_2016.txt", "UTF-8");
@@ -148,7 +148,7 @@ public class CalApplicationTest {
 	public static void tearDownAfterClass() throws Exception {
 		new File("cal_2017.txt").delete(); 
 		new File("cal_monday_2017.txt").delete();
-		new File("cal_jan_2016.txt").delete();
+		new File("cal_feb_2016.txt").delete();
 		new File("cal_monday_jan_2016.txt").delete();
 		new File("cal_monday_dec_2017.txt").delete();
 	}
@@ -177,7 +177,7 @@ public class CalApplicationTest {
 	@Test
 	public void testPrintCalForMonthYear() {
 		String output = calApp.printCalForMonthYear("1 16");
-		assertEquals(getOutputFromFile("cal_jan_2016.txt"), output);
+		assertEquals(getOutputFromFile("cal_feb_2016.txt"), output);
 	}
 	
 	@Test
@@ -208,7 +208,7 @@ public class CalApplicationTest {
 			e.printStackTrace();
 		}
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-		String expected = getOutputFromFile("cal_jan_2016.txt");
+		String expected = getOutputFromFile("cal_feb_2016.txt");
 		assertEquals(expected, new String(byteArray));
 	}
 	

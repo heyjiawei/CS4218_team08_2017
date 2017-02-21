@@ -16,7 +16,7 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 public class EchoApplicationTest {
 
 	private InputStream inputStream = null;
-	private ByteArrayOutputStream outputStream = null;
+	private ByteArrayOutputStream outputStream;
 	private EchoApplication echoApplication;
 	private final String lineSeparator = System.getProperty("line.separator");
 
@@ -31,6 +31,7 @@ public class EchoApplicationTest {
 	@Before
 	public void setUp() throws Exception {
 		echoApplication = new EchoApplication();
+		outputStream = new ByteArrayOutputStream();
 	}
 
 	@After
@@ -40,27 +41,25 @@ public class EchoApplicationTest {
 	@Test(expected = EchoException.class)
 	public void testThrowWhenArgsNull() throws EchoException {
 		String[] args = null;
-		outputStream = new ByteArrayOutputStream();
 		echoApplication.run(args, inputStream, outputStream);
 	}
 
 	@Test(expected = EchoException.class)
 	public void testThrowWhenOutputStreamNull() throws EchoException {
 		String[] args = {};
+		outputStream = null;
 		echoApplication.run(args, inputStream, outputStream);
 	}
 
 	@Test(expected = EchoException.class)
 	public void testNullArgument() throws EchoException {
 		String[] args = {null};
-		outputStream = new ByteArrayOutputStream();
 		echoApplication.run(args, inputStream, outputStream);
 	}
 
 	@Test
 	public void testNoArguments() throws EchoException {
 		String[] args = {};
-		outputStream = new ByteArrayOutputStream();
 		echoApplication.run(args, inputStream, outputStream);
 		assertEquals("\n", outputStream.toString());
 	}
@@ -69,7 +68,6 @@ public class EchoApplicationTest {
 	public void testOneArgument() throws EchoException {
 		String testArgument = "test argument";
 		String[] args = {testArgument};
-		outputStream = new ByteArrayOutputStream();
 		echoApplication.run(args, inputStream, outputStream);
 		assertEquals(testArgument + lineSeparator, outputStream.toString());
 	}
@@ -79,7 +77,6 @@ public class EchoApplicationTest {
 		String firstTestArgument = "first test argument";
 		String secondTestArgument = "second test argument";
 		String[] args = {firstTestArgument, secondTestArgument};
-		outputStream = new ByteArrayOutputStream();
 		echoApplication.run(args, inputStream, outputStream);
 		String expectedResult = firstTestArgument + " " +
 				secondTestArgument + lineSeparator;

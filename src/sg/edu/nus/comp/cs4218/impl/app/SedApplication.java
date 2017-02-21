@@ -14,6 +14,7 @@ import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.app.Sed;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.SedException;
 
 public class SedApplication implements Sed {
 	private String delimiter = null;
@@ -320,7 +321,7 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidReplacement(String args) {
-		return "Invalid replacement string. Replacement of a backslash";
+		return "sed: Invalid replacement string. Replacement of a backslash";
 	}
 
 	/**
@@ -329,7 +330,7 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidRegex(String args) {
-		return "Invalid regex pattern. Regex consist of a backslash";
+		return "sed: Invalid regex pattern. Regex consist of a backslash";
 	}
 
 }

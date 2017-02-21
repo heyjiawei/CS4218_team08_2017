@@ -39,6 +39,7 @@ public class ShellIORedirectionTest {
 	public void setUp() throws Exception {
 		shell = new ShellImpl();
 		outputStream = new ByteArrayOutputStream();
+
 		Files.createDirectories(Paths.get(TEST_FILE_PATH));
 		try(PrintWriter out = new PrintWriter(TEST_FILE_INPUT)) {
 		    out.print(TEST_STRING + NEW_LINE);

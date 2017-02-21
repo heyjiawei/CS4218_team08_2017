@@ -1,6 +1,4 @@
-package sg.edu.nus.comp.cs4218.impl.app;
-
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+package sg.edu.nus.comp.cs4218.exception;
 
 public class SedException extends AbstractApplicationException {
 

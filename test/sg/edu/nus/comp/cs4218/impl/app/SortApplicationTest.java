@@ -2,7 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,6 +14,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 
 // Assumptions made in tests:
 // 1. 'Simple' letters means lowercase letters
@@ -24,6 +28,8 @@ import org.junit.Test;
 //    but abc34 or a34bc will not be recognized as a number)
 public class SortApplicationTest {
 
+	private InputStream inputStream;
+	private ByteArrayOutputStream outputStream;
 	private SortApplication sortApplication;
 	private final String testFilesPath = "test_inputs/sort/";
 
@@ -90,7 +96,7 @@ public class SortApplicationTest {
 		String numbersFilePath = testFilesPath + "simple_numbers.txt";
 		String sortedNumbersFilePath = testFilesPath + 
 				"numbers_sorted_treating_first_word_as_number.txt";
-		String sortedString = sortApplication.sortNumbers(numbersFilePath);
+		String sortedString = sortApplication.sortNumbers("-n " + numbersFilePath);
 		String sortedNumbersString = convertFileToString(sortedNumbersFilePath);
 		assertEquals(sortedNumbersString, sortedString);
 	}
@@ -149,7 +155,8 @@ public class SortApplicationTest {
 		String simpleNumbersFilePath = testFilesPath + "simple_numbers.txt";
 		String sortedSimpleNumbersFilePath = testFilesPath + 
 				"simple_numbers_sorted_treating_first_word_as_number.txt";
-		String sortedString = sortApplication.sortSimpleNumbers(simpleNumbersFilePath);
+		String sortedString = sortApplication.sortSimpleNumbers("-n " +
+				simpleNumbersFilePath);
 		String sortedSimpleNumbersString = convertFileToString(sortedSimpleNumbersFilePath);
 		assertEquals(sortedSimpleNumbersString, sortedString);
 	}
@@ -192,7 +199,8 @@ public class SortApplicationTest {
 		String capitalNumbersFilePath = testFilesPath + "capital_numbers.txt";
 		String sortedCapitalNumbersFilePath = testFilesPath + 
 				"capital_numbers_sorted_treating_first_word_as_number.txt";
-		String sortedString = sortApplication.sortCapitalNumbers(capitalNumbersFilePath);
+		String sortedString = sortApplication.sortCapitalNumbers("-n " +
+				capitalNumbersFilePath);
 		String sortedCapitalNumbersString = convertFileToString(sortedCapitalNumbersFilePath);
 		assertEquals(sortedCapitalNumbersString, sortedString);
 	}
@@ -236,7 +244,8 @@ public class SortApplicationTest {
 		String numbersSpecialFilePath = testFilesPath + "numbers_special.txt";
 		String sortedNumbersSpecialFilePath = testFilesPath + 
 				"numbers_special_sorted_treating_first_word_as_number.txt";
-		String sortedString = sortApplication.sortNumbersSpecialChars(numbersSpecialFilePath);
+		String sortedString = sortApplication.sortNumbersSpecialChars("-n " +
+				numbersSpecialFilePath);
 		String sortedNumbersSpecialString = convertFileToString(sortedNumbersSpecialFilePath);
 		assertEquals(sortedNumbersSpecialString, sortedString);
 	}
@@ -266,7 +275,7 @@ public class SortApplicationTest {
 		String sortedSimpleCapitalNumberFilePath = testFilesPath + 
 				"simple_capital_number_sorted_treating_first_word_as_number.txt";
 		String sortedString = sortApplication.sortNumbersSpecialChars(
-				simpleCapitalNumberFilePath);
+				"-n " + simpleCapitalNumberFilePath);
 		String sortedSimpleCapitalNumberString = convertFileToString(
 				sortedSimpleCapitalNumberFilePath);
 		assertEquals(sortedSimpleCapitalNumberString, sortedString);
@@ -316,7 +325,7 @@ public class SortApplicationTest {
 		String sortedSimpleNumbersSpecialFilePath = testFilesPath +
 				"simple_numbers_special_treat_first_word_as_number_sorted.txt";
 		String sortedString = sortApplication.sortSimpleNumbersSpecialChars(
-				simpleNumbersSpecialFilePath);
+				"-n " + simpleNumbersSpecialFilePath);
 		String sortedSimpleNumbersSpecialString = convertFileToString(
 				sortedSimpleNumbersSpecialFilePath);
 		assertEquals(sortedSimpleNumbersSpecialString, sortedString);
@@ -348,7 +357,7 @@ public class SortApplicationTest {
 		String sortedCapitalNumbersSpecialFilePath = testFilesPath +
 				"capital_numbers_special_treat_first_word_as_number_sorted.txt";
 		String sortedString = sortApplication.sortCapitalNumbersSpecialChars(
-				capitalNumbersSpecialFilePath);
+				"-n " + capitalNumbersSpecialFilePath);
 		String sortedCapitalNumbersSpecialString = convertFileToString(
 				sortedCapitalNumbersSpecialFilePath);
 		assertEquals(sortedCapitalNumbersSpecialString, sortedString);
@@ -375,7 +384,7 @@ public class SortApplicationTest {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath +
 				"all_treat_first_word_as_number_sorted.txt";
-		String sortedString = sortApplication.sortAll(allFilePath);
+		String sortedString = sortApplication.sortAll("-n " + allFilePath);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
 		assertEquals(sortedAllString, sortedString);
 	}
@@ -385,6 +394,32 @@ public class SortApplicationTest {
 		String emptyFilePath = testFilesPath + "empty.txt";
 		String sortedString = sortApplication.sortAll(emptyFilePath);
 		assertEquals("", sortedString);
+	}
+
+	@Test
+	public void testRun() throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String[] args = {allFilePath};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
+	}
+
+	@Test
+	public void testRunTreatFirstWordAsNumber()
+			throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath +
+				"all_treat_first_word_as_number_sorted.txt";
+		String[] args = {"-n", allFilePath};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
 	}
 
 	/**
