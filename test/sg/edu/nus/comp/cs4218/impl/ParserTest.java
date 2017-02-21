@@ -172,6 +172,17 @@ public class ParserTest {
 	}
 
 	@Test
+	public void testParseCallCommandEmptyString() throws ShellException {
+		String cmd = "";
+		String[] correctSequences = { };
+
+		Vector<String> parsed = parser.parseCallCommand(cmd);
+		String[] sequences = parsed.toArray(new String[parsed.size()]);
+
+		assertArrayEquals(correctSequences, sequences);
+	}
+
+	@Test
 	public void testParseCallCommandInvalidArguments() throws ShellException {
 		String cmd = "echo -1";
 
