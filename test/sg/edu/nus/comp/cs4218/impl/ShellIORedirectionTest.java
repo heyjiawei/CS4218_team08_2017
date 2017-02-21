@@ -1,6 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
@@ -23,11 +22,13 @@ public class ShellIORedirectionTest {
 	ByteArrayOutputStream outputStream;
 	private Shell shell;
 	private String output;
-	private final String newLine = System.getProperty("line.separator");
 	
-	private static final String testFilePath = "test_ioredirection/";
-	private static final String testFileInput = "test_ioredirection/input.txt";
-	private static final String testFileOutput = "test_ioredirection/output.txt";
+	private static final String NEW_LINE = System.getProperty("line.separator");
+	
+	private static final String TEST_STRING = "test";
+	private static final String TEST_FILE_PATH = "test_ioredirection/";
+	private static final String TEST_FILE_INPUT = "test_ioredirection/input.txt";
+	private static final String TEST_FILE_OUTPUT = "test_ioredirection/output.txt";
 
 	static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -38,41 +39,52 @@ public class ShellIORedirectionTest {
 	public void setUp() throws Exception {
 		shell = new ShellImpl();
 		outputStream = new ByteArrayOutputStream();
-		Files.createDirectories(Paths.get(testFilePath));
-		try(PrintWriter out = new PrintWriter(testFileInput)) {
-		    out.print("test");
+		Files.createDirectories(Paths.get(TEST_FILE_PATH));
+		try(PrintWriter out = new PrintWriter(TEST_FILE_INPUT)) {
+		    out.print(TEST_STRING + NEW_LINE);
 		}
 	}
 	
 	@After
 	public void tearDown() throws Exception {
-		File tempOutputFile = new File(testFileOutput);
+		File tempOutputFile = new File(TEST_FILE_OUTPUT);
 		tempOutputFile.delete();
-		File tempInputFile = new File(testFileInput);
+		File tempInputFile = new File(TEST_FILE_INPUT);
 		tempInputFile.delete();
-		File tempFileDir = new File(testFilePath);
+		File tempFileDir = new File(TEST_FILE_PATH);
 		tempFileDir.delete();
 	}
 	
 	@Test
-	public void testShellIORedirectionOutput() throws AbstractApplicationException, ShellException, IOException {
-		String cmd = "echo test"  + " > " + testFileOutput;
+	public void testShellIORedirectionInputOutput() throws AbstractApplicationException, ShellException, IOException {
+		String cmd = "cat"  + " < " + TEST_FILE_INPUT + " > " + TEST_FILE_OUTPUT;
 		
 		shell.parseAndEvaluate(cmd, outputStream);
 		
-		output = readFile(testFileOutput, Charset.defaultCharset());
+		output = readFile(TEST_FILE_OUTPUT, Charset.defaultCharset());
 		
-		assertEquals("test" + newLine, output);
+		assertEquals(TEST_STRING + NEW_LINE, output);
+	}
+	
+	@Test
+	public void testShellIORedirectionOutput() throws AbstractApplicationException, ShellException, IOException {
+		String cmd = "echo " + TEST_STRING  + " > " + TEST_FILE_OUTPUT;
+		
+		shell.parseAndEvaluate(cmd, outputStream);
+		
+		output = readFile(TEST_FILE_OUTPUT, Charset.defaultCharset());
+		
+		assertEquals(TEST_STRING + NEW_LINE, output);
 	}
 	
 	@Test
 	public void testShellIORedirectionInput() throws AbstractApplicationException, ShellException {
-		String cmd = "echo"  + " < " + testFileInput;
+		String cmd = "cat"  + " < " + TEST_FILE_INPUT;
 		
 		shell.parseAndEvaluate(cmd, outputStream);
 		
 		output = outputStream.toString();
 		
-		assertEquals("test" + newLine, output);
+		assertEquals(TEST_STRING + NEW_LINE, output);
 	}
 }
