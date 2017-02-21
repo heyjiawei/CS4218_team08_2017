@@ -73,7 +73,12 @@ public class CatApplication implements Application {
 				try {
 					isFileReadable = checkIfFileIsReadable(filePath);
 				} catch (CatException e) {
-					continue;
+					// Try to continue to print any valid files
+					if (numOfFiles > 1) {
+						continue;
+					} else {
+						throw e;
+					}
 				}
 				if (isFileReadable) {
 					filePathList.add(filePath);
