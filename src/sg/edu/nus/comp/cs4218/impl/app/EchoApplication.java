@@ -23,7 +23,8 @@ public class EchoApplication implements Application {
 	 * @param args
 	 *            Array of arguments for the application.
 	 * @param stdin
-	 *            An InputStream, not used.
+	 *            An InputStream. Input can be passed to the application via
+	 *            stdin.
 	 * @param stdout
 	 *            An OutputStream. Elements of args will be output to stdout,
 	 *            separated by a space character.
@@ -40,7 +41,7 @@ public class EchoApplication implements Application {
 			throw new EchoException("No input provided");
 		}
 		try {
-			if (args != null) {
+			if (args != null && args.length > 0) {
 				for (int i = 0; i < args.length; i++) {
 					String argument = args[i];
 					if (argument == null) {
@@ -51,7 +52,7 @@ public class EchoApplication implements Application {
 					}
 					stdout.write(argument.getBytes());
 				}
-			} else {
+			} else if (stdin != null) {
 				byte[] buffer = new byte[1024];
 				int numberOfBytesRead;
 				while ((numberOfBytesRead = stdin.read(buffer)) != -1) {
