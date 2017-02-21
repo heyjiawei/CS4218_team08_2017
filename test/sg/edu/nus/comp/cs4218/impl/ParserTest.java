@@ -55,7 +55,7 @@ public class ParserTest {
 
 	@Test
 	public void testParseSingleQuotes() throws ShellException {
-		String cmd = "echo 'a'";
+		String cmd = "echo 'a`'";
 		String[] callCommands = { cmd };
 
 		String[][] sequences = parser.parse(cmd);
@@ -82,11 +82,20 @@ public class ParserTest {
 
 	@Test
 	public void testParseBackQuotesInDoubleQuotes() throws ShellException {
-		String cmd = "echo \"echo `a`\"";
+		String cmd = "echo \"`echo a`\"";
 		String[] callCommands = { cmd };
 
 		String[][] sequences = parser.parse(cmd);
 		assertArrayEquals(callCommands, sequences[0]);
+	}
+
+	@Test
+	public void testParseUnclosedBackQuotesInDoubleQuotes() throws ShellException {
+		String cmd = "echo \"echo a`\"";
+
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(ShellImpl.EXP_SYNTAX);
+		parser.parse(cmd);
 	}
 
 	@Test
