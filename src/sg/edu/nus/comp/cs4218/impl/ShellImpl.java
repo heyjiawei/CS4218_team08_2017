@@ -85,10 +85,14 @@ public class ShellImpl implements Shell {
 	}
 
 	/**
-	 * Evaluate pipe call with two commands
-	 * @param args String containing the command, input arguments and the pipe operator
+	 * For the purpose of all the interface methods. Oh god why.
+	 *
+	 * @param args
+	 *            String contain commands/arguments/syntax errors/everything
+	 * @return
+	 *            Regurgitate everything, includes error messages
 	 */
-	public String pipeTwoCommands(String args) {
+	private String parseAndEvaluateToString(String args) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		try {
@@ -99,40 +103,186 @@ public class ShellImpl implements Shell {
 		}
 
 		return out.toString();
+	}
+
+	/**
+	 * Evaluate pipe call with two commands
+	 * @param args
+	 *            String containing the command, input arguments and the pipe
+	 *            operator
+	 * @return
+	 *            String output
+	 */
+	public String pipeTwoCommands(String args) {
+		return parseAndEvaluateToString(args);
 	}
 
 	/**
 	 * Evaluate pipe call with more than two commands
-	 * @param args String containing the commands, input arguments and the pipe operators
+	 * @param args
+	 *            String containing the commands, input arguments and the pipe
+	 *            operators
+	 * @return
+	 *            String output
 	 */
 	public String pipeMultipleCommands(String args) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-		try {
-			Shell shell = new ShellImpl();
-			shell.parseAndEvaluate(args, out);
-		} catch (AbstractApplicationException|ShellException e) {
-			return e.getMessage();
-		}
-
-		return out.toString();
+		return parseAndEvaluateToString(args);
 	}
 
 	/**
 	 * Evaluate pipe call with one part generating an exception
-	 * @param args String containing the commands, input arguments and the pipe operator/s
+	 * @param args
+	 *            String containing the commands, input arguments and the pipe
+	 *            operator/s
+	 * @return
+	 *            String output
 	 */
 	public String pipeWithException(String args) {
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		return parseAndEvaluateToString(args);
+	}
 
-		try {
-			Shell shell = new ShellImpl();
-			shell.parseAndEvaluate(args, out);
-		} catch (AbstractApplicationException|ShellException e) {
-			return e.getMessage();
-		}
+	/**
+	 * Evaluate globbing with no files or directories
+	 * @param args
+	 *            String containing the commands, input arguments and the
+	 *            asterisk (globbing operator)
+	 * @return
+	 *            String output
+	 */
+	public String globNoPaths(String args) {
+		return parseAndEvaluateToString(args);
+	}
 
-		return out.toString();
+	/**
+	 * Evaluate globbing with one file (one path)
+	 * @param args
+	 *            String containing the commands, input arguments and the
+	 *            asterisk (globbing operator)
+	 * @return
+	 *            String output
+	 */
+	public String globOneFile(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate globbing with multiple files and directories (multiple paths)
+	 * @param args
+	 *            String containing the commands, input arguments and the
+	 *            asterisk (globbing operator)
+	 * @return
+	 *            String output
+	 */
+	public String globFilesDirectories(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate globbing with exception
+	 * @param args
+	 *            String containing the commands, input arguments and the
+	 *            asterisk (globbing operator)
+	 * @return
+	 *            String output
+	 */
+	public String globWithException(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate opening InputStream from file for input redirection
+	 * @param args
+	 *            String containing the commands, input arguments and the "<"
+	 *            symbol (input redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectInput(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate opening OutputStream to file for output redirection
+	 * @param args
+	 *            String containing the commands, input arguments and the ">"
+	 *            symbol (output redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectOutput(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate input redirection with no files
+	 * @param args
+	 *            String containing the commands, input arguments and the "<"
+	 *            symbol (input redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectInputWithNoFile(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate output redirection with no files
+	 * @param args
+	 *            String containing the commands, input arguments and the ">"
+	 *            symbol (output redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectOutputWithNoFile(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate input redirection with exception
+	 * @param args
+	 *            String containing the commands, input arguments and the "<"
+	 *            symbol (input redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectInputWithException(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate output redirection with exception
+	 * @param args
+	 *            String containing the commands, input arguments and the ">"
+	 *            symbol (output redirection operator)
+	 * @return
+	 *            String output
+	 */
+	public String redirectOutputWithException(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate command substitution
+	 * @param args
+	 *            String containing the commands, input arguments surrounded by
+	 *            backquotes
+	 * @return
+	 *            String output
+	 */
+	public String performCommandSubstitution(String args) {
+		return parseAndEvaluateToString(args);
+	}
+
+	/**
+	 * Evaluate command substitution with exception
+	 * @param args
+	 *            String containing the commands, input arguments surrounded by
+	 *            backquotes
+	 * @return
+	 *            String output
+	 */
+	public String performCommandSubstitutionWithException(String args) {
+		return parseAndEvaluateToString(args);
 	}
 
 	/**

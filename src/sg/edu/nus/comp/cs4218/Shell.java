@@ -34,71 +34,71 @@ public interface Shell {
 	 * Evaluate globbing with no files or directories
 	 * @param args String containing the commands, input arguments and the asterisk (globbing operator)
 	 */
-//	public String globNoPaths(String args);
+	public String globNoPaths(String args);
 
 	/**
 	 * Evaluate globbing with one file (one path)
 	 * @param args String containing the commands, input arguments and the asterisk (globbing operator)
 	 */
-//	public String globOneFile(String args);
+	public String globOneFile(String args);
 
 	/**
 	 * Evaluate globbing with multiple files and directories (multiple paths)
 	 * @param args String containing the commands, input arguments and the asterisk (globbing operator)
 	 */
-//	public String globFilesDirectories(String args);
+	public String globFilesDirectories(String args);
 
 	/**
 	 * Evaluate globbing with exception
 	 * @param args String containing the commands, input arguments and the asterisk (globbing operator)
 	 */
-//	public String globWithException(String args);
+	public String globWithException(String args);
 
 	/**
 	 * Evaluate opening InputStream from file for input redirection
 	 * @param args String containing the commands, input arguments and the "<" symbol (input redirection operator)
 	 */
-//	public String redirectInput(String args);
+	public String redirectInput(String args);
 
 	/**
 	 * Evaluate opening OutputStream to file for output redirection
 	 * @param args String containing the commands, input arguments and the ">" symbol (output redirection operator)
 	 */
-//	public String redirectOutput(String args);
+	public String redirectOutput(String args);
 
 	/**
 	 * Evaluate input redirection with no files
 	 * @param args String containing the commands, input arguments and the "<" symbol (input redirection operator)
 	 */
-//	public String redirectInputWithNoFile(String args);
+	public String redirectInputWithNoFile(String args);
 
 	/**
 	 * Evaluate output redirection with no files
 	 * @param args String containing the commands, input arguments and the ">" symbol (output redirection operator)
 	 */
-//	public String redirectOutputWithNoFile(String args);
+	public String redirectOutputWithNoFile(String args);
 
 	/**
 	 * Evaluate input redirection with exception
 	 * @param args String containing the commands, input arguments and the "<" symbol (input redirection operator)
 	 */
-//	public String redirectInputWithException(String args);
+	public String redirectInputWithException(String args);
 
 	/**
 	 * Evaluate output redirection with exception
 	 * @param args String containing the commands, input arguments and the ">" symbol (output redirection operator)
 	 */
-//	public String redirectOutputWithException(String args);
+	public String redirectOutputWithException(String args);
 
 	/**
 	 * Evaluate command substitution
 	 * @param args String containing the commands, input arguments surrounded by backquotes
 	 */
-//	public String performCommandSubstitution(String args);
+	public String performCommandSubstitution(String args);
 
 	/**
 	 * Evaluate command substitution with exception
 	 * @param args String containing the commands, input arguments surrounded by backquotes
 	 */
-//	public String performCommandSubstitutionWithException(String args);
+	public String performCommandSubstitutionWithException(String args);
 }
