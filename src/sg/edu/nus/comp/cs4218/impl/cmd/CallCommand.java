@@ -28,14 +28,10 @@ public class CallCommand implements Command {
 	String app;
 	String cmdline, inputStreamS, outputStreamS;
 	String[] argsArray;
-	Boolean error;
-	String errorMsg;
 
 	public CallCommand(String cmdline) {
 		this.cmdline = cmdline.trim();
 		app = inputStreamS = outputStreamS = "";
-		error = false;
-		errorMsg = "";
 		argsArray = new String[0];
 	}
 
@@ -60,10 +56,6 @@ public class CallCommand implements Command {
 	@Override
 	public void evaluate(InputStream stdin, OutputStream stdout)
 			throws AbstractApplicationException, ShellException {
-		if (error) {
-			throw new ShellException(errorMsg);
-		}
-
 		InputStream inputStream;
 		OutputStream outputStream;
 
@@ -103,13 +95,10 @@ public class CallCommand implements Command {
 			throw new ShellException(ShellImpl.EXP_INVALID_APP);
 		}
 
-		this.app = cmdVector.get(0);
-
 		Vector<String> argsVector = new Vector<>();
 		Iterator<String> cmdIterator = cmdVector.iterator();
 
-		this.app = cmdIterator.next();
-
+		boolean isAppSet = false;
 		String arg;
 
 		while (cmdIterator.hasNext()) {
@@ -119,6 +108,9 @@ public class CallCommand implements Command {
 				this.inputStreamS = cmdIterator.next();
 			} else if(arg.equals(">")) {
 				this.outputStreamS = cmdIterator.next();
+			} else if (!isAppSet) {
+				this.app = arg;
+				isAppSet = true;
 			} else {
 				argsVector.add(arg);
 			}
