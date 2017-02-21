@@ -19,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.SedException;
 
 public class SedApplicationTest {
 	SedApplication sedApp;
@@ -213,7 +214,7 @@ public class SedApplicationTest {
 			e.printStackTrace();
 		}
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-		assertEquals("Invalid regex pattern. Regex consist of a backslash", 
+		assertEquals("sed: Invalid regex pattern. Regex consist of a backslash", 
 				new String(byteArray));
 	}
 	
@@ -227,7 +228,7 @@ public class SedApplicationTest {
 			e.printStackTrace();
 		}
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-		assertEquals("Invalid replacement string. Replacement of a backslash", 
+		assertEquals("sed: Invalid replacement string. Replacement of a backslash", 
 				new String(byteArray));
 	}
 	
