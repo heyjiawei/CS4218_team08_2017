@@ -40,7 +40,7 @@ public class ShellIORedirectionTest {
 		outputStream = new ByteArrayOutputStream();
 		Files.createDirectories(Paths.get(testFilePath));
 		try(PrintWriter out = new PrintWriter(testFileInput)) {
-		    out.print("test");
+		    out.println("test");
 		}
 	}
 	
