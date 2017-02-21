@@ -6,11 +6,14 @@ import static org.junit.Assert.assertEquals;
 import java.io.ByteArrayOutputStream;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 
 public class ShellTest {
 	ByteArrayOutputStream outputStream;
@@ -18,6 +21,9 @@ public class ShellTest {
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
 
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	@Before
 	public void setUp() throws Exception {
 		shell = new ShellImpl();
@@ -44,6 +50,17 @@ public class ShellTest {
 		output = outputStream.toString();
 		
 		assertEquals("cat" + newLine, output);
+	}
+	
+	@Test
+	public void testInvalidCommandSubstitution() throws AbstractApplicationException, ShellException {
+		String cmd = "echo `echo `echo cat` cat`";
+		
+		thrown.expect(ShellException.class);
+		thrown.expectMessage(CallCommand.EXP_SYNTAX);
+		
+		shell.parseAndEvaluate(cmd, outputStream);
+		
 	}
 	
 	@Test
