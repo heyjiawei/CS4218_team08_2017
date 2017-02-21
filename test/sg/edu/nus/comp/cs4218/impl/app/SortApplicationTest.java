@@ -2,7 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,6 +14,8 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 
 // Assumptions made in tests:
 // 1. 'Simple' letters means lowercase letters
@@ -24,6 +28,8 @@ import org.junit.Test;
 //    but abc34 or a34bc will not be recognized as a number)
 public class SortApplicationTest {
 
+	private InputStream inputStream;
+	private ByteArrayOutputStream outputStream;
 	private SortApplication sortApplication;
 	private final String testFilesPath = "test_inputs/sort/";
 
@@ -388,6 +394,32 @@ public class SortApplicationTest {
 		String emptyFilePath = testFilesPath + "empty.txt";
 		String sortedString = sortApplication.sortAll(emptyFilePath);
 		assertEquals("", sortedString);
+	}
+
+	@Test
+	public void testRun() throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String[] args = {allFilePath};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
+	}
+
+	@Test
+	public void testRunTreatFirstWordAsNumber()
+			throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath +
+				"all_treat_first_word_as_number_sortedl_sorted.txt";
+		String[] args = {"-n", allFilePath};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
 	}
 
 	/**
