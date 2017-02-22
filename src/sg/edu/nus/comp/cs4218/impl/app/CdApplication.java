@@ -105,7 +105,7 @@ public class CdApplication implements Application {
 	 * Changes the current working directory and updates the relevant
 	 * Environment variable appropriately.
 	 *
-	 * @param newWorkingDirectoryPathStrin
+	 * @param newWorkingDirectoryPathString
 	 *            The string representing the path to change the working
 	 *            directory to
 	 */
