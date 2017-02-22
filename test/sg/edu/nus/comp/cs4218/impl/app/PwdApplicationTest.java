@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.exception.PwdException;
 
 public class PwdApplicationTest {
@@ -50,6 +51,18 @@ public class PwdApplicationTest {
 		String[] args = null;
 		outputStream = new ByteArrayOutputStream();
 		Environment.currentDirectory = "~";
+		pwdApplication.run(args, inputStream, outputStream);
+		assertEquals(Environment.currentDirectory + newLine, outputStream.toString());
+	}
+
+	@Test
+	public void testPwdAfterCd() throws PwdException, CdException {
+		String[] args = null;
+		outputStream = new ByteArrayOutputStream();
+		ByteArrayOutputStream cdOutputStream = new ByteArrayOutputStream();
+		CdApplication cdApplication = new CdApplication();
+		String[] cdArgs = {"~"};
+		cdApplication.run(cdArgs, inputStream, cdOutputStream);
 		pwdApplication.run(args, inputStream, outputStream);
 		assertEquals(Environment.currentDirectory + newLine, outputStream.toString());
 	}
