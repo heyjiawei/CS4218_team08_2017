@@ -43,23 +43,7 @@ public class SedApplicationTest {
 		    writer.println("sunnight monnight tuesnight");
 		    writer.print("happynight sad night all-night $100 000 000");
 		    writer.close();
-//		    
-//		    File file = new File(System.getProperty("user.dir") + 
-//		    				"/testing_sed_folder/sed file.txt");
-//		    if (file.getParentFile().mkdir()) {
-//		        file.createNewFile();
-//		    } else {
-//		        throw new IOException("Failed to create directory " + file.getParent());
-//		    }
-//		    
-//		    File dir = new File(file.getParentFile(), file.getName());
-//	        writer = new PrintWriter(dir);
-//	        writer.println("sunday monday tuesday");
-//		    writer.println("wednesday thursday friday");
-//		    writer.println("saturday today everyday");
-//		    writer.println("happyday sad day all-day");
-//	        writer.close();
-//		    
+		    
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -70,16 +54,7 @@ public class SedApplicationTest {
 		new File("sed_test.txt").delete();
 		new File("sed_test_replace_first.txt").delete();
 		new File("sed_test_replace_all.txt").delete();
-		
-		// Delete folder and files within
-//		File folder = new File(System.getProperty("user.dir") + "/testing_sed_folder/");
-//		File[] folderFiles = folder.listFiles();
-//	    if (folderFiles != null) {
-//	        for (File f: folderFiles) {
-//	            f.delete();
-//	        }
-//	    }
-//	    folder.delete();
+	
 	}
 
 	@Before
@@ -177,6 +152,13 @@ public class SedApplicationTest {
 	}
 	
 	@Test (expected = SedException.class)
+	public void testThrowNoInputException() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s,day,shine,g"}, in, out);
+	}
+	
+	@Test (expected = SedException.class)
 	public void testThrowInvalidDelimiterException() throws AbstractApplicationException {
 		in = new ByteArrayInputStream("sunday monday".getBytes());
 		out = new ByteArrayOutputStream();
@@ -233,10 +215,17 @@ public class SedApplicationTest {
 	}
 	
 	@Test (expected = SedException.class)
-	public void testInvalidFileException() throws AbstractApplicationException {
+	public void testThrowInvalidFileException() throws AbstractApplicationException {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		sedApp.run(new String[]{"s/day/night/g", "file.txt"}, in, out);
+		sedApp.run(new String[]{"s/day/night/g", "file"}, in, out);
+	}
+	
+	@Test (expected = SedException.class)
+	public void testExtraArgs() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		sedApp.run(new String[]{"s/day/night/g", "file", "sed_test.txt"}, in, out);
 	}
 	
 	private String getOutputFromFile(String filename) {

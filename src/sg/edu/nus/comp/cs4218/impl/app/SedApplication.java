@@ -16,16 +16,57 @@ import sg.edu.nus.comp.cs4218.app.Sed;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.SedException;
 
+/**
+ * Copies input file (or input stream) to stdout performing string replacement. 
+ * For each line containing a match to a specified pattern (in JAVA format), 
+ * replaces the matched substring with the specified string.
+ * 
+ * <p>
+ * <b>Command format:</b> <code>sed REPLACEMENT [FILE]</code>
+ * <dl>
+ * <dt>REPLACEMENT</dt>
+ * <dd>s/regexp/replacement/ –replace the first(in each line) substring 
+ * matched by regexp with the string replacement.</dd>
+ * <dd>s/regexp/replacement/g -replace all the substrings matched by 
+ * regexp with the string replacement.</dd>
+ * </dl>
+ * <dl>
+ * <dt>FILE</dt>
+ * <dd>the name of the file(s). If no files are specified, use stdin.</dd>
+ * </dl>
+ * </p>
+ */
+
 public class SedApplication implements Sed {
 	private String delimiter = null;
 
 	/**
-	 * Runs application with specified input data and specified output stream.
+	 * Runs the sed application with the specified arguments.
+	 * 
+	 * @param args
+	 *            Array of arguments for the application. Each array element is
+	 *            the path to a file. If no files are specified stdin is used.
+	 * @param stdin
+	 *            An InputStream. The input for the command is read from this
+	 *            InputStream if no files are specified.
+	 * @param stdout
+	 *            An OutputStream. The output of the command is written to this
+	 *            OutputStream.
+	 * 
+	 * @throws SedException
+	 *             If the file(s) specified do not exist or are unreadable,
+	 *             if there are no inputs, if replacement (regex or replaced 
+	 *             characters or flags) is incorrect
+	 *
 	 */
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
-		if (args.length == 0) {
+		if (args.length == 0 || 
+			(args.length > 0 && args[0].length() == 0)) {
 			throw new SedException("No replacement detected.");
+		}
+		if (args.length > 2) {
+			throw new SedException("sed only takes in 1 file");
 		}
 		if (stdin == null) {
 			throw new SedException("No input stream provided");
@@ -81,6 +122,12 @@ public class SedApplication implements Sed {
 		}
 	}
 
+	/**
+	 * Checks if the number of delimiters in replacement is correct
+	 * @param args String containing command and arguments
+	 * @return boolean true if there are 3 delimiters in replacement, false otherwise
+	 * @throws SedException if it is an invalid delimiter
+	 */
 	private boolean hasSufficientDelimiter(String string) throws SedException{
 		String delimiter = getDelimiter(string);
 		int delimiterCount = 0;
@@ -98,6 +145,12 @@ public class SedApplication implements Sed {
 		}
 	}
 
+	/**
+	 * Checks if the replacement string is valid (does not contain backslash)
+	 * @param string String containing command and arguments
+	 * @return boolean true if the replacement string is valid, false otherwise
+	 * @throws SedException if it is an invalid delimiter
+	 */
 	private boolean isValidReplacement(String string) throws SedException {
 		String delimiter = getDelimiter(string);
 		String replacement = split(string, delimiter)[1];
@@ -109,6 +162,12 @@ public class SedApplication implements Sed {
 		return true;
 	}
 
+	/**
+	 * Checks if the regex string is valid (does not contain backslash)
+	 * @param string String containing command and arguments
+	 * @return boolean true if the regex string is valid, false otherwise
+	 * @throws SedException if it is an invalid delimiter
+	 */
 	private boolean isValidRegex(String string) throws SedException {
 		String delimiter = getDelimiter(string);
 		try {
@@ -119,10 +178,15 @@ public class SedApplication implements Sed {
 		return true;
 	}
 
+	/**
+	 * Checks if the provided input stream is empty
+	 * @param stdin InputStream. The input for the command is read from this
+	 *  		InputStream if no files are specified.
+	 * @return boolean true if input stream is empty, false otherwise
+	 */
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
-			if (stdin.read() > -1) {
-				stdin.reset();
+			if (stdin.available() > 0) {
 				return false;
 			} else {
 				return true;
@@ -133,6 +197,11 @@ public class SedApplication implements Sed {
 		return true;
 	}
 
+	/**
+	 * Checks if the file provided is valid
+	 * @param args String[] command line arguments
+	 * @return boolean true if file is valid, false otherwise
+	 */
 	private boolean isFileDirectoryValid(String[] args) {
 		if (args.length <= 1) {
 			return false;
@@ -149,6 +218,13 @@ public class SedApplication implements Sed {
 	    }
 	}
 	
+	/**
+	 * Retrieve delimiter from command string.
+	 * Checks if delimiter character is not [\n\\s\\\r\t]
+	 * @param args String containing command and arguments
+	 * @return sets delimiter and returns delimiter
+	 * @throws SedException if delimiter character is any of the following: [\n\\s\\\r\t]
+	 */
 	private String getDelimiter(String args) throws SedException {
 		if (this.delimiter != null) {
 			return this.delimiter;
@@ -168,11 +244,25 @@ public class SedApplication implements Sed {
 		}
 	}
 	
+	/**
+	 * Creates and return a pattern object from the regex pattern
+	 * @param args String containing command and arguments
+	 * @param delimiter String delimiter in this command
+	 * @return Pattern object consisting of regex pattern
+	 * @throws PatternSyntaxException if regex pattern is invalid
+	 */
 	private Pattern getRegexPattern(String args, String delimiter) throws PatternSyntaxException {
 		String[] parts = split(args, delimiter);
 		return Pattern.compile(parts[0]);
 	}
 	
+	/**
+	 * Splits the given string with the provided delimiter. Different from String.split
+	 * as delimiter is a String rather than regex
+	 * @param args String containing replacement
+	 * @param delimiter String 
+	 * @return String[] after splitting with delimiter
+	 */
 	private String[] split(String string, String delimiter) {
 		int pos = -1;
 		int nextPos = -1;
@@ -189,6 +279,13 @@ public class SedApplication implements Sed {
 		return parts.toArray(new String[parts.size()]);
 	}
 	
+	/**
+	 * Perform string replacement on input stream string
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing string
+	 * @param isReplaceFirst boolean true if there is no flag, false if flag 'g' exists
+	 * @return replaced string
+	 */
 	private String replaceFromStdin(String args, InputStream stdin, boolean isReplaceFirst) {
 		String output = "";
 		String line = "";
@@ -221,14 +318,18 @@ public class SedApplication implements Sed {
 				}
 			}
 			is.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SedException e) {
+		} catch (IOException | SedException e) {
 			e.printStackTrace();
 		}
 		return output;
 	}
 	
+	/**
+	 * Perform string replacement on string read from file
+	 * @param args String containing command and arguments
+	 * @param isReplaceFirst boolean true if there is no flag, false if flag 'g' exists
+	 * @return replaced string
+	 */
 	private String replaceFromFile(String args, boolean isReplaceFirst) {
 		String[] argsParts = args.split("\\s+");
 		String filename = argsParts[argsParts.length - 1];
@@ -263,9 +364,7 @@ public class SedApplication implements Sed {
 				}
 			}
 			reader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SedException e) {
+		} catch (IOException | SedException e) {
 			e.printStackTrace();
 		}
 		

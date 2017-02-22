@@ -7,13 +7,30 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Scanner;
 
 import sg.edu.nus.comp.cs4218.app.Wc;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
+
+/**
+ * The wc command prints the number of bytes, words, and lines in given files 
+ * (followed by a newline).
+ * 
+ * <p>
+ * <b>Command format:</b> <code>wc [OPTIONS] [FILE]...</code>
+ * <dl>
+ * <dt>OPTIONS</dt>
+ * <dd>-m : Print only the character counts </dd>
+ * <dd>-w : Print only the word counts </dd>
+ * <dd>-l : Print only the newline counts </dd>
+ * </dl>
+ * <dl>
+ * <dt>FILE</dt>
+ * <dd>the name of the file(s). If no files are specified, use stdin.</dd>
+ * </dl>
+ * </p>
+ */
 
 public class WcApplication implements Wc {
 	private int charCount = 0;
@@ -23,7 +40,22 @@ public class WcApplication implements Wc {
 	private boolean isCountProcessed = false;
 
 	/**
-	 * Runs application with specified input data and specified output stream.
+	 * Runs the wc application with the specified arguments.
+	 * 
+	 * @param args
+	 *            Array of arguments for the application. Each array element is
+	 *            the path to a file. If no files are specified stdin is used.
+	 * @param stdin
+	 *            An InputStream. The input for the command is read from this
+	 *            InputStream if no files are specified.
+	 * @param stdout
+	 *            An OutputStream. The output of the command is written to this
+	 *            OutputStream.
+	 * 
+	 * @throws WcException
+	 *             If the file(s) specified do not exist or are unreadable or 
+	 *             if there are no inputs
+	 *
 	 */
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) 
@@ -38,10 +70,10 @@ public class WcApplication implements Wc {
 		String countStr = "";
 		boolean[] options = optionsSeparator(args);
 		if (isFileDirectoryValid(args)) {
-			countStr = callOption(args, options, null, false);
+			countStr = callOption(args, options, null, false) + "\n";
 			
 		} else if (!isInputStreamEmpty(stdin)) {
-			countStr = callOption(args, options, stdin, true);
+			countStr = callOption(args, options, stdin, true) + "\n";
 			
 		} else {
 			throw new WcException("No input detected. Please ensure filename is correct or stdin is not empty");
@@ -50,7 +82,6 @@ public class WcApplication implements Wc {
 		try {
 			stdout.write(countStr.getBytes());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -59,6 +90,7 @@ public class WcApplication implements Wc {
 	 * Separate joined options e.g. "-lwm" to individual options e.g. "-l -w -m"
 	 * Individual options are represented by a boolean array, 
 	 * in the respective position -m -w -l
+	 * 
 	 * @param args String[] command line arguments
 	 * @return boolean[] that marks true in the position of the respective option 
 	 * @throws WcException when an invalid option is entered
@@ -81,7 +113,6 @@ public class WcApplication implements Wc {
 			while (startIndex > -1 && startIndex < command.length()) {
 				if (startIndex + 1 == command.length()) {
 					break;
-					//throw new WcException("Illegal Option. Please put \"-m\", \"-w\" or \"-l\"");
 				}
 				
 				String nextChar = command.substring(startIndex, startIndex + 1);
@@ -113,9 +144,18 @@ public class WcApplication implements Wc {
 		return options;
 	}
 
-	
+	/**
+	 * Calls the relevant interface functions depending on the option provided
+	 * @param args String[] command line arguments
+	 * @param options boolean[] that marks true in the position of the respective option 
+	 * @param stdin InputStream. The input for the command is read from this
+	 *  		InputStream if no files are specified.
+	 * @param isStdin boolean true if an input stream is passed in, false otherwise
+	 * @return String containing counts. Counts are returned in the order of -m -w -l 
+	 * 			if all options are specified
+	 */
 	private String callOption(String[] args, boolean[] options, 
-								InputStream stdin, boolean isStdin) throws WcException {
+								InputStream stdin, boolean isStdin) {
 		String commandLine = "";
 		String countStr = "";
 		for (int i = 0; i < args.length; i++) {
@@ -148,6 +188,12 @@ public class WcApplication implements Wc {
 		return countStr.trim();
 	}
 
+	/**
+	 * Checks if the provided input stream is empty
+	 * @param stdin InputStream. The input for the command is read from this
+	 *  		InputStream if no files are specified.
+	 * @return boolean true if input stream is empty, false otherwise
+	 */
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
 			if (stdin.available() > 0) {
@@ -161,6 +207,11 @@ public class WcApplication implements Wc {
 		return true;
 	}
 	
+	/**
+	 * Checks if the file provided is valid
+	 * @param args String[] command line arguments
+	 * @return boolean true if file is valid, false otherwise
+	 */
 	private boolean isFileDirectoryValid(String[] args) {		
 		if (args.length == 0) {
 			return false;
@@ -177,6 +228,11 @@ public class WcApplication implements Wc {
 	    }
 	}
 
+	/**
+	 * Retrieves the filename of file to be read
+	 * @param args String[] command line arguments
+	 * @return String filename
+	 */
 	private String getFilename(String args) {
 		if (this.filename == null) {
 			String[] parts = args.split(" ");
@@ -186,6 +242,11 @@ public class WcApplication implements Wc {
 		}
 	}
 	
+	/**
+	 * Store character count, word count and line count read from file
+	 * in private variables
+	 * @param args String containing command and arguments
+	 */
 	private void processCountInFile(String input) {
 		if (this.isCountProcessed) {
 			return;
@@ -214,6 +275,11 @@ public class WcApplication implements Wc {
 		}
 	}
 
+	/**
+	 * Store character count, word count and line count read from input stream
+	 * in private variables
+	 * @param stdin InputStream containing content
+	 */
 	private void processCountInStdin(InputStream stdin) {
 		if (this.isCountProcessed) {
 			return;

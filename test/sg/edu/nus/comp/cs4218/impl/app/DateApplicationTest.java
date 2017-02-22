@@ -73,9 +73,13 @@ public class DateApplicationTest {
 		dateformat.format(currentDate);
 		Boolean isSame = false;
 		try {
-			java.util.Date appDate = dateformat.parse(dateApp.printCurrentDate("date"));
+			in = new ByteArrayInputStream("".getBytes());
+			out = new ByteArrayOutputStream();
+			dateApp.run(new String[]{}, in, out);
+			byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
+			java.util.Date appDate = dateformat.parse(new String(byteArray));
 			isSame = (currentDate.getTime() - appDate.getTime()) < 5000;
-		} catch (ParseException e) {
+		} catch (ParseException| DateException e) {
 			e.printStackTrace();
 		}
 		assertTrue(isSame);

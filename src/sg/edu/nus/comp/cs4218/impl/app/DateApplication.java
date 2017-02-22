@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -10,37 +10,49 @@ import java.util.Locale;
 import sg.edu.nus.comp.cs4218.app.Date;
 import sg.edu.nus.comp.cs4218.exception.DateException;
 
+/**
+ * The date command prints out the date string in the format
+ * [week day] [month] [day] [hh:mm:ss] [time zone] [year]
+ * 
+ * <p>
+ * <b>Command format:</b> <code>date</code>
+ * </p>
+ */
+
 public class DateApplication implements Date {
 
 	/**
-	 * Runs application with specified input data and specified output stream.
+	 * Runs the date application with the specified arguments.
+	 * 
+	 * @param args
+	 *            Array of arguments for the application. Each array element is
+	 *            the path to a file. If no files are specified stdin is used.
+	 * @param stdin
+	 *            An InputStream. The input for the command is read from this
+	 *            InputStream if no files are specified.
+	 * @param stdout
+	 *            An OutputStream. The output of the command is written to this
+	 *            OutputStream.
+	 * 
+	 * @throws DateException
+	 *             If there are args provided
 	 */
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws DateException {
-		// TODO Auto-generated method stub
-		// 1 check if command is correct in run function
-		// 2 if command is right
-		// if args is null or length 0 and stdin is null throw error - no arguments provided
-		// else check if args get datestring from printCurrentDate 
-		
-		// 3 get datestring from printCurrentDate
-		// 3a write to stdout
-		// 3b otherwise, throw error by writing to stderr
 		if (stdout == null) {
 			throw new DateException("No output stream provided");
 		}
 		if (stdin == null) {
-			// is the checking of stdin == null necessary?
-			// Will there be a case InputStream will not be passed?
 			throw new DateException("No input stream provided");
 		}
-		if (args.length == 1 && args[0].equalsIgnoreCase("date")) {
-			String currentDate = printCurrentDate(args[0]);
-			PrintWriter writer = new PrintWriter(stdout);
-			writer.println(currentDate);
-			
-		} else {
+		if (args.length > 0) {
 			throw new DateException("illegal date format");
+		}
+		String currentDate = printCurrentDate("date");
+		try {
+			stdout.write(currentDate.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -50,8 +62,6 @@ public class DateApplication implements Date {
 	 */
 	@Override
 	public String printCurrentDate(String args) {
-		// TODO Auto-generated method stub
-		// test if locale.english gives the right ans
 		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
 													Locale.ENGLISH);
 

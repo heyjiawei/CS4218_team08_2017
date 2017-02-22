@@ -137,7 +137,7 @@ public class WcApplicationTest {
 		wcApp.run(new String[]{"-wl", "-m", "wc_test.txt"}, in, out);
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
 		
-		assertEquals("31 6 4", new String(byteArray));
+		assertEquals("31 6 4\n", new String(byteArray));
 	}
 	
 	@Test
@@ -147,7 +147,7 @@ public class WcApplicationTest {
 		wcApp.run(new String[]{"wc_test.txt"}, in, out);
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
 		
-		assertEquals("31 6 4", new String(byteArray));
+		assertEquals("31 6 4\n", new String(byteArray));
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class WcApplicationTest {
 		wcApp.run(new String[]{"-wm", "-l"}, in, out);
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
 		
-		assertEquals("33 6 2", new String(byteArray));
+		assertEquals("33 6 2\n", new String(byteArray));
 	}
 	
 	@Test
@@ -167,7 +167,7 @@ public class WcApplicationTest {
 		wcApp.run(new String[]{}, in, out);
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
 		
-		assertEquals("33 6 2", new String(byteArray));
+		assertEquals("33 6 2\n", new String(byteArray));
 		
 	}
 	
@@ -181,7 +181,7 @@ public class WcApplicationTest {
 			e.printStackTrace();
 		}
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-		assertEquals("31 6 4", new String(byteArray));
+		assertEquals("31 6 4\n", new String(byteArray));
 	}
 
 	@Test
@@ -194,7 +194,7 @@ public class WcApplicationTest {
 			e.printStackTrace();
 		}
 		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-		assertEquals("31", new String(byteArray));
+		assertEquals("31\n", new String(byteArray));
 	}
 
 	@Test (expected = WcException.class)

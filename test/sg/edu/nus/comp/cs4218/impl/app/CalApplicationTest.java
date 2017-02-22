@@ -165,13 +165,13 @@ public class CalApplicationTest {
 	@Test
 	public void testPrintCal() {
 		fail("Not yet implemented");
-		// How to do this? won't the current month keep changing?
+		
 	}
 	
 	@Test
 	public void testPrintCalWithMondayFirst() {
 		fail("Not yet implemented");
-		// How to do this? won't the current month keep changing?
+		
 	}
 	
 	@Test
@@ -266,23 +266,36 @@ public class CalApplicationTest {
 	public void testThrowInvalidMonthLowerbound() throws AbstractApplicationException {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		calApp.run(new String[]{"0 2017"}, in, out);
+		calApp.run(new String[]{"0", "2017"}, in, out);
 	}
 	
 	@Test (expected = CalException.class)
 	public void testThrowInvalidMonthUpperbound() throws AbstractApplicationException {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		calApp.run(new String[]{"13 17"}, in, out);
+		calApp.run(new String[]{"13", "17"}, in, out);
 	}
 	
 	@Test (expected = CalException.class)
 	public void testThrowInvalidYear() throws AbstractApplicationException {
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		calApp.run(new String[]{"12 0"}, in, out);
+		calApp.run(new String[]{"12", "0"}, in, out);
 	}
 	
+	@Test (expected = CalException.class)
+	public void testThrowInvalidNumOfArgs() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"12", "12", "12"}, in, out);
+	}
+	
+	@Test (expected = CalException.class)
+	public void testThrowNotDigit() throws AbstractApplicationException {
+		in = new ByteArrayInputStream("".getBytes());
+		out = new ByteArrayOutputStream();
+		calApp.run(new String[]{"feb", "16"}, in, out);
+	}
 	/**
 	 * Reads from file respective to source folder.
 	 * @param filename String filename (optional prepending of directory) to read from
