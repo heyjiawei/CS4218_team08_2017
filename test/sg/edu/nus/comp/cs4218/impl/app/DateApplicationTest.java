@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -48,32 +49,36 @@ public class DateApplicationTest {
 	@Test (expected = DateException.class)
 	public void testNullOutputStream() throws Exception {
 		in = new ByteArrayInputStream("".getBytes());
-		dateApp.run(new String[]{"date"}, in, null);
+		dateApp.run(new String[]{""}, in, null);
 	}
 	
 	@Test (expected = DateException.class)
 	public void testNullInputStream() throws Exception {
 		out = new ByteArrayOutputStream();
-		dateApp.run(new String[]{"date"}, null, out);
+		dateApp.run(new String[]{""}, null, out);
 	}
 	
 	@Test (expected = DateException.class)
 	public void testAdditionalArguments() throws Exception {
-//		fail("Not yet implemented");
 		in = new ByteArrayInputStream("".getBytes());
 		out = new ByteArrayOutputStream();
-		dateApp.run(new String[]{"date today"}, in, out);
+		dateApp.run(new String[]{"date", "today"}, in, out);
 	}
 
 	@Test
 	public void testPrintCurrentDate() {
-		fail("Not yet implemented");
-//		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
-//													Locale.ENGLISH);
-//		java.util.Date currentDate = new java.util.Date();
-//		String[] date = dateformat.format(currentDate).split(" ");
-//		String[] parts = dateApp.printCurrentDate("date").split(" ");
-//		assertEquals(date, parts);
+		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
+													Locale.ENGLISH);
+		java.util.Date currentDate = new java.util.Date();
+		dateformat.format(currentDate);
+		Boolean isSame = false;
+		try {
+			java.util.Date appDate = dateformat.parse(dateApp.printCurrentDate("date"));
+			isSame = (currentDate.getTime() - appDate.getTime()) < 5000;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		assertTrue(isSame);
 	}
 
 }
