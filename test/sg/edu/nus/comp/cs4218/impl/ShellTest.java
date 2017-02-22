@@ -79,7 +79,7 @@ public class ShellTest {
 
 		output = shell.pipeTwoCommands(cmd);
 
-		assertEquals("3 1 1", output);
+		assertEquals("3 1 1" + newLine, output);
 	}
 
 	@Test
