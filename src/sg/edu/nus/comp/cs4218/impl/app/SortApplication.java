@@ -29,14 +29,9 @@ public class SortApplication implements Sort {
 				return firstString.compareTo(secondString);
 			}
 		};
-		try {
-			String[] strings = convertFileToStringArray(toSort);
-			mergeSort(strings, 0, strings.length - 1, simpleStringComparator);
-			return String.join(newLine, strings);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+		String[] strings = toSort.split(newLine);
+		mergeSort(strings, 0, strings.length - 1, simpleStringComparator);
+		return String.join(newLine, strings);
 	}
 
 	@Override
