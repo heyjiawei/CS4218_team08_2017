@@ -36,8 +36,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortStringsCapital(String toSort) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
