@@ -54,15 +54,15 @@ public class SortApplicationTest {
 	public void testSortStringsSimple() throws IOException {
 		String simpleStringsFilePath = testFilesPath + "simple.txt";
 		String sortedSimpleStringsFilePath = testFilesPath + "simple_sorted.txt";
-		String sortedString = sortApplication.sortStringsSimple(simpleStringsFilePath);
+		String unsortedString = convertFileToString(simpleStringsFilePath);
+		String sortedString = sortApplication.sortStringsSimple(unsortedString);
 		String sortedSimpleString = convertFileToString(sortedSimpleStringsFilePath);
 		assertEquals(sortedSimpleString, sortedString);
 	}
 
 	@Test
-	public void testSortStringsSimpleEmptyFile() {
-		String emptyFilePath = testFilesPath + "empty.txt";
-		String sortedString = sortApplication.sortStringsSimple(emptyFilePath);
+	public void testSortStringsSimpleEmptyString() {
+		String sortedString = sortApplication.sortStringsSimple("");
 		assertEquals("", sortedString);
 	}
 
