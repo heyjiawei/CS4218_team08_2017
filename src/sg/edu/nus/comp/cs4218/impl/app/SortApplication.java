@@ -29,9 +29,7 @@ public class SortApplication implements Sort {
 				return firstString.compareTo(secondString);
 			}
 		};
-		String[] strings = toSort.split(newLine);
-		mergeSort(strings, 0, strings.length - 1, simpleStringComparator);
-		return String.join(newLine, strings);
+		return sort(toSort, simpleStringComparator);
 	}
 
 	@Override
@@ -115,6 +113,23 @@ public class SortApplication implements Sort {
 	public String sortAll(String toSort) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Takes in the string to sort, sorts it in the order specified by
+	 * the given comparator, and returns the sorted string.
+	 *
+	 * @param toSort
+	 *            The string to be sorted. Assumed to contain a number of
+	 *            strings to sort, each separated by a new line character
+	 * @param comparator
+	 *            The comparator which determines how to order the elements during
+	 *            sorting
+	 */
+	private String sort(String toSort, Comparator<String> comparator) {
+		String[] strings = toSort.split(newLine);
+		mergeSort(strings, 0, strings.length - 1, comparator);
+		return String.join(newLine, strings);
 	}
 
 	/**
