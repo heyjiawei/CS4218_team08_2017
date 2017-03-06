@@ -93,7 +93,13 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortSpecialChars(String toSort) {
-		return "";
+		Comparator<String> specialStringComparator = new Comparator<String>() {
+			@Override
+			public int compare(String firstString, String secondString) {
+				return firstString.compareTo(secondString);
+			}
+		};
+		return sort(toSort, specialStringComparator);
 	}
 
 	@Override
