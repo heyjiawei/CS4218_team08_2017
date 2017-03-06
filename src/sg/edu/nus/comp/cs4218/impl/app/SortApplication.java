@@ -38,11 +38,11 @@ public class SortApplication implements Sort {
 			// only the first string has a number as its first word
 			} else if (firstStringFirstWordAsInteger != null &&
 					secondStringFirstWordAsInteger == null) {
-				return 1;
+				return -1;
 			// only the second string has a number as its first word
 			} else if (firstStringFirstWordAsInteger == null &&
 					secondStringFirstWordAsInteger != null) {
-				return -1;
+				return 1;
 			// both strings do not have numbers as their first words
 			} else {
 				return firstString.compareTo(secondString);
