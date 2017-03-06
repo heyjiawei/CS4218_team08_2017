@@ -176,9 +176,10 @@ public class SortApplicationTest {
 	@Test
 	public void testSortSimpleSpecialChars() throws IOException {
 		String simpleSpecialFilePath = testFilesPath + "simple_special.txt";
-		String sortedSimpleSpecialFilePath = testFilesPath + "simple_special.txt";
+		String sortedSimpleSpecialFilePath = testFilesPath + "simple_special_sorted.txt";
 		String unsortedSimpleSpecialString = convertFileToString(simpleSpecialFilePath);
-		String sortedString = sortApplication.sortSimpleNumbers(unsortedSimpleSpecialString);
+		String sortedString = sortApplication.sortSimpleSpecialChars(
+				unsortedSimpleSpecialString);
 		String sortedSimpleSpecialString = convertFileToString(sortedSimpleSpecialFilePath);
 		assertEquals(sortedSimpleSpecialString, sortedString);
 	}
