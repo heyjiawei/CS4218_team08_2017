@@ -16,6 +16,13 @@ public class SortApplication implements Sort {
 
 	private final String newLine = System.getProperty("line.separator");
 
+	Comparator<String> genericStringComparator = new Comparator<String>() {
+		@Override
+		public int compare(String firstString, String secondString) {
+			return firstString.compareTo(secondString);
+		}
+	};
+
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
 		// TODO Auto-generated method stub
@@ -24,34 +31,16 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortStringsSimple(String toSort) {
-		Comparator<String> simpleStringComparator = new Comparator<String>() {
-			@Override
-			public int compare(String firstString, String secondString) {
-				return firstString.compareTo(secondString);
-			}
-		};
-		return sort(toSort, simpleStringComparator);
+		return sort(toSort, genericStringComparator);
 	}
 
 	@Override
 	public String sortStringsCapital(String toSort) {
-		Comparator<String> capitalStringComparator = new Comparator<String>() {
-			@Override
-			public int compare(String firstString, String secondString) {
-				return firstString.compareTo(secondString);
-			}
-		};
-		return sort(toSort, capitalStringComparator);
+		return sort(toSort, genericStringComparator);
 	}
 
 	@Override
 	public String sortNumbers(String toSort) {
-		Comparator<String> numberStringComparator = new Comparator<String>() {
-			@Override
-			public int compare(String firstString, String secondString) {
-				return firstString.compareTo(secondString);
-			}
-		};
 		Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
 			@Override
 			public int compare(String firstString, String secondString) {
@@ -87,19 +76,13 @@ public class SortApplication implements Sort {
 
 			return sort(toSort, firstWordAsNumberComparator);
 		} else {
-			return sort(toSort, numberStringComparator);
+			return sort(toSort, genericStringComparator);
 		}
 	}
 
 	@Override
 	public String sortSpecialChars(String toSort) {
-		Comparator<String> specialStringComparator = new Comparator<String>() {
-			@Override
-			public int compare(String firstString, String secondString) {
-				return firstString.compareTo(secondString);
-			}
-		};
-		return sort(toSort, specialStringComparator);
+		return sort(toSort, genericStringComparator);
 	}
 
 	@Override
