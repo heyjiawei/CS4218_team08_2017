@@ -98,8 +98,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortSimpleSpecialChars(String toSort) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
