@@ -128,6 +128,25 @@ public class SortApplication implements Sort {
 	}
 
 	/**
+	 * Determines whether the first word of each line in the lines given
+	 * should be treated as a number when sorting. Returns true if the
+	 * first line is "-n" and false otherwise.
+	 *
+	 * @param lines
+	 *            The lines that are to be sorted, possibly including the
+	 *            -n parameter as the first line
+	 * @return Whether the first word of each line should be treated as a number
+	 */
+	private boolean shouldTreatFirstWordOfLineAsNumber(String lines) {
+		String[] lineArray = lines.split(newLine);
+		if (lineArray.length == 0) {
+			return false;
+		}
+		String firstLine = lineArray[0];
+		return firstLine == "-n";
+	}
+
+	/**
 	 * Takes in the string to sort, sorts it in the order specified by
 	 * the given comparator, and returns the sorted string.
 	 *
