@@ -96,7 +96,7 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortNumbersTreatFirstWordAsNumber() throws IOException {
-		String numbersFilePath = testFilesPath + "simple_numbers.txt";
+		String numbersFilePath = testFilesPath + "numbers.txt";
 		String sortedNumbersFilePath = testFilesPath + 
 				"numbers_sorted_treating_first_word_as_number.txt";
 		String unsortedNumbersString = convertFileToString(numbersFilePath);
