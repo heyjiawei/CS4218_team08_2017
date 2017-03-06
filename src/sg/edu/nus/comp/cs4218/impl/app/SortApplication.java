@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import sg.edu.nus.comp.cs4218.app.Sort;
@@ -51,8 +52,43 @@ public class SortApplication implements Sort {
 				return firstString.compareTo(secondString);
 			}
 		};
-		return sort(toSort, numberStringComparator);
+		Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
+			@Override
+			public int compare(String firstString, String secondString) {
+				Integer firstStringFirstWordAsInteger =
+						getFirstWordOfStringAsInteger(firstString);
+				Integer secondStringFirstWordAsInteger =
+						getFirstWordOfStringAsInteger(secondString);
+				// both strings have numbers as their first words
+				if (firstStringFirstWordAsInteger != null &&
+						secondStringFirstWordAsInteger != null) {
+					return firstStringFirstWordAsInteger.
+							compareTo(secondStringFirstWordAsInteger);
+				// only the first string has a number as its first word
+				} else if (firstStringFirstWordAsInteger != null &&
+						secondStringFirstWordAsInteger == null) {
+					return 1;
+				// only the second string has a number as its first word
+				} else if (firstStringFirstWordAsInteger == null &&
+						secondStringFirstWordAsInteger != null) {
+					return -1;
+				// both strings do not have numbers as their first words
+				} else {
+					return firstString.compareTo(secondString);
+				}
+			}
+		};
+		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
+			// remove the -n parameter before sorting
+			String[] toSortArray = toSort.split(newLine);
+			String[] arrayWithoutParameter = Arrays.copyOfRange(
+					toSortArray, 1, toSortArray.length);
+			toSort = String.join(newLine, arrayWithoutParameter);
 
+			return sort(toSort, firstWordAsNumberComparator);
+		} else {
+			return sort(toSort, numberStringComparator);
+		}
 	}
 
 	@Override
@@ -128,6 +164,25 @@ public class SortApplication implements Sort {
 	}
 
 	/**
+	 * Gets the first word of the given string as an integer.
+	 *
+	 * @param string
+	 *            The string that is to be checked
+	 * @return The first word as a integer if valid, and null if not
+	 */
+	private Integer getFirstWordOfStringAsInteger(String string) {
+		String[] stringWords = string.split(newLine);
+		if (stringWords.length == 0) {
+			return null;
+		}
+		try {
+			return Integer.parseInt(stringWords[0]);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Determines whether the first word of each line in the lines given
 	 * should be treated as a number when sorting. Returns true if the
 	 * first line is "-n" and false otherwise.
@@ -143,7 +198,7 @@ public class SortApplication implements Sort {
 			return false;
 		}
 		String firstLine = lineArray[0];
-		return firstLine == "-n";
+		return firstLine.equals("-n");
 	}
 
 	/**
