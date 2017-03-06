@@ -50,6 +50,44 @@ public class SortApplication implements Sort {
 		}
 	};
 
+	Comparator<String> stringContainingSpecialComparator = new Comparator<String>() {
+		@Override
+		public int compare(String firstString, String secondString) {
+			String[] firstStringCharacters = firstString.split("");
+			String[] secondStringCharacters = secondString.split("");
+			int smallerStringLength = Math.min(firstString.length(), secondString.length());
+
+			for (int i = 0; i < smallerStringLength; i++) {
+				String firstStringCharacter = firstStringCharacters[i];
+				String secondStringCharacter = secondStringCharacters[i];
+				if (firstStringCharacter.equals(secondStringCharacter)) {
+					continue;
+				}
+				// only the first character is a special character
+				if (!isAlphaNumeric(firstStringCharacter) &&
+						isAlphaNumeric(secondStringCharacter)) {
+					return -1;
+				// only the second character is a special character
+				} else if (isAlphaNumeric(firstStringCharacter) &&
+						!isAlphaNumeric(secondStringCharacter)) {
+					return 1;
+				// both characters are special or both characters are
+				// nonspecial characters
+				} else {
+					return firstStringCharacter.compareTo(secondStringCharacter);
+				}
+			}
+			// shorter sequence is smaller
+			if (firstString.length() < secondString.length()) {
+				return -1;
+			} else if (firstString.length() > secondString.length()) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	};
+
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
 		// TODO Auto-generated method stub
@@ -98,7 +136,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortSimpleSpecialChars(String toSort) {
-		return "";
+		return sort(toSort, stringContainingSpecialComparator);
 	}
 
 	@Override
@@ -147,6 +185,17 @@ public class SortApplication implements Sort {
 	public String sortAll(String toSort) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/**
+	 * Checks whether the given string is alphanumeric.
+	 *
+	 * @param string
+	 *            The string that is to be checked
+	 * @return Whether the given string is alphanumeric
+	 */
+	private boolean isAlphaNumeric(String string) {
+		return string.matches("^[a-zA-Z0-9]+$");
 	}
 
 	/**
