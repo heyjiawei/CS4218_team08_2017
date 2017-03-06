@@ -87,8 +87,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortSimpleCapital(String toSort) {
-		// TODO Auto-generated method stub
-		return "";
+		return sort(toSort, genericStringComparator);
 	}
 
 	@Override
