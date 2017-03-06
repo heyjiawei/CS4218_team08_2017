@@ -69,12 +69,7 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortNumbers(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			// remove the -n parameter before sorting
-			String[] toSortArray = toSort.split(newLine);
-			String[] arrayWithoutParameter = Arrays.copyOfRange(
-					toSortArray, 1, toSortArray.length);
-			toSort = String.join(newLine, arrayWithoutParameter);
-
+			toSort = removeFirstLineFromString(toSort);
 			return sort(toSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, genericStringComparator);
@@ -167,6 +162,24 @@ public class SortApplication implements Sort {
 		} catch (NumberFormatException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Removes the first line from a given string. It is assumed that the
+	 * given string is contains lines separated by a newline character.
+	 *
+	 * @param string
+	 *            The string from which the first line is to be removed.
+	 * @return The string with the first line removed, if any.
+	 */
+	private String removeFirstLineFromString(String string) {
+		String[] toSortArray = string.split(newLine);
+		if (toSortArray.length < 2) {
+			return "";
+		}
+		String[] arrayWithoutParameter = Arrays.copyOfRange(
+				toSortArray, 1, toSortArray.length);
+		return String.join(newLine, arrayWithoutParameter);
 	}
 
 	/**
