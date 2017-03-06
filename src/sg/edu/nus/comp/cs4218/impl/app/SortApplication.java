@@ -34,7 +34,13 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortStringsCapital(String toSort) {
-		return "";
+		Comparator<String> capitalStringComparator = new Comparator<String>() {
+			@Override
+			public int compare(String firstString, String secondString) {
+				return firstString.compareTo(secondString);
+			}
+		};
+		return sort(toSort, capitalStringComparator);
 	}
 
 	@Override
