@@ -23,6 +23,33 @@ public class SortApplication implements Sort {
 		}
 	};
 
+	Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
+		@Override
+		public int compare(String firstString, String secondString) {
+			Integer firstStringFirstWordAsInteger =
+					getFirstWordOfStringAsInteger(firstString);
+			Integer secondStringFirstWordAsInteger =
+					getFirstWordOfStringAsInteger(secondString);
+			// both strings have numbers as their first words
+			if (firstStringFirstWordAsInteger != null &&
+					secondStringFirstWordAsInteger != null) {
+				return firstStringFirstWordAsInteger.
+						compareTo(secondStringFirstWordAsInteger);
+			// only the first string has a number as its first word
+			} else if (firstStringFirstWordAsInteger != null &&
+					secondStringFirstWordAsInteger == null) {
+				return 1;
+			// only the second string has a number as its first word
+			} else if (firstStringFirstWordAsInteger == null &&
+					secondStringFirstWordAsInteger != null) {
+				return -1;
+			// both strings do not have numbers as their first words
+			} else {
+				return firstString.compareTo(secondString);
+			}
+		}
+	};
+
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
 		// TODO Auto-generated method stub
@@ -41,32 +68,6 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortNumbers(String toSort) {
-		Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
-			@Override
-			public int compare(String firstString, String secondString) {
-				Integer firstStringFirstWordAsInteger =
-						getFirstWordOfStringAsInteger(firstString);
-				Integer secondStringFirstWordAsInteger =
-						getFirstWordOfStringAsInteger(secondString);
-				// both strings have numbers as their first words
-				if (firstStringFirstWordAsInteger != null &&
-						secondStringFirstWordAsInteger != null) {
-					return firstStringFirstWordAsInteger.
-							compareTo(secondStringFirstWordAsInteger);
-				// only the first string has a number as its first word
-				} else if (firstStringFirstWordAsInteger != null &&
-						secondStringFirstWordAsInteger == null) {
-					return 1;
-				// only the second string has a number as its first word
-				} else if (firstStringFirstWordAsInteger == null &&
-						secondStringFirstWordAsInteger != null) {
-					return -1;
-				// both strings do not have numbers as their first words
-				} else {
-					return firstString.compareTo(secondString);
-				}
-			}
-		};
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
 			// remove the -n parameter before sorting
 			String[] toSortArray = toSort.split(newLine);
