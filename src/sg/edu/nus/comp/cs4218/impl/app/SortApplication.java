@@ -219,7 +219,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortAll(String toSort) {
-		return "";
+		return sort(toSort, stringContainingSpecialComparator);
 	}
 
 	/**
