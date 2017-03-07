@@ -33,8 +33,14 @@ public class SortApplication implements Sort {
 			// both strings have numbers as their first words
 			if (firstStringFirstWordAsInteger != null &&
 					secondStringFirstWordAsInteger != null) {
-				return firstStringFirstWordAsInteger.
+				int numberComparison = firstStringFirstWordAsInteger.
 						compareTo(secondStringFirstWordAsInteger);
+				// the numbers are the same, compare using the rest of the first word
+				if (numberComparison == 0) {
+					return firstString.compareTo(secondString);
+				} else {
+					return numberComparison;
+				}
 			// only the first string has a number as its first word
 			} else if (firstStringFirstWordAsInteger != null &&
 					secondStringFirstWordAsInteger == null) {
@@ -198,7 +204,9 @@ public class SortApplication implements Sort {
 	}
 
 	/**
-	 * Gets the first word of the given string as an integer.
+	 * Gets the first word of the given string as an integer. The first
+	 * word is considered to be valid as an integer if it starts with an
+	 * integer (e.g. 34 and 34ab are valid, a34b and ab34 are not)
 	 *
 	 * @param string
 	 *            The string that is to be checked
@@ -210,7 +218,23 @@ public class SortApplication implements Sort {
 			return null;
 		}
 		try {
-			return Integer.parseInt(stringWords[0]);
+			String firstWord = stringWords[0];
+			String frontPartOfWordAsNumber = "";
+			// extract front part of word that is a number
+			for (int i = 0; i < firstWord.length(); i++) {
+				String currentCharacter = firstWord.substring(i, i + 1);
+				if (currentCharacter.matches("[0-9]")) {
+					frontPartOfWordAsNumber += currentCharacter;
+				} else {
+					break;
+				}
+			}
+			// word does not have number at front part
+			if (frontPartOfWordAsNumber.equals("")) {
+				return null;
+			} else {
+				return Integer.parseInt(frontPartOfWordAsNumber);
+			}
 		} catch (NumberFormatException e) {
 			return null;
 		}
