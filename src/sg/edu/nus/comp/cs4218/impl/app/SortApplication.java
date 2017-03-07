@@ -157,7 +157,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortCapitalSpecialChars(String toSort) {
-		return "";
+		return sort(toSort, stringContainingSpecialComparator);
 	}
 
 	@Override
