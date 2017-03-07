@@ -199,7 +199,12 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortSimpleNumbersSpecialChars(String toSort) {
-		return sort(toSort, stringContainingSpecialComparator);
+		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
+			toSort = removeFirstLineFromString(toSort);
+			return sort(toSort, firstWordAsNumberComparator);
+		} else {
+			return sort(toSort, stringContainingSpecialComparator);
+		}
 	}
 
 	@Override
