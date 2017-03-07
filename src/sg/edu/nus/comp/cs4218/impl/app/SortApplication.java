@@ -141,6 +141,14 @@ public class SortApplication implements Sort {
 				if (args.length < 2 || args[1] == null) {
 					throw new SortException("No file path provided");
 				}
+				try {
+					String toSort = convertFileToString(args[1]);
+					// add flag to get string sorted with first word as number
+					toSort = treatFirstWordAsNumberFlag + newLine + toSort;
+					stdout.write(sortAll(toSort).getBytes());
+				} catch (IOException e) {
+					throw new SortException("IOException");
+				}
 			} else {
 				// assume first argument is filename
 				try {
