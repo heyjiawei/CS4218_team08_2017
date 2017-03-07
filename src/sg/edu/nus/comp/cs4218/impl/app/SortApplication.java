@@ -23,39 +23,6 @@ public class SortApplication implements Sort {
 		}
 	};
 
-	Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
-		@Override
-		public int compare(String firstString, String secondString) {
-			Integer firstStringFirstWordAsInteger =
-					getFirstWordOfStringAsInteger(firstString);
-			Integer secondStringFirstWordAsInteger =
-					getFirstWordOfStringAsInteger(secondString);
-			// both strings have numbers as their first words
-			if (firstStringFirstWordAsInteger != null &&
-					secondStringFirstWordAsInteger != null) {
-				int numberComparison = firstStringFirstWordAsInteger.
-						compareTo(secondStringFirstWordAsInteger);
-				// the numbers are the same, compare using the rest of the first word
-				if (numberComparison == 0) {
-					return firstString.compareTo(secondString);
-				} else {
-					return numberComparison;
-				}
-			// only the first string has a number as its first word
-			} else if (firstStringFirstWordAsInteger != null &&
-					secondStringFirstWordAsInteger == null) {
-				return -1;
-			// only the second string has a number as its first word
-			} else if (firstStringFirstWordAsInteger == null &&
-					secondStringFirstWordAsInteger != null) {
-				return 1;
-			// both strings do not have numbers as their first words
-			} else {
-				return firstString.compareTo(secondString);
-			}
-		}
-	};
-
 	Comparator<String> stringContainingSpecialComparator = new Comparator<String>() {
 		@Override
 		public int compare(String firstString, String secondString) {
@@ -90,6 +57,51 @@ public class SortApplication implements Sort {
 				return 1;
 			} else {
 				return 0;
+			}
+		}
+	};
+
+	Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
+		@Override
+		public int compare(String firstString, String secondString) {
+			Integer firstStringFirstWordAsInteger =
+					getFirstWordOfStringAsInteger(firstString);
+			Integer secondStringFirstWordAsInteger =
+					getFirstWordOfStringAsInteger(secondString);
+			// both strings have numbers as their first words
+			if (firstStringFirstWordAsInteger != null &&
+					secondStringFirstWordAsInteger != null) {
+				int numberComparison = firstStringFirstWordAsInteger.
+						compareTo(secondStringFirstWordAsInteger);
+				// the numbers are the same, compare using the rest of the first word
+				if (numberComparison == 0) {
+					return stringContainingSpecialComparator.compare(firstString, secondString);
+				} else {
+					return numberComparison;
+				}
+			// only the first string has a number as its first word
+			} else if (firstStringFirstWordAsInteger != null &&
+					secondStringFirstWordAsInteger == null) {
+				// special characters go before numbers
+				if (secondString.length() > 0 &&
+						!isAlphaNumeric(secondString.substring(0, 1))) {
+					return 1;
+				} else {
+					return -1;
+				}
+			// only the second string has a number as its first word
+			} else if (firstStringFirstWordAsInteger == null &&
+					secondStringFirstWordAsInteger != null) {
+				// special characters go before numbers
+				if (firstString.length() > 0 &&
+						!isAlphaNumeric(firstString.substring(0, 1))) {
+					return -1;
+				} else {
+					return 1;
+				}
+			// both strings do not have numbers as their first words
+			} else {
+				return stringContainingSpecialComparator.compare(firstString, secondString);
 			}
 		}
 	};
@@ -162,7 +174,12 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortNumbersSpecialChars(String toSort) {
-		return sort(toSort, stringContainingSpecialComparator);
+		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
+			toSort = removeFirstLineFromString(toSort);
+			return sort(toSort, firstWordAsNumberComparator);
+		} else {
+			return sort(toSort, stringContainingSpecialComparator);
+		}
 	}
 
 	@Override
