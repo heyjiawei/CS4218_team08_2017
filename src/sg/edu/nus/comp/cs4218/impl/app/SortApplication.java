@@ -219,8 +219,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortAll(String toSort) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	/**
