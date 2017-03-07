@@ -209,7 +209,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortCapitalNumbersSpecialChars(String toSort) {
-		return "";
+		return sort(toSort, stringContainingSpecialComparator);
 	}
 
 	@Override
