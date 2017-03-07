@@ -141,8 +141,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortCapitalNumbers(String toSort) {
-		// TODO Auto-generated method stub
-		return null;
+		return "";
 	}
 
 	@Override
