@@ -196,6 +196,26 @@ public class SortApplication implements Sort {
 	}
 
 	/**
+	 * Joins the given String array into a single string using the given
+	 * delimiter.
+	 *
+	 * @param stringsToJoin
+	 *            The strings to be joined together
+	 * @param delimiter
+	 *            The delimiter used to join the strings
+	 * @return The strings joined with the given delimiter
+	 */
+	private String joinWithDelimiter(String[] stringsToJoin, String delimiter) {
+		String sortedString = "";
+		for (int i = 0; i < stringsToJoin.length - 1; i++) {
+			sortedString += stringsToJoin[i];
+			sortedString += newLine;
+		}
+		sortedString += stringsToJoin[stringsToJoin.length - 1];
+		return sortedString;
+	}
+
+	/**
 	 * Checks whether the given string is alphanumeric.
 	 *
 	 * @param string
@@ -258,7 +278,7 @@ public class SortApplication implements Sort {
 		}
 		String[] arrayWithoutParameter = Arrays.copyOfRange(
 				toSortArray, 1, toSortArray.length);
-		return String.join(newLine, arrayWithoutParameter);
+		return joinWithDelimiter(arrayWithoutParameter, newLine);
 	}
 
 	/**
@@ -294,7 +314,7 @@ public class SortApplication implements Sort {
 	private String sort(String toSort, Comparator<String> comparator) {
 		String[] strings = toSort.split(newLine);
 		mergeSort(strings, 0, strings.length - 1, comparator);
-		return String.join(newLine, strings);
+		return joinWithDelimiter(strings, newLine);
 	}
 
 	/**
