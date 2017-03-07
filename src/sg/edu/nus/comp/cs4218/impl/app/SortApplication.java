@@ -147,7 +147,12 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortCapitalNumbers(String toSort) {
-		return sort(toSort, genericStringComparator);
+		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
+			toSort = removeFirstLineFromString(toSort);
+			return sort(toSort, firstWordAsNumberComparator);
+		} else {
+			return sort(toSort, genericStringComparator);
+		}
 	}
 
 	@Override
