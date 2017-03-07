@@ -125,8 +125,7 @@ public class SortApplication implements Sort {
 				    contents.write(buffer, 0, bytesRead);
 				}
 				String toSort = contents.toString();
-				String sorted = sortAll(toSort);
-				stdout.write(sorted.getBytes());
+				stdout.write(sortAll(toSort).getBytes());
 			} catch (IOException e) {
 				throw new SortException("IOException");
 			}
@@ -134,6 +133,13 @@ public class SortApplication implements Sort {
 			String firstArgument = args[0];
 			if (firstArgument == null) {
 				throw new SortException("First argument provided is null");
+			}
+			// assume first argument is filepath
+			try {
+				String toSort = convertFileToString(firstArgument);
+				stdout.write(sortAll(toSort).getBytes());
+			} catch (IOException e) {
+				throw new SortException("IOException");
 			}
 		}
 	}
@@ -474,8 +480,8 @@ public class SortApplication implements Sort {
 	 * @throws IOException
 	 *             If there is an error reading the file
 	 */
-	private String[] convertFileToStringArray(String filePathString) throws IOException {
+	private String convertFileToString(String filePathString) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(filePathString));
-		return new String(encoded, StandardCharsets.UTF_8).split(newLine);
+		return new String(encoded, StandardCharsets.UTF_8);
 	}
 }
