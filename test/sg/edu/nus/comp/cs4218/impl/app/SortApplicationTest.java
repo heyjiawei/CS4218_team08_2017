@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -429,7 +430,7 @@ public class SortApplicationTest {
 	}
 
 	@Test
-	public void testRun() throws AbstractApplicationException, IOException {
+	public void testRunUsingFile() throws AbstractApplicationException, IOException {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
 		String[] args = {allFilePath};
@@ -439,6 +440,7 @@ public class SortApplicationTest {
 		String sortedAllString = convertFileToString(sortedAllFilePath);
 		assertEquals(sortedAllString, outputStream.toString());
 	}
+
 
 	@Test
 	public void testRunTreatFirstWordAsNumber()
@@ -466,7 +468,7 @@ public class SortApplicationTest {
 	}
 
 	@Test
-	public void testThrowWhenArgsAndStdInputNull() throws AbstractApplicationException {
+	public void testRunThrowWhenArgsAndStdInputNull() throws AbstractApplicationException {
 		String[] args = null;
 		thrown.expect(SortException.class);
 		thrown.expectMessage("No input provided");
@@ -476,10 +478,20 @@ public class SortApplicationTest {
 	}
 
 	@Test
-	public void testThrowWhenEmptyArgsAndStdInputNull() throws AbstractApplicationException {
+	public void testRunThrowWhenEmptyArgsAndStdInputNull() throws AbstractApplicationException {
 		String[] args = {};
 		thrown.expect(SortException.class);
 		thrown.expectMessage("No input provided");
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+	}
+
+	@Test
+	public void testRunThrowWhenFirstArgumentNull() throws AbstractApplicationException {
+		String[] args = {null};
+		thrown.expect(SortException.class);
+		thrown.expectMessage("First argument provided is null");
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
 		sortApplication.run(args, inputStream, outputStream);

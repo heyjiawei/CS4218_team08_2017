@@ -116,6 +116,11 @@ public class SortApplication implements Sort {
 			if (stdin == null) {
 				throw new SortException("No input provided");
 			}
+		} else {
+			String firstArgument = args[0];
+			if (firstArgument == null) {
+				throw new SortException("First argument provided is null");
+			}
 		}
 	}
 
