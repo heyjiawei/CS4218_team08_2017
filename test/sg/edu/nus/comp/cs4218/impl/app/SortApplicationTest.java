@@ -508,6 +508,17 @@ public class SortApplicationTest {
 		sortApplication.run(args, inputStream, outputStream);
 	}
 
+	@Test
+	public void testRunThrowWhenNecessarySecondArgumentNotGiven()
+			throws AbstractApplicationException {
+		String[] args = {"-n"};
+		thrown.expect(SortException.class);
+		thrown.expectMessage("No file path provided");
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+	}
+
 	/**
 	 * Converts the file found at the given input file path string to
 	 * a string.

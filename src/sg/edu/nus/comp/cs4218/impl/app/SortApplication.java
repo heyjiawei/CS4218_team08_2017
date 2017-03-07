@@ -17,6 +17,7 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 public class SortApplication implements Sort {
 
 	private final String newLine = System.getProperty("line.separator");
+	private final String treatFirstWordAsNumberFlag = "-n";
 
 	Comparator<String> genericStringComparator = new Comparator<String>() {
 		@Override
@@ -134,12 +135,20 @@ public class SortApplication implements Sort {
 			if (firstArgument == null) {
 				throw new SortException("First argument provided is null");
 			}
-			// assume first argument is filepath
-			try {
-				String toSort = convertFileToString(firstArgument);
-				stdout.write(sortAll(toSort).getBytes());
-			} catch (IOException e) {
-				throw new SortException("IOException");
+			// check whether first argument is -n flag
+			if (firstArgument.equals(treatFirstWordAsNumberFlag)) {
+				// assume second argument is filename
+				if (args.length < 2 || args[1] == null) {
+					throw new SortException("No file path provided");
+				}
+			} else {
+				// assume first argument is filename
+				try {
+					String toSort = convertFileToString(firstArgument);
+					stdout.write(sortAll(toSort).getBytes());
+				} catch (IOException e) {
+					throw new SortException("IOException");
+				}
 			}
 		}
 	}
@@ -361,7 +370,7 @@ public class SortApplication implements Sort {
 			return false;
 		}
 		String firstLine = lineArray[0];
-		return firstLine.equals("-n");
+		return firstLine.equals(treatFirstWordAsNumberFlag);
 	}
 
 	/**
