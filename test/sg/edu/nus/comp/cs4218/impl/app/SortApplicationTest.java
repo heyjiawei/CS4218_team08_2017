@@ -24,8 +24,8 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 //    returns a string containing only simple letters, only takes in strings that contain
 //    only simple letters.
 // 3. When -n is specified, the first word of a line is treated as a number only if
-//    it can be parsed as an integer (e.g. 34 will be recognized as a number, but
-//    34abc, abc34 or a34bc will not be recognized). -n has to be specified
+//    the first part of it is an integer (e.g. 34 and 34abc will be recognized as
+//    a number, but abc34 or a34bc will not be recognized). -n has to be specified
 //    by being the first line in the input string.
 public class SortApplicationTest {
 
