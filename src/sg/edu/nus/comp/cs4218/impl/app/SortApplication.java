@@ -11,6 +11,7 @@ import java.util.Comparator;
 
 import sg.edu.nus.comp.cs4218.app.Sort;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.SortException;
 
 public class SortApplication implements Sort {
 
@@ -108,8 +109,9 @@ public class SortApplication implements Sort {
 
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
-		// TODO Auto-generated method stub
-		
+		if (stdout == null) {
+			throw new SortException("No output stream provided");
+		}
 	}
 
 	@Override

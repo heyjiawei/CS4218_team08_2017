@@ -13,9 +13,12 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.SortException;
 
 // Assumptions made in tests:
 // 1. 'Simple' letters means lowercase letters
@@ -34,6 +37,9 @@ public class SortApplicationTest {
 	private SortApplication sortApplication;
 	private final String testFilesPath = "test_inputs/sort/";
 	private final String newLine = System.getProperty("line.separator");
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -445,6 +451,17 @@ public class SortApplicationTest {
 		sortApplication.run(args, inputStream, outputStream);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
 		assertEquals(sortedAllString, outputStream.toString());
+	}
+
+	@Test
+	public void testRunThrowWhenStdOutputNull() throws AbstractApplicationException {
+		String allFilePath = testFilesPath + "all.txt";
+		String[] args = {allFilePath};
+		thrown.expect(SortException.class);
+		thrown.expectMessage("No output stream provided");
+		inputStream = null;
+		outputStream = null;
+		sortApplication.run(args, inputStream, outputStream);
 	}
 
 	/**
