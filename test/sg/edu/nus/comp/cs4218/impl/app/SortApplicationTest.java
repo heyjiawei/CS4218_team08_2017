@@ -468,6 +468,21 @@ public class SortApplicationTest {
 	}
 
 	@Test
+	public void testRunUsingStdInputTreatFirstWordAsNumber()
+			throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath +
+				"all_sorted_treat_first_word_as_number.txt";
+		String allTestString = "-n" + newLine + convertFileToString(allFilePath);
+		String[] args = {};
+		inputStream = new ByteArrayInputStream(allTestString.getBytes());
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
+	}
+
+	@Test
 	public void testRunThrowWhenStdOutputNull() throws AbstractApplicationException {
 		String allFilePath = testFilesPath + "all.txt";
 		String[] args = {allFilePath};
