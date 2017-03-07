@@ -475,6 +475,16 @@ public class SortApplicationTest {
 		sortApplication.run(args, inputStream, outputStream);
 	}
 
+	@Test
+	public void testThrowWhenEmptyArgsAndStdInputNull() throws AbstractApplicationException {
+		String[] args = {};
+		thrown.expect(SortException.class);
+		thrown.expectMessage("No input provided");
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+	}
+
 	/**
 	 * Converts the file found at the given input file path string to
 	 * a string.
