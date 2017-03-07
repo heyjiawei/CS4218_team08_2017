@@ -388,7 +388,7 @@ public class SortApplicationTest {
 	}
 
 	@Test
-	public void testSortCapitalNumbersSpecialCharsFile() {
+	public void testSortCapitalNumbersSpecialCharsEmptyString() {
 		String sortedString = sortApplication.sortCapitalNumbersSpecialChars("");
 		assertEquals("", sortedString);
 	}
