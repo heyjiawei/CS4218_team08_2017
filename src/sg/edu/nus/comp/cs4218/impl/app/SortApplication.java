@@ -112,6 +112,11 @@ public class SortApplication implements Sort {
 		if (stdout == null) {
 			throw new SortException("No output stream provided");
 		}
+		if (args == null) {
+			if (stdin == null) {
+				throw new SortException("No input provided");
+			}
+		}
 	}
 
 	@Override

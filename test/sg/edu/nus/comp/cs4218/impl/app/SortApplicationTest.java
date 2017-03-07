@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
 
 // Assumptions made in tests:
@@ -461,6 +462,16 @@ public class SortApplicationTest {
 		thrown.expectMessage("No output stream provided");
 		inputStream = null;
 		outputStream = null;
+		sortApplication.run(args, inputStream, outputStream);
+	}
+
+	@Test
+	public void testThrowWhenArgsAndStdInputNull() throws AbstractApplicationException {
+		String[] args = null;
+		thrown.expect(SortException.class);
+		thrown.expectMessage("No input provided");
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
 		sortApplication.run(args, inputStream, outputStream);
 	}
 
