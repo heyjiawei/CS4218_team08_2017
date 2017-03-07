@@ -141,7 +141,7 @@ public class SortApplication implements Sort {
 
 	@Override
 	public String sortCapitalNumbers(String toSort) {
-		return "";
+		return sort(toSort, genericStringComparator);
 	}
 
 	@Override
