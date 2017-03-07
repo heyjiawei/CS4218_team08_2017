@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -115,6 +116,19 @@ public class SortApplication implements Sort {
 		if (args == null || args.length == 0) {
 			if (stdin == null) {
 				throw new SortException("No input provided");
+			}
+			ByteArrayOutputStream contents = new ByteArrayOutputStream();
+			byte[] buffer = new byte[8192];
+			int bytesRead;
+			try {
+				while ((bytesRead = stdin.read(buffer)) != -1) {
+				    contents.write(buffer, 0, bytesRead);
+				}
+				String toSort = contents.toString();
+				String sorted = sortAll(toSort);
+				stdout.write(sorted.getBytes());
+			} catch (IOException e) {
+				throw new SortException("IOException");
 			}
 		} else {
 			String firstArgument = args[0];

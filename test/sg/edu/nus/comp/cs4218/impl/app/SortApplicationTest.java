@@ -19,7 +19,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
 
 // Assumptions made in tests:
@@ -441,7 +440,6 @@ public class SortApplicationTest {
 		assertEquals(sortedAllString, outputStream.toString());
 	}
 
-
 	@Test
 	public void testRunTreatFirstWordAsNumber()
 			throws AbstractApplicationException, IOException {
@@ -450,6 +448,19 @@ public class SortApplicationTest {
 				"all_treat_first_word_as_number_sorted.txt";
 		String[] args = {"-n", allFilePath};
 		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, outputStream.toString());
+	}
+
+	@Test
+	public void testRunUsingStdInput() throws AbstractApplicationException, IOException {
+		String allFilePath = testFilesPath + "all.txt";
+		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String allTestString = convertFileToString(allFilePath);
+		String[] args = {};
+		inputStream = new ByteArrayInputStream(allTestString.getBytes());
 		outputStream = new ByteArrayOutputStream();
 		sortApplication.run(args, inputStream, outputStream);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
