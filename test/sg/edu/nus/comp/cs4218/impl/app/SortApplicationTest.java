@@ -411,6 +411,12 @@ public class SortApplicationTest {
 	}
 
 	@Test
+	public void testSortAllInputSingleNewLine() throws IOException {
+		String sortedString = sortApplication.sortAll(newLine);
+		assertEquals(newLine, sortedString);
+	}
+
+	@Test
 	public void testSortAllTreatFirstWordAsNumber() throws IOException {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath +

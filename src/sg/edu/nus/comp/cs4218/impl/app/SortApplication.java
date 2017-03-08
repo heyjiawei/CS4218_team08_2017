@@ -375,11 +375,11 @@ public class SortApplication implements Sort {
 	/**
 	 * Determines whether the first word of each line in the lines given
 	 * should be treated as a number when sorting. Returns true if the
-	 * first line is "-n" and false otherwise.
+	 * first line is the flag to treat the first word as a number and false otherwise.
 	 *
 	 * @param lines
 	 *            The lines that are to be sorted, possibly including the
-	 *            -n parameter as the first line
+	 *            flag to treat the first word as a number as the first line
 	 * @return Whether the first word of each line should be treated as a number
 	 */
 	private boolean shouldTreatFirstWordOfLineAsNumber(String lines) {
@@ -404,6 +404,9 @@ public class SortApplication implements Sort {
 	 */
 	private String sort(String toSort, Comparator<String> comparator) {
 		String[] strings = toSort.split(newLine);
+		if (strings.length == 0) {
+			return toSort;
+		}
 		mergeSort(strings, 0, strings.length - 1, comparator);
 		return joinWithDelimiter(strings, newLine);
 	}
