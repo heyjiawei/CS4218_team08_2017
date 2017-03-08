@@ -329,32 +329,28 @@ public class SortApplication implements Sort {
 		if (stringWords.length == 0) {
 			return null;
 		}
-		try {
-			String firstWord = stringWords[0];
-			String frontPartOfWordAsNumber = "";
-			// extract front part of word that is a number
-			for (int i = 0; i < firstWord.length(); i++) {
-				String currentCharacter = firstWord.substring(i, i + 1);
-				// detect and handle possible negative number
-				if (i == 0 && currentCharacter.equals("-")) {
-					frontPartOfWordAsNumber += currentCharacter;
-					continue;
-				}
-				if (currentCharacter.matches("[0-9]")) {
-					frontPartOfWordAsNumber += currentCharacter;
-				} else {
-					break;
-				}
+		String firstWord = stringWords[0];
+		String frontPartOfWordAsNumber = "";
+		// extract front part of word that is a number
+		for (int i = 0; i < firstWord.length(); i++) {
+			String currentCharacter = firstWord.substring(i, i + 1);
+			// detect and handle possible negative number
+			if (i == 0 && currentCharacter.equals("-")) {
+				frontPartOfWordAsNumber += currentCharacter;
+				continue;
 			}
-			// word does not have number at front part
-			if (frontPartOfWordAsNumber.equals("") ||
-					frontPartOfWordAsNumber.equalsIgnoreCase("-")) {
-				return null;
+			if (currentCharacter.matches("[0-9]")) {
+				frontPartOfWordAsNumber += currentCharacter;
 			} else {
-				return Integer.parseInt(frontPartOfWordAsNumber);
+				break;
 			}
-		} catch (NumberFormatException e) {
+		}
+		// word does not have number at front part
+		if (frontPartOfWordAsNumber.equals("") ||
+				frontPartOfWordAsNumber.equalsIgnoreCase("-")) {
 			return null;
+		} else {
+			return Integer.parseInt(frontPartOfWordAsNumber);
 		}
 	}
 
