@@ -67,12 +67,13 @@ public class SortApplication implements Sort {
 	Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
 		@Override
 		public int compare(String firstString, String secondString) {
+			if (firstString.equals(secondString)) {
+				return 0;
+			}
 			if (firstString.equals("") && !secondString.equals("")) {
 				return -1;
 			} else if (!firstString.equals("") && secondString.equals("")) {
 				return 1;
-			} else if (firstString.equals("") && secondString.equals("")) {
-				return 0;
 			}
 			Integer firstStringFirstWordAsInteger =
 					getFirstWordOfStringAsInteger(firstString);
