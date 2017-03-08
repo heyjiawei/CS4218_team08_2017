@@ -468,6 +468,15 @@ public class SortApplicationTest {
 	}
 
 	@Test
+	public void testRunUsingEmptyStdInput() throws AbstractApplicationException, IOException {
+		String[] args = {};
+		inputStream = new ByteArrayInputStream("".getBytes());
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		assertEquals("", outputStream.toString());
+	}
+
+	@Test
 	public void testRunUsingStdInputTreatFirstWordAsNumber()
 			throws AbstractApplicationException, IOException {
 		String allFilePath = testFilesPath + "all.txt";
