@@ -492,6 +492,17 @@ public class SortApplicationTest {
 	}
 
 	@Test
+	public void testRunUsingStdInputTreatFirstWordAsNumberNoInput()
+			throws AbstractApplicationException {
+		String allTestString = "-n" + newLine;
+		String[] args = {};
+		inputStream = new ByteArrayInputStream(allTestString.getBytes());
+		outputStream = new ByteArrayOutputStream();
+		sortApplication.run(args, inputStream, outputStream);
+		assertEquals("", outputStream.toString());
+	}
+
+	@Test
 	public void testRunThrowWhenStdOutputNull() throws AbstractApplicationException {
 		String allFilePath = testFilesPath + "all.txt";
 		String[] args = {allFilePath};
