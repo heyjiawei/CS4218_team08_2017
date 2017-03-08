@@ -298,7 +298,7 @@ public class SortApplicationTest {
 				"simple_capital_number_sorted_treating_first_word_as_number.txt";
 		String unsortedSimpleCapitalNumberString =
 				convertFileToString(simpleCapitalNumberFilePath);
-		String sortedString = sortApplication.sortNumbersSpecialChars(
+		String sortedString = sortApplication.sortSimpleCapitalNumber(
 				"-n" + newLine + unsortedSimpleCapitalNumberString);
 		String sortedSimpleCapitalNumberString = convertFileToString(
 				sortedSimpleCapitalNumberFilePath);
