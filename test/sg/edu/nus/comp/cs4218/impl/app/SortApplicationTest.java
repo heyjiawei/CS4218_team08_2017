@@ -414,7 +414,7 @@ public class SortApplicationTest {
 	public void testSortAllTreatFirstWordAsNumber() throws IOException {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath +
-				"all_treat_first_word_as_number_sorted.txt";
+				"all_sorted_treat_first_word_as_number.txt";
 		String unsortedAllString = convertFileToString(allFilePath);
 		String sortedString = sortApplication.sortAll(
 				"-n" + newLine + unsortedAllString);
@@ -445,7 +445,7 @@ public class SortApplicationTest {
 			throws AbstractApplicationException, IOException {
 		String allFilePath = testFilesPath + "all.txt";
 		String sortedAllFilePath = testFilesPath +
-				"all_treat_first_word_as_number_sorted.txt";
+				"all_sorted_treat_first_word_as_number.txt";
 		String[] args = {"-n", allFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
