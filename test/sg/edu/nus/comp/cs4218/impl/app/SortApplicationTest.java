@@ -429,6 +429,18 @@ public class SortApplicationTest {
 	}
 
 	@Test
+	public void testSortAllMediumLengthSentences() throws IOException {
+		String allFilePath = testFilesPath + "medium_length_sentences.txt";
+		String sortedAllFilePath = testFilesPath +
+				"medium_length_sentences_sorted.txt";
+		String unsortedAllString = convertFileToString(allFilePath);
+		String sortedString = sortApplication.sortAll(
+				"-n" + newLine + unsortedAllString);
+		String sortedAllString = convertFileToString(sortedAllFilePath);
+		assertEquals(sortedAllString, sortedString);
+	}
+
+	@Test
 	public void testSortAllEmptyString() {
 		String sortedString = sortApplication.sortAll("");
 		assertEquals("", sortedString);
