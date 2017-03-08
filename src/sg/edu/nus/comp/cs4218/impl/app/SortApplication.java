@@ -310,14 +310,14 @@ public class SortApplication implements Sort {
 	/**
 	 * Gets the first word of the given string as an integer. The first
 	 * word is considered to be valid as an integer if it starts with an
-	 * integer (e.g. 34 and 34ab are valid, a34b and ab34 are not)
+	 * integer (e.g. 34, 34ab and -34ab are valid, a34b and ab34 are not)
 	 *
 	 * @param string
 	 *            The string that is to be checked
 	 * @return The first word as a integer if valid, and null if not
 	 */
 	private Integer getFirstWordOfStringAsInteger(String string) {
-		String[] stringWords = string.split(newLine);
+		String[] stringWords = string.split(" ");
 		if (stringWords.length == 0) {
 			return null;
 		}
@@ -327,6 +327,11 @@ public class SortApplication implements Sort {
 			// extract front part of word that is a number
 			for (int i = 0; i < firstWord.length(); i++) {
 				String currentCharacter = firstWord.substring(i, i + 1);
+				// detect and handle possible negative number
+				if (i == 0 && currentCharacter.equals("-")) {
+					frontPartOfWordAsNumber += currentCharacter;
+					continue;
+				}
 				if (currentCharacter.matches("[0-9]")) {
 					frontPartOfWordAsNumber += currentCharacter;
 				} else {
@@ -334,7 +339,8 @@ public class SortApplication implements Sort {
 				}
 			}
 			// word does not have number at front part
-			if (frontPartOfWordAsNumber.equals("")) {
+			if (frontPartOfWordAsNumber.equals("") ||
+					frontPartOfWordAsNumber.equalsIgnoreCase("-")) {
 				return null;
 			} else {
 				return Integer.parseInt(frontPartOfWordAsNumber);
