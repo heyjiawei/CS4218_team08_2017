@@ -9,15 +9,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
-import sg.edu.nus.comp.cs4218.impl.app.CdApplication;
-import sg.edu.nus.comp.cs4218.impl.app.DateApplication;
-import sg.edu.nus.comp.cs4218.impl.app.EchoApplication;
-import sg.edu.nus.comp.cs4218.impl.app.HeadApplication;
-import sg.edu.nus.comp.cs4218.impl.app.PwdApplication;
-import sg.edu.nus.comp.cs4218.impl.app.SedApplication;
-import sg.edu.nus.comp.cs4218.impl.app.TailApplication;
-import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
+import sg.edu.nus.comp.cs4218.impl.app.*;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 
 /**
@@ -395,6 +387,8 @@ public class ShellImpl implements Shell {
 			absApp = new TailApplication();
 		} else if (("wc").equalsIgnoreCase(app)) {
 			absApp = new WcApplication();
+		} else if (("cal").equalsIgnoreCase(app)) {
+			absApp = new CalApplication();
 		} else { // invalid command
 			throw new ShellException(app + ": " + EXP_INVALID_APP);
 		}
