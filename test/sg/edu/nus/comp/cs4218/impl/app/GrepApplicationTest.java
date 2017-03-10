@@ -26,7 +26,7 @@ import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 
 public class GrepApplicationTest {
 	private static final String REGEXMULTIOUT = "Hello Hello\nABC Hello\nello milo";
-	private static final String NOMATCHFILE = "Pattern Not Found In File!";
+	private static final String NOMATCHFILE = "Pattern Not Found In File!\n";
 	private static final String REGEXPATTERNOUT = "Hello Hello\nABC Hello\n";
 	private static final String REGEXPATTERN = ".*ell";
 	private static final String ABCSINGLEFILEOUT = "ABC Hello\nABCDEFGHI\n";
@@ -109,7 +109,7 @@ public class GrepApplicationTest {
 		args[0] = REGEXPATTERN;
 		assertEquals(REGEXPATTERNOUT, grepApp.grepFromStdin(args[0], stdin));
 	}
-	/*
+	
 	@Test
 	public void grepSingleFileNoMatchesFromRun() throws GrepException {
 		args = new String[2];
@@ -117,9 +117,9 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(NOMATCHFILE + "\n", baos.toString());
+		assertEquals(NOMATCHFILE, baos.toString());
 	}
-	
+		
 	@Test
 	public void grepSingleFileNoMatches() throws GrepException {
 		args = new String[2];
@@ -128,7 +128,7 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		assertEquals(NOMATCHFILE, grepApp.grepFromOneFile(args[0] + " " + args[1]));
 	}
-
+		
 	@Test
 	public void grepSingleFileMultipleMatchesInALineFromRun() throws GrepException {
 		args = new String[2];
@@ -161,7 +161,7 @@ public class GrepApplicationTest {
 				+ "Led income months itself and houses you. After nor you leave might share court balls.\n",
 				baos.toString());
 	}
-
+	
 	@Test
 	public void grepSingleFileMatchesFromRun() throws GrepException {
 		args = new String[2];
@@ -169,9 +169,9 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(ABCSINGLEFILEOUT + "\n", baos.toString());
+		assertEquals(ABCSINGLEFILEOUT, baos.toString());
 	}
-
+	
 	@Test
 	public void grepSingleFileMatches() throws GrepException {
 		args = new String[2];
@@ -180,7 +180,7 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		assertEquals(ABCSINGLEFILEOUT, grepApp.grepFromOneFile(args[0] + " " + args[1]));
 	}
-
+	
 	@Test
 	public void grepSingleFileRegexMatchesFromRun() throws GrepException {
 		args = new String[2];
@@ -188,9 +188,9 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(REGEXPATTERNOUT + "\n", baos.toString());
+		assertEquals(REGEXPATTERNOUT, baos.toString());
 	}
-
+	
 	@Test
 	public void grepSingleFileRegexMatches() throws GrepException {
 		args = new String[2];
@@ -199,7 +199,7 @@ public class GrepApplicationTest {
 		args[1] = fileName;
 		assertEquals(REGEXPATTERNOUT, grepApp.grepFromOneFile(args[0] + " " + args[1]));
 	}
-
+	/*
 	@Test
 	public void grepMultipleFileNoMatchesFromRun() throws GrepException {
 		args = new String[3];

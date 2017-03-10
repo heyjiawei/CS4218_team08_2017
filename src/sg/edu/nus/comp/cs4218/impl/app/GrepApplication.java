@@ -2,16 +2,22 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.app.Grep;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.Parser;
 
 public class GrepApplication implements Grep {
 	private boolean isError = false;
@@ -25,10 +31,18 @@ public class GrepApplication implements Grep {
 			throw new GrepException("No input stream provided");
 		}
 		String output = "No input provided";
-		if (!isInputStreamEmpty(stdin)) {
+		if (isFileDirectoryValid(args)) {
+			String commandLine = "";
+			for (int i = 0; i < args.length; i++) {
+				commandLine += args[i] + " ";
+			}
+			commandLine = commandLine.trim();
+			
+			output = grepFromOneFile(commandLine);
+		} else if (!isInputStreamEmpty(stdin)) {
 			// Assume commandline args are valid for now
 			output = grepFromStdin(args[0], stdin);
-		} 
+		}
 		if (this.isError) {
 			throw new GrepException(output);
 		} else {
@@ -58,6 +72,7 @@ public class GrepApplication implements Grep {
 			    	output.append(line + "\n");
 			    }
 			}
+			in.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -83,11 +98,51 @@ public class GrepApplication implements Grep {
 		}
 		return true;
 	}
+	
+	private boolean isFileDirectoryValid(String[] args) {
+		if (args.length <= 1) {
+			return false;
+		} 
+		String filename = args[args.length-1];
+
+		File file = new File(filename);
+	    boolean isFile = file.exists() && file.isFile();
+	    
+	    if (isFile) {
+	    	return true;
+	    } else {
+	    	return false;
+	    }
+	}
 
 	@Override
 	public String grepFromOneFile(String args) {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder output = new StringBuilder();
+		Parser parser = new Parser();
+		try {
+			Vector<String> argsList = parser.parseCallCommand(args);
+			if (argsList.size() != 2) {
+				this.isError = true;
+				return "Incorrect Arguments\n";
+			}
+			Pattern regex = getRegexPattern(argsList.firstElement());
+			BufferedReader reader = new BufferedReader(new FileReader(argsList.lastElement()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				Matcher matcher = regex.matcher(line);
+			    if (matcher.find()) {
+			    	output.append(line + "\n");
+			    }
+			}
+			reader.close();
+		} catch (ShellException | IOException e) {
+			e.printStackTrace();
+		}
+		if (output.length() > 0) {
+			return output.toString();
+		} else {
+			return "Pattern Not Found In File!\n";
+		}
 	}
 
 	@Override
