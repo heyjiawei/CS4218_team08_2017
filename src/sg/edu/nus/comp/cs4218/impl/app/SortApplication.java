@@ -53,14 +53,8 @@ public class SortApplication implements Sort {
 					return firstStringCharacter.compareTo(secondStringCharacter);
 				}
 			}
-			// shorter sequence is smaller
-			if (firstString.length() < secondString.length()) {
-				return -1;
-			} else if (firstString.length() > secondString.length()) {
-				return 1;
-			} else {
-				return 0;
-			}
+			// compare length
+			return Integer.compare(firstString.length(), secondString.length());
 		}
 	};
 
