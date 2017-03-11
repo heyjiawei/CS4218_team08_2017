@@ -27,24 +27,26 @@ public class GrepApplication implements Grep {
 		if (stdout == null) {
 			throw new GrepException("No output stream provided");
 		}
+		
 		if (stdin == null) {
 			throw new GrepException("No input stream provided");
 		}
-		String output = "No input provided";
-		if (isFileDirectoryValid(args)) {
-			String commandLine = "";
-			for (int i = 0; i < args.length; i++) {
-				commandLine += args[i] + " ";
-			}
-			commandLine = commandLine.trim();
-			
+		
+		String output = "No Input provided (via file or stdin) or no such file or directory";
+		String commandLine = joinCommandArgs(args);
+		if (args.length == 2) {
 			output = grepFromOneFile(commandLine);
+		
+		} else if (args.length > 2) {
+			output = grepFromMultipleFiles(commandLine);
+		
 		} else if (!isInputStreamEmpty(stdin)) {
-			// Assume commandline args are valid for now
-			output = grepFromStdin(args[0], stdin);
+			output = grepFromStdin(commandLine, stdin);
 		}
+		
 		if (this.isError) {
 			throw new GrepException(output);
+		
 		} else {
 			try {
 				stdout.write(output.getBytes());
@@ -52,6 +54,15 @@ public class GrepApplication implements Grep {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private String joinCommandArgs(String[] args) {
+		String commandLine = "";
+		for (int i = 0; i < args.length; i++) {
+			commandLine += args[i] + " ";
+		}
+		commandLine = commandLine.trim();
+		return commandLine;
 	}
 
 	@Override
@@ -99,20 +110,9 @@ public class GrepApplication implements Grep {
 		return true;
 	}
 	
-	private boolean isFileDirectoryValid(String[] args) {
-		if (args.length <= 1) {
-			return false;
-		} 
-		String filename = args[args.length-1];
-
-		File file = new File(filename);
-	    boolean isFile = file.exists() && file.isFile();
-	    
-	    if (isFile) {
-	    	return true;
-	    } else {
-	    	return false;
-	    }
+	private boolean isFileValid(String args) {
+		File file = new File(args);
+	    return file.exists() && file.isFile();
 	}
 
 	@Override
@@ -123,7 +123,12 @@ public class GrepApplication implements Grep {
 			Vector<String> argsList = parser.parseCallCommand(args);
 			if (argsList.size() != 2) {
 				this.isError = true;
-				return "Incorrect Arguments\n";
+				return "Incorrect Arguments or Invalid File\n";
+			}
+			
+			if (!isFileValid(argsList.lastElement())) {
+				this.isError = true;
+				return "No such file or directory\n";
 			}
 			Pattern regex = getRegexPattern(argsList.firstElement());
 			BufferedReader reader = new BufferedReader(new FileReader(argsList.lastElement()));
@@ -147,8 +152,38 @@ public class GrepApplication implements Grep {
 
 	@Override
 	public String grepFromMultipleFiles(String args) {
-		// TODO Auto-generated method stub
-		return null;
+		StringBuilder output = new StringBuilder();
+		Parser parser = new Parser();
+		try {
+			Vector<String> argsList = parser.parseCallCommand(args);
+			if (argsList.size() <= 1) {
+				this.isError = true;
+				return "Incorrect Arguments\n";
+			}
+			Pattern regex = getRegexPattern(argsList.firstElement());
+			BufferedReader reader;
+			String line;
+			for (int i = 1; i < argsList.size(); i++) {
+				if (isFileValid(argsList.get(i))) {
+					reader = new BufferedReader(new FileReader(argsList.get(i)));
+					 while ((line = reader.readLine()) != null) {
+						Matcher matcher = regex.matcher(line);
+					    if (matcher.find()) {
+					    	output.append(argsList.get(i) + ":");
+					    	output.append(line + "\n");
+					    }
+					}
+					reader.close();
+				}
+			}
+		} catch (ShellException | IOException e) {
+			e.printStackTrace();
+		}
+		if (output.length() > 0) {
+			return output.toString();
+		} else {
+			return "Pattern Not Found In File!\n";
+		}
 	}
 
 	@Override
