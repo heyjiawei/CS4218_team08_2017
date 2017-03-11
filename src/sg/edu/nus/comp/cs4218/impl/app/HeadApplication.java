@@ -61,9 +61,6 @@ public class HeadApplication implements Application {
 		}
 		Integer numberOfLinesToPrint = DEFAULT_NUMBER_OF_LINES_TO_PRINT;
 		if (args == null || args.length == 0) {
-			if (stdin == null) {
-				throw new HeadException("No input stream provided");
-			}
 			// print default number of lines from inputstream
 			printLinesFromInputStreamToOutputStream(numberOfLinesToPrint,
 					stdin, stdout);
@@ -146,9 +143,6 @@ public class HeadApplication implements Application {
 		if (stdin == null) {
 			throw new HeadException("No input stream provided");
 		}
-		if (stdout == null) {
-			throw new HeadException("No output stream provided");
-		}
 		try {
 			InputStreamReader stdinReader = new InputStreamReader(stdin, "UTF-8");
 			BufferedReader bufferedReader = new BufferedReader(stdinReader);
@@ -178,12 +172,6 @@ public class HeadApplication implements Application {
 	 */
 	private void printLinesFromFileToOutputStream(int numberOfLines,
 			String filePathString, OutputStream stdout) throws HeadException {
-		if (filePathString == null) {
-			throw new HeadException("No file path provided");
-		}
-		if (stdout == null) {
-			throw new HeadException("No output stream provided");
-		}
 		Path pathToReadFrom = getReadableFilePath(filePathString);
 		try {
 			FileReader fileReader = new FileReader(pathToReadFrom.toString());
