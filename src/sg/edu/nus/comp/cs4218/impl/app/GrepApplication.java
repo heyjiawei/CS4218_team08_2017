@@ -32,9 +32,14 @@ public class GrepApplication implements Grep {
 			throw new GrepException("No input stream provided");
 		}
 		
-		String output = "No Input provided (via file or stdin) or no such file or directory";
+		String output = "No Input provided (in file or stdin) or no there is such file or directory";
 		String commandLine = joinCommandArgs(args);
-		if (args.length == 2) {
+		
+		if (!containsPattern(args)) {
+			this.isError = true;
+			output = "No pattern provided\n";
+			
+		} else if (args.length == 2) {
 			output = grepFromOneFile(commandLine);
 		
 		} else if (args.length > 2) {
@@ -53,6 +58,15 @@ public class GrepApplication implements Grep {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private boolean containsPattern(String[] args) {
+		if (args.length == 0 ||
+			(args.length >= 1 && (args[0] == null || args[0].isEmpty()))) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 
@@ -174,6 +188,8 @@ public class GrepApplication implements Grep {
 					    }
 					}
 					reader.close();
+				} else {
+					output.append(argsList.get(i) + ":No such file or directory\n");
 				}
 			}
 		} catch (ShellException | IOException e) {
