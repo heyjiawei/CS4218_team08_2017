@@ -93,7 +93,16 @@ public class HeadApplicationTest {
 		outputStream = new ByteArrayOutputStream();
 		headApplication.run(args, inputStream, outputStream);
 	}
-	
+
+	@Test(expected = HeadException.class)
+	public void testThrowWhenSpecifiedOutputLineCountInvalid() throws HeadException {
+		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String[] args = {"-5", inputFilePathString};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		headApplication.run(args, inputStream, outputStream);
+	}
+
 	@Test
 	public void testValidFilePathWithOneLineWithDefaultOutputLineCount()
 			throws HeadException, IOException {
@@ -122,15 +131,6 @@ public class HeadApplicationTest {
 		expectedOutputFileString = 
 				convertFileToString(expectedOutputFilePathString);
 		assertEquals(expectedOutputFileString, outputStream.toString());
-	}
-	
-	@Test(expected = HeadException.class)
-	public void testThrowWhenSpecifiedOutputLineCountInvalid() throws HeadException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
-		String[] args = {"-5", inputFilePathString};
-		inputStream = null;
-		outputStream = new ByteArrayOutputStream();
-		headApplication.run(args, inputStream, outputStream);
 	}
 	
 	@Test
@@ -240,6 +240,7 @@ public class HeadApplicationTest {
 		assertEquals(expectedOutputString, outputStream.toString());
 	}
 
+	@Test
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
 		String sixNewLines = new String(new char[6]).replace("\0", newLine);
@@ -252,7 +253,8 @@ public class HeadApplicationTest {
 		headApplication.run(args, inputStream, outputStream);
 		assertEquals(expectedOutputString, outputStream.toString());
 	}
-	
+
+	@Test
 	public void testInputFromStdInWithLessLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
 		String threeNewLines = new String(new char[3]).replace("\0", newLine);
@@ -263,7 +265,20 @@ public class HeadApplicationTest {
 		headApplication.run(args, inputStream, outputStream);
 		assertEquals(testString, outputStream.toString());
 	}
-	
+
+	@Test
+	public void testNumberOfLinesFromArgsLinesFromStdIn()
+			throws HeadException, IOException {
+		String[] args = {"4"};
+		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String expectedOutputString = "test string" + threeNewLines;
+		String testString = expectedOutputString + newLine + " string test";
+		inputStream = new ByteArrayInputStream(testString.getBytes());;
+		outputStream = new ByteArrayOutputStream();
+		headApplication.run(args, inputStream, outputStream);
+		assertEquals(expectedOutputString, outputStream.toString());
+	}
+
 	@Test
 	public void testUnicodeInput() throws HeadException, IOException {
 		String testString = "ږ ڗ ژАБВञटḥḦḧ✉✌✍讀拏";
