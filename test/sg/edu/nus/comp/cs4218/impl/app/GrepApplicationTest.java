@@ -25,7 +25,7 @@ import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
  */
 
 public class GrepApplicationTest {
-	private static final String REGEXMULTIOUT = "Hello Hello\nABC Hello\nello milo";
+	private static final String REGEXMULTIOUT = "Hello Hello\nABC Hello\nello milo\n";
 	private static final String NOMATCHFILE = "Pattern Not Found In File!\n";
 	private static final String REGEXPATTERNOUT = "Hello Hello\nABC Hello\n";
 	private static final String REGEXPATTERN = ".*ell";
@@ -33,7 +33,9 @@ public class GrepApplicationTest {
 	private static final String ABCPATTERN = "ABC";
 	private static final String HIEPATTERN = "hie";
 	private static final String NOMATCHSTDIN = "Pattern Not Found In Stdin!\n";
-	private static final String GREPEXCEPTION = "grep: ";
+	private static final String FILEDIRECTORYDONOTEXIST = "No such file or directory\n";
+	private static final String INVALIDFILEDIRECTORY = "grep: No such file or directory\n";
+	private static final String INVALIDNOPATTERN = "grep: No pattern provided\n";
 	private GrepApplication grepApp;
 	private String[] args;
 	private FileInputStream stdin;
@@ -71,7 +73,6 @@ public class GrepApplicationTest {
 	@Test
 	public void grepStdInNoMatches() throws GrepException {
 		args = new String[1];
-//		grepApp.setData(grepApp.readFromInputStream(stdin));
 		args[0] = HIEPATTERN;
 		assertEquals(NOMATCHSTDIN, grepApp.grepFromStdin(args[0], stdin));
 	}
@@ -88,7 +89,6 @@ public class GrepApplicationTest {
 	@Test
 	public void grepStdInMatches() throws GrepException {
 		args = new String[1];
-//		grepApp.setData(grepApp.readFromInputStream(stdin));
 		args[0] = ABCPATTERN;
 		assertEquals(ABCSINGLEFILEOUT, grepApp.grepFromStdin(args[0], stdin));
 	}
@@ -105,7 +105,6 @@ public class GrepApplicationTest {
 	@Test
 	public void grepStdInRegexMatches() throws GrepException {
 		args = new String[1];
-//		grepApp.setData(grepApp.readFromInputStream(stdin));
 		args[0] = REGEXPATTERN;
 		assertEquals(REGEXPATTERNOUT, grepApp.grepFromStdin(args[0], stdin));
 	}
@@ -123,7 +122,6 @@ public class GrepApplicationTest {
 	@Test
 	public void grepSingleFileNoMatches() throws GrepException {
 		args = new String[2];
-//		grepApp.setData(grepApp.readFromFile(fileName));
 		args[0] = HIEPATTERN;
 		args[1] = fileName;
 		assertEquals(NOMATCHFILE, grepApp.grepFromOneFile(args[0] + " " + args[1]));
@@ -175,7 +173,6 @@ public class GrepApplicationTest {
 	@Test
 	public void grepSingleFileMatches() throws GrepException {
 		args = new String[2];
-//		grepApp.setData(grepApp.readFromFile(fileName));
 		args[0] = ABCPATTERN;
 		args[1] = fileName;
 		assertEquals(ABCSINGLEFILEOUT, grepApp.grepFromOneFile(args[0] + " " + args[1]));
@@ -194,12 +191,11 @@ public class GrepApplicationTest {
 	@Test
 	public void grepSingleFileRegexMatches() throws GrepException {
 		args = new String[2];
-//		grepApp.setData(grepApp.readFromFile(fileName));
 		args[0] = REGEXPATTERN;
 		args[1] = fileName;
 		assertEquals(REGEXPATTERNOUT, grepApp.grepFromOneFile(args[0] + " " + args[1]));
 	}
-	/*
+	
 	@Test
 	public void grepMultipleFileNoMatchesFromRun() throws GrepException {
 		args = new String[3];
@@ -208,19 +204,18 @@ public class GrepApplicationTest {
 		args[2] = fileName2;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(NOMATCHFILE + "\n", baos.toString());
+		assertEquals(NOMATCHFILE, baos.toString());
 	}
 
 	@Test
 	public void grepMultipleFileNoMatches() throws GrepException {
 		args = new String[3];
-//		grepApp.setData(grepApp.readFromFile(fileName) + "\n" + grepApp.readFromFile(fileName2));
 		args[0] = HIEPATTERN;
 		args[1] = fileName;
 		args[2] = fileName2;
-		assertEquals(NOMATCHFILE, grepApp.grepFromOneFile(args[0] + " " + args[1] + " " + args[2]));
+		assertEquals(NOMATCHFILE, grepApp.grepFromMultipleFiles(args[0] + " " + args[1] + " " + args[2]));
 	}
-
+	
 	@Test
 	public void grepMultipleFileMatchesFromRun() throws GrepException {
 		args = new String[3];
@@ -229,30 +224,36 @@ public class GrepApplicationTest {
 		args[2] = fileName2;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals("ABCDEFGHI\nDEF" + "\n", baos.toString());
+		String expected = args[1] + ":ABCDEFGHI\n" 
+						+ args[2] + ":DEF\n";
+		assertEquals(expected, baos.toString());
 	}
-
+	
 	@Test
 	public void grepMultipleFileMatches() throws GrepException {
 		args = new String[3];
-//		grepApp.setData(grepApp.readFromFile(fileName) + "\n" + grepApp.readFromFile(fileName2));
 		args[0] = "DEF";
 		args[1] = fileName;
 		args[2] = fileName2;
-		assertEquals("ABCDEFGHI\nDEF", grepApp.grepFromOneFile(args[0] + " " + args[1] + " " + args[2]));
+		String expected = args[1] + ":ABCDEFGHI\n" 
+						+ args[2] + ":DEF\n";
+		assertEquals(expected, grepApp.grepFromMultipleFiles(args[0] + " " + args[1] + " " + args[2]));
 	}
-
+	
 	@Test
 	public void grepMultipleFileInvalidMatches() throws GrepException {
 		args = new String[4];
-//		grepApp.setData(grepApp.readFromFile(fileName) + "\n" + grepApp.readFromFile(fileName2));
 		args[0] = "DEF";
-		args[1] = invalidFile;
-		args[2] = fileName2;
+		args[1] = fileName2;
+		args[2] = invalidFile;
 		args[3] = fileName;
-		assertEquals("ABCDEFGHI\nDEF", grepApp.grepFromOneFile(args[0] + " " + args[1] + " " + args[2]));
+		String command = args[0] + " " + args[1] + " " + args[2] + " " + args[3];
+		String expected = args[1] + ":DEF\n" 
+						+ args[2] + ":" + FILEDIRECTORYDONOTEXIST
+						+ args[3] + ":ABCDEFGHI\n";
+		assertEquals(expected, grepApp.grepFromMultipleFiles(command));
 	}
-
+	
 	@Test
 	public void grepMultipleFileRegexMatchesFromRun() throws GrepException {
 		args = new String[3];
@@ -261,107 +262,123 @@ public class GrepApplicationTest {
 		args[2] = fileName2;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(REGEXMULTIOUT + "\n", baos.toString());
+		String expected = args[1] + ":Hello Hello\n" 
+						+ args[1] + ":ABC Hello\n" 
+						+ args[2] + ":ello milo\n";
+		assertEquals(expected, baos.toString());
 	}
-
+	
 	@Test
 	public void grepMultipleFileRegexMatches() throws GrepException {
 		args = new String[3];
-//		grepApp.setData(grepApp.readFromFile(fileName) + "\n" + grepApp.readFromFile(fileName2));
 		args[0] = REGEXPATTERN;
 		args[1] = fileName;
 		args[2] = fileName2;
-		assertEquals(REGEXMULTIOUT, grepApp.grepFromOneFile(args[0] + " " + args[1] + " " + args[2]));
+		String command = args[0] + " " + args[1] + " " + args[2];
+		String expected = args[1] + ":Hello Hello\n" 
+						+ args[1] + ":ABC Hello\n" 
+						+ args[2] + ":ello milo\n";
+		assertEquals(expected, grepApp.grepFromMultipleFiles(command));
 	}
-
+	
 	@Test
-	public void grepUnorderedInput1FromRun() throws GrepException {
+	public void grepUnorderedInputFromRun() throws GrepException {
 		args = new String[3];
 		args[0] = fileName;
 		args[1] = REGEXPATTERN;
 		args[2] = fileName2;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(REGEXMULTIOUT + "\n", baos.toString());
+		assertEquals(args[1] + ":" + FILEDIRECTORYDONOTEXIST, baos.toString());
 	}
-
+	
 	@Test
-	public void grepUnorderedInput2FromRun() throws GrepException {
-		args = new String[3];
-		args[0] = fileName;
-		args[1] = fileName2;
-		args[2] = REGEXPATTERN;
-		grepApp.run(args, stdin, System.out);
-		System.out.flush();
-		assertEquals(REGEXMULTIOUT + "\n", baos.toString());
-	}
-
-	@Test
-	public void grepMultiFileDirectoryFromRun() throws GrepException {
-		args = new String[4];
-		args[0] = fileName;
-		args[1] = fileName2;
-		args[2] = REGEXPATTERN;
-		args[3] = directory;
-		grepApp.run(args, stdin, System.out);
-		System.out.flush();
-		assertEquals(REGEXMULTIOUT + "\n", baos.toString());
-	}
-
-	@Test
-	public void grepDirectoryWithFileFromRun() throws GrepException {
+	public void grepMultipleFileDirectoryFromRun() throws GrepException {
 		args = new String[3];
 		args[0] = REGEXPATTERN;
 		args[1] = fileName;
 		args[2] = directory;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
-		assertEquals(REGEXPATTERNOUT + "\n", baos.toString());
+		String expected = args[1] + ":Hello Hello\n" 
+						+ args[1] + ":ABC Hello\n"
+						+ args[2] + ":" + FILEDIRECTORYDONOTEXIST;
+		assertEquals(expected, baos.toString());
 	}
-
+	
 	@Test(expected = GrepException.class)
-	public void grepNoPatternFileFromRun() throws GrepException {
-		args = new String[1];
-		args[0] = fileName;
-		grepApp.run(args, stdin, System.out);
-		System.out.flush();
-	}
-
-	@Test(expected = GrepException.class)
-	public void grepNoPatternMultipleFileFromRun() throws GrepException {
-		args = new String[2];
-		args[0] = fileName;
-		args[1] = fileName2;
-		grepApp.run(args, stdin, System.out);
-		System.out.flush();
-	}
-
-	@Test(expected = GrepException.class)
-	public void grepNoPatternStdInFromRun() throws GrepException {
-		args = new String[0];
-		grepApp.run(args, stdin, System.out);
-		System.out.flush();
-	}
-
-	@Test(expected = GrepException.class)
-	public void grepDirectoryFromRun() throws GrepException {
+	public void grepSingleFileInvalidDirectoryFromRun() throws GrepException {
 		args = new String[2];
 		args[0] = REGEXPATTERN;
 		args[1] = directory;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
+		assertEquals(INVALIDFILEDIRECTORY, baos.toString());
 	}
-
+	
 	@Test(expected = GrepException.class)
-	public void grepMultiplePatternFromRun() throws GrepException {
+	public void grepNoPatternFileFromRun() throws GrepException {
+		args = new String[2];
+		args[0] = "";
+		args[1] = fileName;
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		assertEquals(INVALIDNOPATTERN, baos.toString());
+	}
+	
+	@Test(expected = GrepException.class)
+	public void grepNoPatternEmptyStringStdinFromRun() throws GrepException {
+		args = new String[1];
+		args[0] = "";
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		assertEquals(INVALIDNOPATTERN, baos.toString());
+	}
+	
+	@Test(expected = GrepException.class)
+	public void grepNoPatternArgLengthZeroStdInFromRun() throws GrepException {
+		args = new String[0];
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		assertEquals(INVALIDNOPATTERN, baos.toString());
+	}
+	
+	@Test(expected = GrepException.class)
+	public void grepNoPatternNullArgStdInFromRun() throws GrepException {
+		args = new String[1];
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		assertEquals(INVALIDNOPATTERN, baos.toString());
+	}
+	
+	@Test(expected = GrepException.class)
+	public void grepNoPatternMultipleFileFromRun() throws GrepException {
+		args = new String[3];
+		args[0] = "";
+		args[1] = fileName;
+		args[2] = fileName2;
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		assertEquals(INVALIDNOPATTERN, baos.toString());
+	}
+	
+	
+	
+	@Test
+	public void grepMultipleFileWithInvalidFileFromRun() throws GrepException {
 		args = new String[3];
 		args[0] = REGEXPATTERN;
 		args[1] = ABCPATTERN;
 		args[2] = fileName;
 		grepApp.run(args, stdin, System.out);
 		System.out.flush();
+		String expected = args[1] + ":" + FILEDIRECTORYDONOTEXIST 
+						+ args[2] + ":Hello Hello\n" 
+						+ args[2] + ":ABC Hello\n";
+		assertEquals(expected, baos.toString());
 	}
-
+	
+	/*
 	@Test(expected = GrepException.class)
 	public void invalidRegexFromRun() throws GrepException {
 		args = new String[3];
