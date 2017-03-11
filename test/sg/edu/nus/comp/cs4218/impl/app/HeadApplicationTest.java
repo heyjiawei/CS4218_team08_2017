@@ -62,8 +62,16 @@ public class HeadApplicationTest {
 	}
 	
 	@Test(expected = HeadException.class)
-	public void testThrowWhenNullArgumentGiven() throws HeadException {
+	public void testThrowWhenFirstArgumentGivenNull() throws HeadException {
 		String[] args = {null};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		headApplication.run(args, inputStream, outputStream);
+	}
+
+	@Test(expected = HeadException.class)
+	public void testThrowWhenSecondArgumentGivenNull() throws HeadException {
+		String[] args = {"5", null};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
 		headApplication.run(args, inputStream, outputStream);
