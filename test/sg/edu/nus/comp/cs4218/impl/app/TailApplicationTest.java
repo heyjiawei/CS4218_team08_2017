@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 
+import sg.edu.nus.comp.cs4218.exception.HeadException;
 import sg.edu.nus.comp.cs4218.exception.TailException;
 
 public class TailApplicationTest {
@@ -81,6 +82,14 @@ public class TailApplicationTest {
 	public void testThrowWhenNonexistentFilePathGiven() throws TailException {
 		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
 		String[] args = {nonexistentFilePath};
+		inputStream = null;
+		outputStream = new ByteArrayOutputStream();
+		tailApplication.run(args, inputStream, outputStream);
+	}
+
+	@Test(expected = TailException.class)
+	public void testThrowWhenSecondArgumentGivenNull() throws TailException {
+		String[] args = {"5", null};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
 		tailApplication.run(args, inputStream, outputStream);
@@ -231,20 +240,22 @@ public class TailApplicationTest {
 		tailApplication.run(args, inputStream, outputStream);
 		assertEquals(expectedOutputString, outputStream.toString());
 	}
-	
+
+	@Test
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
 		String sixNewLines = new String(new char[6]).replace("\0", newLine);
-		String testString = "test string" + sixNewLines + " string test";
+		String testString = "test string" + sixNewLines + "string test";
 		String fiveNewLines = new String(new char[5]).replace("\0", newLine);
-		String expectedOutputString = "test string" + fiveNewLines;
+		String expectedOutputString = fiveNewLines + "string test";
 		String[] args = {"6"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
 		tailApplication.run(args, inputStream, outputStream);
 		assertEquals(expectedOutputString, outputStream.toString());
 	}
-	
+
+	@Test
 	public void testInputFromStdInWithLessLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
 		String threeNewLines = new String(new char[3]).replace("\0", newLine);
@@ -295,5 +306,4 @@ public class TailApplicationTest {
 		byte[] encoded = Files.readAllBytes(Paths.get(filePathString));
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
-
 }

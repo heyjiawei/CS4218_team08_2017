@@ -62,9 +62,6 @@ public class TailApplication implements Application {
 		}
 		Integer numberOfLinesToPrint = DEFAULT_NUMBER_OF_LINES_TO_PRINT;
 		if (args == null || args.length == 0) {
-			if (stdin == null) {
-				throw new TailException("No input stream provided");
-			}
 			// print default number of lines from inputstream
 			printLastNLinesFromInputStreamToOutputStream(numberOfLinesToPrint,
 					stdin, stdout);
