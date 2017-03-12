@@ -78,7 +78,7 @@ public class ShellGlobbingTest {
 
 	@Test
 	public void testGlobNoPaths() throws IOException {
-		System.setProperty("user.dir", new File("test_globbing/_tpu_").getCanonicalPath());
+		System.setProperty("user.dir", new File("_tpu_").getCanonicalPath());
 		String cmd = " echo * ";
 
 		output = shell.globNoPaths(cmd);
@@ -151,10 +151,11 @@ public class ShellGlobbingTest {
 
 	@Test
 	public void testGlobHidden() {
+		// do not include hidden files
 		String cmd = " echo .* ";
 
 		output = shell.globOneFile(cmd);
 
-		assertEquals(".input" + NEW_LINE, output);
+		assertEquals("" + NEW_LINE, output);
 	}
 }

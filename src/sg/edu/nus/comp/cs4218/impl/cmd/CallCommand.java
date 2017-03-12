@@ -1,8 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -88,6 +90,9 @@ public class CallCommand implements Command {
 	 *             redirection file path.
 	 */
 	public void parse() throws ShellException {
+		// Get current directory for globbing
+		String currentDir = System.getProperty("user.dir");
+		
 		Vector<String> cmdVector = new Parser().parseCallCommand(this.cmdline);
 
 		if (cmdVector.isEmpty()) {
@@ -112,8 +117,33 @@ public class CallCommand implements Command {
 				this.app = arg;
 				isAppSet = true;
 			} else {
-				if(arg.equals("*")) {
-					arg = "a ab abc";
+				// perform globbing on the argument
+				if(arg.startsWith("*")) {
+					arg = "";
+					File folder = new File(currentDir);
+					System.out.println(currentDir);
+					File[] listOfFiles = folder.listFiles();
+					
+					// Sort files by name
+	                Arrays.sort(listOfFiles, new Comparator<File>()
+	                {
+	                    @Override
+	                    public int compare(File f1, File f2) {
+	                        return ((File) f1).getName().compareTo(((File) f2).getName());
+	                    }
+	                });
+	                
+					for (int i = 0; i < listOfFiles.length; i++) {
+						// ignore hidden files that start with "."
+						if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
+							// insert args separated by space
+							// first arg does not have space in front
+							arg += arg == "" ? listOfFiles[i].getName() : " " + listOfFiles[i].getName();
+							// System.out.println("File " + listOfFiles[i].getName());
+						} else if (listOfFiles[i].isDirectory()) {
+							// System.out.println("Directory " + listOfFiles[i].getName());
+						}
+					}
 				}
 				argsVector.add(arg);
 			}
