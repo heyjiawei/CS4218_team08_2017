@@ -112,6 +112,9 @@ public class CallCommand implements Command {
 				this.app = arg;
 				isAppSet = true;
 			} else {
+				if(arg.equals("*")) {
+					arg = "a ab abc";
+				}
 				argsVector.add(arg);
 			}
 		}
