@@ -1,13 +1,19 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.PathMatcher;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -123,16 +129,21 @@ public class CallCommand implements Command {
 				if(arg.contains("*")) {
 					PathMatcher matcher;
 					matcher = FileSystems.getDefault().getPathMatcher("glob:" + currentDir + File.separator + arg);
+					// System.out.println("glob:" + currentDir + File.separator + arg);
 					arg = "";
-					File folder = new File(currentDir);
-					File[] listOfFiles = folder.listFiles();
-					System.out.println("glob:" + currentDir + File.separator + arg);
+					Path folder = new File(currentDir).toPath();
+					
+					List<File> arrayListFiles = new ArrayList<File>();
+					arrayListFiles = getFileNames(arrayListFiles, folder);
+					File[] listOfFiles = new File[arrayListFiles.size()];
+					listOfFiles = arrayListFiles.toArray(listOfFiles);
+					
 					// Sort files by name
 	                Arrays.sort(listOfFiles, new Comparator<File>()
 	                {
 	                    @Override
 	                    public int compare(File f1, File f2) {
-	                        return ((File) f1).getName().compareTo(((File) f2).getName());
+	                        return ((File) f1).getPath().compareTo(((File) f2).getPath());
 	                    }
 	                });
 	                
@@ -141,22 +152,28 @@ public class CallCommand implements Command {
 						if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
 							// match the globbing pattern
 
-							System.out.println(listOfFiles[i].toPath());
 							if(matcher.matches(listOfFiles[i].toPath())) {
 								// insert args separated by space
 								// first arg does not have space in front
-//								System.out.println("match");
-								arg += arg == "" ? listOfFiles[i].getName() : " " + listOfFiles[i].getName();
+								String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
+								arg += arg == "" ? relative : " " + relative;
 							} else {
-//								System.out.println("no match");
 							}
-							// System.out.println("File " + listOfFiles[i].getName());
 						} else if (listOfFiles[i].isDirectory()) {
-							// System.out.println("Directory " + listOfFiles[i].getName());
+							if(matcher.matches(listOfFiles[i].toPath())) {
+								// insert args separated by space
+								// first arg does not have space in front
+								String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
+								if(relative.endsWith(File.separator)) {
+									relative = relative.substring(0, relative.length() - 1);
+								}
+								arg += arg == "" ? relative : " " + relative;
+							} else {
+							}
 						}
 					}
 				}
-//				System.out.println("arg: " + arg);
+				// System.out.println("arg: " + arg);
 				argsVector.add(arg);
 			}
 		}
@@ -169,6 +186,22 @@ public class CallCommand implements Command {
 		this.argsArray = argsVector.toArray(new String[argsVector.size()]);
 	}
 
+	private List<File> getFileNames(List<File> files, Path dir) {
+	    try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+	        for (Path path : stream) {
+	            if(path.toFile().isDirectory()) {
+	            	files.add(path.toAbsolutePath().toFile());
+	                getFileNames(files, path);
+	            } else {
+	            	files.add(path.toAbsolutePath().toFile());
+	            }
+	        }
+	    } catch(IOException e) {
+	        e.printStackTrace();
+	    }
+	    return files;
+	} 
+	
 	/**
 	 * Terminates current execution of the command (unused for now)
 	 */

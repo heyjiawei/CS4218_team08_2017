@@ -97,11 +97,11 @@ public class ShellGlobbingTest {
 
 	@Test
 	public void testGlobFilesDirectories() {
-		String cmd = " echo **/* ";
+		String cmd = " echo */* ";
 
 		output = shell.globFilesDirectories(cmd);
 
-		assertEquals("_npu_ _npu_/single_file.txt _tpu_ _tpu_/a _tpu_/ab _tpu_/abc input1.txt input2.txt output1.txt output2.txt" + NEW_LINE, output);
+		assertEquals("_npu_/single_file.txt _tpu_/a _tpu_/ab _tpu_/abc" + NEW_LINE, output);
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class ShellGlobbingTest {
 
 		output = shell.globFilesDirectories(cmd);
 
-		assertEquals("_npu_ _npu_/single_file.txt _tpu_ _tpu_/a _tpu_/ab _tpu_/abc" + NEW_LINE, output);
+		assertEquals("_npu_/single_file.txt _tpu_/a _tpu_/ab _tpu_/abc" + NEW_LINE, output);
 	}
 
 	@Test
