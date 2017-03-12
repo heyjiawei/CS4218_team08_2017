@@ -3,6 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.cmd;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileSystems;
+import java.nio.file.PathMatcher;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -118,12 +120,13 @@ public class CallCommand implements Command {
 				isAppSet = true;
 			} else {
 				// perform globbing on the argument
-				if(arg.startsWith("*")) {
+				if(arg.contains("*")) {
+					PathMatcher matcher;
+					matcher = FileSystems.getDefault().getPathMatcher("glob:" + currentDir + File.separator + arg);
 					arg = "";
 					File folder = new File(currentDir);
-					System.out.println(currentDir);
 					File[] listOfFiles = folder.listFiles();
-					
+					System.out.println("glob:" + currentDir + File.separator + arg);
 					// Sort files by name
 	                Arrays.sort(listOfFiles, new Comparator<File>()
 	                {
@@ -136,15 +139,24 @@ public class CallCommand implements Command {
 					for (int i = 0; i < listOfFiles.length; i++) {
 						// ignore hidden files that start with "."
 						if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
-							// insert args separated by space
-							// first arg does not have space in front
-							arg += arg == "" ? listOfFiles[i].getName() : " " + listOfFiles[i].getName();
+							// match the globbing pattern
+
+							System.out.println(listOfFiles[i].toPath());
+							if(matcher.matches(listOfFiles[i].toPath())) {
+								// insert args separated by space
+								// first arg does not have space in front
+//								System.out.println("match");
+								arg += arg == "" ? listOfFiles[i].getName() : " " + listOfFiles[i].getName();
+							} else {
+//								System.out.println("no match");
+							}
 							// System.out.println("File " + listOfFiles[i].getName());
 						} else if (listOfFiles[i].isDirectory()) {
 							// System.out.println("Directory " + listOfFiles[i].getName());
 						}
 					}
 				}
+//				System.out.println("arg: " + arg);
 				argsVector.add(arg);
 			}
 		}
