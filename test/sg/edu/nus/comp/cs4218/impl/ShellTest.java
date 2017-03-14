@@ -53,14 +53,6 @@ public class ShellTest {
 	}
 	
 	@Test
-	public void testCommandSubstitutionWithPipe() throws AbstractApplicationException, ShellException {
-		String cmd = "echo `echo cat | wc -m`";
-		shell.parseAndEvaluate(cmd, outputStream);
-		output = outputStream.toString();
-		assertEquals("4" + newLine, output);
-	}
-	
-	@Test
 	public void testPipeTwoCommands() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | wc";
 		output = shell.pipeTwoCommands(cmd);
