@@ -5,9 +5,11 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import org.junit.After;
@@ -20,58 +22,76 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 public class WcApplicationTest {
+	private static final String FILE_SEPARATOR = File.separator;
+	private static final String LINE_SEPARATOR = System.lineSeparator();
+	private static final String MWLFILE = String.format("test_inputs%swc%swc_test.txt", 
+			FILE_SEPARATOR, FILE_SEPARATOR);
+	private static final String MWLDIRECTORYFILE = String.format("test_inputs%swc%stesting_wc_folder%swc test.txt", 
+			FILE_SEPARATOR, FILE_SEPARATOR, FILE_SEPARATOR);
+	private static final String EMPTYFILE = String.format("test_inputs%swc%sempty.txt", 
+			FILE_SEPARATOR, FILE_SEPARATOR);
+	private static final String SINGLEWORD = String.format("test_inputs%swc%ssingleWord.txt", 
+			FILE_SEPARATOR, FILE_SEPARATOR);
+	private static final String EMPTYFOLDER = String.format("test_inputs%swc%semptyFolder%s", 
+			FILE_SEPARATOR, FILE_SEPARATOR, FILE_SEPARATOR);
+
 	WcApplication wcApp;
 	InputStream in;
 	OutputStream out;
-
+	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		try{
-		    PrintWriter writer = new PrintWriter("wc_test.txt", "UTF-8");
-		    writer.println("4 lines\n");
-		    writer.println("6 WORDS\n");
-		    writer.println("31 characters");
-		    writer.close();
-		    
-		    File file = new File(System.getProperty("user.dir") + 
-		    				"/testing_wc_folder/wc file.txt");
-		    if (file.getParentFile().mkdir()) {
-		        file.createNewFile();
-		    } else {
-		        throw new IOException("Failed to create directory " + file.getParent());
-		    }
-		    
-		    File dir = new File(file.getParentFile(), file.getName());
-	        writer = new PrintWriter(dir);
-	        writer.println("4 lines\n");
-		    writer.println("6 WORDS\n");
-		    writer.println("31 characters");
-	        writer.close();
-		    
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
+//		try{
+//		    PrintWriter writer = new PrintWriter("wc_test.txt", "UTF-8");
+//		    writer.println("4 lines\n");
+//		    writer.println("6 WORDS\n");
+//		    writer.println("31 characters");
+//		    writer.close();
+//		    
+//		    File file = new File(System.getProperty("user.dir") + 
+//		    				"/testing_wc_folder/wc file.txt");
+//		    if (file.getParentFile().mkdir()) {
+//		        file.createNewFile();
+//		    } else {
+//		        throw new IOException("Failed to create directory " + file.getParent());
+//		    }
+//		    
+//		    File dir = new File(file.getParentFile(), file.getName());
+//	        writer = new PrintWriter(dir);
+//	        writer.println("4 lines\n");
+//		    writer.println("6 WORDS\n");
+//		    writer.println("31 characters");
+//	        writer.close();
+//		    
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		File file = new File("wc_test.txt");    
-		file.delete();
-		
-		// Delete folder and files within
-		File folder = new File(System.getProperty("user.dir") + "/testing_wc_folder/");
-		File[] folderFiles = folder.listFiles();
-	    if (folderFiles != null) {
-	        for (File f: folderFiles) {
-	            f.delete();
-	        }
-	    }
-	    folder.delete();
+//		File file = new File("wc_test.txt");    
+//		file.delete();
+//		
+//		// Delete folder and files within
+//		File folder = new File(System.getProperty("user.dir") + "/testing_wc_folder/");
+//		File[] folderFiles = folder.listFiles();
+//	    if (folderFiles != null) {
+//	        for (File f: folderFiles) {
+//	            f.delete();
+//	        }
+//	    }
+//	    folder.delete();
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		wcApp = new WcApplication();
+		in = new FileInputStream(MWLFILE);
+		out = new ByteArrayOutputStream();
+		PrintStream print = new PrintStream(out);
+		System.setOut(print);
 	}
 
 	@After

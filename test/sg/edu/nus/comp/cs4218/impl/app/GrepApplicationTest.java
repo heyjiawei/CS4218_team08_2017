@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -27,6 +28,19 @@ import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
  */
 
 public class GrepApplicationTest {
+	private static final String FILESEPARATOR = File.separator;
+	private static final String STDINFILE = String.format("test_inputs%sgrep%sgreptestdoc.txt", FILESEPARATOR,
+			FILESEPARATOR);
+	private static final String FILENAME = String.format("test_inputs%sgrep%sgreptestdoc.txt", FILESEPARATOR,
+			FILESEPARATOR);
+	private static final String FILENAME2 = String.format("test_inputs%sgrep%sgreptestdoc2.txt", FILESEPARATOR,
+			FILESEPARATOR);
+	private static final String FILENAME3 = String.format("test_inputs%sgrep%stestdoc.txt", FILESEPARATOR,
+			FILESEPARATOR);
+	private static final String INVALIDFILE = String.format("test_inputs%sgrep%sabjkcsnakjc.txt", FILESEPARATOR,
+			FILESEPARATOR);
+	private static final String DIRECTORY = String.format("test_inputs%sgrep%s", FILESEPARATOR,
+			FILESEPARATOR);
 	private static final String NOMATCHFILE = "Pattern Not Found In File!\n";
 	private static final String REGEXPATTERNOUT = "Hello Hello\nABC Hello\n";
 	private static final String REGEXPATTERN = ".*ell";
@@ -55,12 +69,12 @@ public class GrepApplicationTest {
 	@Before
 	public void setUp() throws FileNotFoundException {
 		grepApp = new GrepApplication();
-		stdin = new FileInputStream("test_inputs/grep/greptestdoc.txt");
-		fileName = "test_inputs/grep/greptestdoc.txt";
-		fileName2 = "test_inputs/grep/greptestdoc2.txt";
-		fileName3 = "test_inputs/grep/testdoc.txt";
-		invalidFile = "test_inputs/grep/abjkcsnakjc.txt";
-		directory = "test_inputs/grep/";
+		stdin = new FileInputStream(STDINFILE);
+		fileName = FILENAME;
+		fileName2 = FILENAME2;
+		fileName3 = FILENAME3;
+		invalidFile = INVALIDFILE;
+		directory = DIRECTORY;
 		baos = new ByteArrayOutputStream();
 		print = new PrintStream(baos);
 		System.setOut(print);
@@ -287,7 +301,21 @@ public class GrepApplicationTest {
 	}
 	
 	@Test
-	public void grepUnorderedInputFromRun() throws GrepException {
+	public void grepUnorderedInputEndWithPatternFromRun() throws GrepException {
+		args = new String[3];
+		args[0] = REGEXPATTERN;
+		args[1] = fileName;
+		args[2] = REGEXPATTERN;
+		grepApp.run(args, stdin, System.out);
+		System.out.flush();
+		String expected = args[1] + ":Hello Hello\n" 
+						+ args[1] + ":ABC Hello\n" 
+						+ args[2] + ":" + FILEDIRECTORYDONOTEXIST;
+		assertEquals(expected, baos.toString());
+	}
+	
+	@Test
+	public void grepUnorderedInputPatternInMiddleFromRun() throws GrepException {
 		args = new String[3];
 		args[0] = fileName;
 		args[1] = REGEXPATTERN;
