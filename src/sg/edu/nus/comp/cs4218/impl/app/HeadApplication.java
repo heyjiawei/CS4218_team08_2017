@@ -229,6 +229,13 @@ public class HeadApplication implements Application {
 	 *             If the file is not readable.
 	 */
 	private Path getReadableFilePath(String filePathString) throws HeadException {
+		// Consider only the first token of the string as the filepath
+		String[] filePathStringTokens = filePathString.split(" ");
+		if (filePathStringTokens.length == 0) {
+			throw new HeadException("No file path provided");
+		}
+		filePathString = filePathStringTokens[0];
+
 		Path currentDir = Paths.get(Environment.currentDirectory);
 		Path filePath = currentDir.resolve(filePathString);
 		Boolean isFileReadable = checkIfFileIsReadable(filePath);
