@@ -14,7 +14,6 @@ import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 
-import sg.edu.nus.comp.cs4218.exception.HeadException;
 import sg.edu.nus.comp.cs4218.exception.TailException;
 
 public class TailApplicationTest {
