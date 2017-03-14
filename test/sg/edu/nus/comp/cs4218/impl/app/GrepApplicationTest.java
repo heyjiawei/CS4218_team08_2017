@@ -392,7 +392,6 @@ public class GrepApplicationTest {
 		args[1] = fileName2;
 		args[2] = fileName;
 		thrown.expect(GrepException.class);
-		
 		thrown.expectMessage(INVALIDPATTERN);
 		grepApp.run(args, null, System.out);
 	}
