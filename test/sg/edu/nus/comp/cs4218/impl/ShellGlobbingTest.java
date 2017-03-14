@@ -16,10 +16,10 @@ public class ShellGlobbingTest {
 
 	private Shell shell;
 	private String output;
-	private String initialDirectory;
+	private static String initialDirectory;
 
 	private static final String NEW_LINE = System.getProperty("line.separator");
-	private static final String TEST_FILE_PATH = "test_globbing/";
+	private static final String TEST_FILE_PATH = "test_globbing" + File.separator;
 	private static final String[] TEST_SUBDIR_PATHS = {
 			"test_globbing/_npu_",
 			"test_globbing/_tpu_"
@@ -49,18 +49,18 @@ public class ShellGlobbingTest {
 
 	@Before
 	public void setUp() throws Exception {
-		initialDirectory = Environment.currentDirectory;
 		shell = new ShellImpl();
-		System.setProperty("user.dir", new File(TEST_FILE_PATH).getCanonicalPath());
+		Environment.currentDirectory = new File(TEST_FILE_PATH).getCanonicalPath();
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		System.setProperty("user.dir", initialDirectory);
+		Environment.currentDirectory = initialDirectory;
 	}
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		initialDirectory = Environment.currentDirectory;
 		deleteDirectory(new File(TEST_FILE_PATH));
 		Files.createDirectories(Paths.get(TEST_FILE_PATH));
 		for (String subdirectories : TEST_SUBDIR_PATHS) {
@@ -78,7 +78,8 @@ public class ShellGlobbingTest {
 
 	@Test
 	public void testGlobNoPaths() throws IOException {
-		System.setProperty("user.dir", new File("_tpu_").getCanonicalPath());
+		Environment.currentDirectory = new File(TEST_FILE_PATH + "_tpu_").getCanonicalPath();
+		
 		String cmd = " echo * ";
 
 		output = shell.globNoPaths(cmd);

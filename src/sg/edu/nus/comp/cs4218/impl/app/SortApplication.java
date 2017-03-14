@@ -31,7 +31,7 @@ public class SortApplication implements Sort {
 		public int compare(String firstString, String secondString) {
 			String[] firstStringCharacters = firstString.split("");
 			String[] secondStringCharacters = secondString.split("");
-			int smallerStringLength = Math.min(firstString.length(), secondString.length());
+			int smallerStringLength = Math.min(firstStringCharacters.length, secondStringCharacters.length);
 
 			for (int i = 0; i < smallerStringLength; i++) {
 				String firstStringCharacter = firstStringCharacters[i];

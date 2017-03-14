@@ -53,14 +53,6 @@ public class ShellTest {
 	}
 	
 	@Test
-	public void testCommandSubstitutionWithPipe() throws AbstractApplicationException, ShellException {
-		String cmd = "echo `echo cat | wc -m`";
-		shell.parseAndEvaluate(cmd, outputStream);
-		output = outputStream.toString();
-		assertEquals("4" + newLine, output);
-	}
-	
-	@Test
 	public void testPipeTwoCommands() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | wc";
 		output = shell.pipeTwoCommands(cmd);
@@ -85,7 +77,7 @@ public class ShellTest {
 	public void testPipeWithException() throws AbstractApplicationException, ShellException {
 		String cmd = "head '   ' | echo unreachable";
 		output = shell.pipeWithException(cmd);
-		assertEquals("head: Could not read file", output);
+		assertEquals("head: No file path provided", output);
 	}
 
 	@Test

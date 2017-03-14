@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.Parser;
@@ -99,8 +100,8 @@ public class CallCommand implements Command {
 	 */
 	public void parse() throws ShellException {
 		// Get current directory for globbing
-		String currentDir = System.getProperty("user.dir");
-		
+		String currentDir = Environment.currentDirectory;
+
 		Vector<String> cmdVector = new Parser().parseCallCommand(this.cmdline);
 
 		if (cmdVector.isEmpty()) {
@@ -132,21 +133,21 @@ public class CallCommand implements Command {
 					// System.out.println("glob:" + currentDir + File.separator + arg);
 					arg = "";
 					Path folder = new File(currentDir).toPath();
-					
+
 					List<File> arrayListFiles = new ArrayList<File>();
 					arrayListFiles = getFileNames(arrayListFiles, folder);
 					File[] listOfFiles = new File[arrayListFiles.size()];
 					listOfFiles = arrayListFiles.toArray(listOfFiles);
-					
+
 					// Sort files by name
-	                Arrays.sort(listOfFiles, new Comparator<File>()
-	                {
-	                    @Override
-	                    public int compare(File f1, File f2) {
-	                        return ((File) f1).getPath().compareTo(((File) f2).getPath());
-	                    }
-	                });
-	                
+					Arrays.sort(listOfFiles, new Comparator<File>()
+					{
+						@Override
+						public int compare(File f1, File f2) {
+							return ((File) f1).getPath().compareTo(((File) f2).getPath());
+						}
+					});
+
 					for (int i = 0; i < listOfFiles.length; i++) {
 						// ignore hidden files that start with "."
 						if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
@@ -187,21 +188,21 @@ public class CallCommand implements Command {
 	}
 
 	private List<File> getFileNames(List<File> files, Path dir) {
-	    try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-	        for (Path path : stream) {
-	            if(path.toFile().isDirectory()) {
-	            	files.add(path.toAbsolutePath().toFile());
-	                getFileNames(files, path);
-	            } else {
-	            	files.add(path.toAbsolutePath().toFile());
-	            }
-	        }
-	    } catch(IOException e) {
-	        e.printStackTrace();
-	    }
-	    return files;
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+			for (Path path : stream) {
+				if(path.toFile().isDirectory()) {
+					files.add(path.toAbsolutePath().toFile());
+					getFileNames(files, path);
+				} else {
+					files.add(path.toAbsolutePath().toFile());
+				}
+			}
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		return files;
 	} 
-	
+
 	/**
 	 * Terminates current execution of the command (unused for now)
 	 */
