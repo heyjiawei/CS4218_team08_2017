@@ -85,7 +85,7 @@ public class ShellTest {
 	public void testPipeWithException() throws AbstractApplicationException, ShellException {
 		String cmd = "head '   ' | echo unreachable";
 		output = shell.pipeWithException(cmd);
-		assertEquals("head: Could not read file", output);
+		assertEquals("head: No file path provided", output);
 	}
 
 	@Test
