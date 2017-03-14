@@ -1,0 +1,2 @@
+testRegexNoSpaceInLine
+this one has space and	tab

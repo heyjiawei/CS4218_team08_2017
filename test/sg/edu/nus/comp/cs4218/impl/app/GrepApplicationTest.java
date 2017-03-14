@@ -55,12 +55,12 @@ public class GrepApplicationTest {
 	@Before
 	public void setUp() throws FileNotFoundException {
 		grepApp = new GrepApplication();
-		stdin = new FileInputStream("test/sg/edu/nus/comp/cs4218/impl/app/greptestdoc.txt");
-		fileName = "test/sg/edu/nus/comp/cs4218/impl/app/greptestdoc.txt";
-		fileName2 = "test/sg/edu/nus/comp/cs4218/impl/app/greptestdoc2.txt";
-		fileName3 = "test/sg/edu/nus/comp/cs4218/impl/app/testdoc.txt";
-		invalidFile = "test/sg/edu/nus/comp/cs4218/impl/app/abjkcsnakjc.txt";
-		directory = "test/sg/edu/nus/comp/cs4218/impl/app/";
+		stdin = new FileInputStream("test_inputs/grep/greptestdoc.txt");
+		fileName = "test_inputs/grep/greptestdoc.txt";
+		fileName2 = "test_inputs/grep/greptestdoc2.txt";
+		fileName3 = "test_inputs/grep/testdoc.txt";
+		invalidFile = "test_inputs/grep/abjkcsnakjc.txt";
+		directory = "test_inputs/grep/";
 		baos = new ByteArrayOutputStream();
 		print = new PrintStream(baos);
 		System.setOut(print);
