@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.Parser;
@@ -99,7 +100,7 @@ public class CallCommand implements Command {
 	 */
 	public void parse() throws ShellException {
 		// Get current directory for globbing
-		String currentDir = System.getProperty("user.dir");
+		String currentDir = Environment.currentDirectory;
 		
 		Vector<String> cmdVector = new Parser().parseCallCommand(this.cmdline);
 
@@ -173,7 +174,7 @@ public class CallCommand implements Command {
 						}
 					}
 				}
-				// System.out.println("arg: " + arg);
+				 // System.out.println("arg: " + arg);
 				argsVector.add(arg);
 			}
 		}
