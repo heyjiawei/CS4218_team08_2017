@@ -34,14 +34,14 @@ public class IntegrationTest {
 		String cmd = "echo `echo cat | wc -m`";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
-		assertEquals("4" + newLine, output);
+		assertEquals("       4" + newLine, output);
 	}
 	
 	@Test
 	public void testPipeEchoWc() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | wc";
 		output = shell.pipeTwoCommands(cmd);
-		assertEquals("3 1 1" + newLine, output);
+		assertEquals("       3       1       1" + newLine, output);
 	}
 
 	@Test
