@@ -4,12 +4,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.app.Wc;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -39,11 +41,10 @@ public class WcApplication implements Wc {
 	private int charCount = 0;
 	private int wordCount = 0;
 	private int lineCount = 0;
+	
 	private int charCountTotal = 0;
 	private int wordCountTotal = 0;
 	private int lineCountTotal = 0;
-	private String filename = null;
-	private boolean isCountProcessed = false;
 
 	/**
 	 * Runs the wc application with the specified arguments.
@@ -69,25 +70,23 @@ public class WcApplication implements Wc {
 		if (stdout == null) {
 			throw new WcException("No output stream provided\n");
 		}
-//		if (stdin == null) {
-//			throw new WcException("No input stream provided");
-//		}
+
 		if (args == null && stdin == null) {
 			throw new WcException("No input provided\n");
 		}
 		
-		boolean[] options = optionsSeparator(args);
+		boolean[] flags = getFlags(args);
+		String[] filenames = getFiles(args);
 		
 		String countStr;
-//		boolean[] options = optionsSeparator(args);
-		if (containsFileDirectory(args)) {
-			countStr = getWc(args, options, null, false) + "\n";
+		if (filenames.length > 0) {
+			countStr = getWc(filenames, flags, null, false);
 			
 		} else if (stdin != null && !isInputStreamEmpty(stdin)) {
-			countStr = getWc(args, options, stdin, true) + "\n";
+			countStr = getWc(null, flags, stdin, true) + "\n";
 			
 		} else {
-			throw new WcException("Input stream empty\n");
+			throw new WcException("Invalid File or Input stream empty\n");
 		}
 		
 		try {
@@ -97,6 +96,67 @@ public class WcApplication implements Wc {
 		}
 	}
 	
+	private String[] getFiles(String[] args) {
+		int fileIndexStart = -1;
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].indexOf("-") != 0 && args[i].length() > 0) {
+				fileIndexStart = i;
+				break;
+			}
+		}
+		
+		ArrayList<String> filenames = new ArrayList<String>();
+		for (int i = fileIndexStart; i < args.length; i++) {
+			filenames.add(args[i]);
+		}
+		return filenames.toArray(new String[filenames.size()]);
+	}
+
+	private boolean[] getFlags(String[] args) throws WcException {
+		boolean[] flags = new boolean[3];
+		for (int i = 0; i < args.length; i++) {
+			if (args[i].indexOf("-") == 0) {
+				flagSeparator(args[i].trim(), flags);
+			} else {
+				break;
+			}
+		}
+		
+		if (flags[0] == false && 
+			flags[1] == false && 
+			flags[2] == false) {
+			Arrays.fill(flags, true);
+		}
+		return flags;
+	}
+
+	private void flagSeparator(String str, boolean[] flags) throws WcException {
+		int dashPosition = str.indexOf('-');
+		int startIndex = dashPosition + 1;
+		while (startIndex > -1 && startIndex < str.length()) {
+			String nextChar = str.substring(startIndex, startIndex + 1);
+			if ("m".equals(nextChar.toLowerCase())) {
+				flags[0] = true;
+				startIndex = startIndex + 1;
+				
+			} else if ("w".equals(nextChar.toLowerCase())) {
+				flags[1] = true;
+				startIndex = startIndex + 1;
+				
+			} else if ("l".equals(nextChar.toLowerCase())) {
+				flags[2] = true;
+				startIndex = startIndex + 1;
+			
+//			} else if (startIndex + 1 == str.length()) {
+//				break;
+				
+			} else {
+				throw new WcException("Invalid Flag\n");
+				
+			}
+		}
+	}
+
 	/**
 	 * Separate joined options e.g. "-lwm" to individual options e.g. "-l -w -m"
 	 * Individual options are represented by a boolean array, 
@@ -106,54 +166,54 @@ public class WcApplication implements Wc {
 	 * @return boolean[] that marks true in the position of the respective option 
 	 * @throws WcException when an invalid option is entered
 	 */
-	private boolean[] optionsSeparator(String[] args) throws WcException {
-		boolean[] options = new boolean[3];
-		String command = "";
-		for (int i = 0; i < args.length; i++) {
-			command += args[i] + " ";
-		}
-
-		int startIndex = 0;
-		int dashPosition = command.indexOf('-');
-		if (dashPosition == -1) {
-			Arrays.fill(options, true);
-			return options;
-			
-		} else {
-			startIndex = dashPosition + 1;
-			while (startIndex > -1 && startIndex < command.length()) {
-				if (startIndex + 1 == command.length()) {
-					break;
-				}
-				
-				String nextChar = command.substring(startIndex, startIndex + 1);
-				if ("m".equals(nextChar.toLowerCase())) {
-					options[0] = true;
-					startIndex = startIndex + 1;
-					
-				} else if ("w".equals(nextChar.toLowerCase())) {
-					options[1] = true;
-					startIndex = startIndex + 1;
-					
-				} else if ("l".equals(nextChar.toLowerCase())) {
-					options[2] = true;
-					startIndex = startIndex + 1;
-				
-				} else if (" ".equals(nextChar)) {
-					dashPosition = command.indexOf("-", startIndex);
-					if (dashPosition > -1) {
-						startIndex = dashPosition + 1;
-					} else {
-						break;
-					}
-				} else {
-					throw new WcException("Invalid Option\n");
-				}	
-			}
-		}
-		
-		return options;
-	}
+//	private boolean[] optionsSeparator(String[] args) throws WcException {
+//		boolean[] options = new boolean[3];
+//		String command = "";
+//		for (int i = 0; i < args.length; i++) {
+//			command += args[i] + " ";
+//		}
+//
+//		int startIndex = 0;
+//		int dashPosition = command.indexOf('-');
+//		if (dashPosition == -1) {
+//			Arrays.fill(options, true);
+//			return options;
+//			
+//		} else {
+//			startIndex = dashPosition + 1;
+//			while (startIndex > -1 && startIndex < command.length()) {
+//				if (startIndex + 1 == command.length()) {
+//					break;
+//				}
+//				
+//				String nextChar = command.substring(startIndex, startIndex + 1);
+//				if ("m".equals(nextChar.toLowerCase())) {
+//					options[0] = true;
+//					startIndex = startIndex + 1;
+//					
+//				} else if ("w".equals(nextChar.toLowerCase())) {
+//					options[1] = true;
+//					startIndex = startIndex + 1;
+//					
+//				} else if ("l".equals(nextChar.toLowerCase())) {
+//					options[2] = true;
+//					startIndex = startIndex + 1;
+//				
+//				} else if (" ".equals(nextChar)) {
+//					dashPosition = command.indexOf("-", startIndex);
+//					if (dashPosition > -1) {
+//						startIndex = dashPosition + 1;
+//					} else {
+//						break;
+//					}
+//				} else {
+//					throw new WcException("Invalid Option\n");
+//				}	
+//			}
+//		}
+//		
+//		return options;
+//	}
 
 	/**
 	 * Calls the relevant interface functions depending on the option provided
@@ -167,51 +227,27 @@ public class WcApplication implements Wc {
 	 */
 	private String getWc(String[] args, boolean[] options, 
 								InputStream stdin, boolean isStdin) {
-//		String commandLine = "";
-//		String countStr = "";
-//		for (int i = 0; i < args.length; i++) {
-//			commandLine += args[i] + " ";
-//		}
-//		commandLine.trim();
-		
 		String output = "";
 		if (isStdin) {
-			processWcInStdin(stdin);
-			output += builtWcString(null, options);
-//			if (options[0]) { // -m
-//				countStr += printCharacterCountInStdin(commandLine, stdin) + " ";
-//			} 
-//			if (options[1]) { // -w
-//				countStr += printWordCountInStdin(commandLine, stdin) + " ";
-//			}
-//			if (options[2]) { // -l
-//				countStr += printNewlineCountInStdin(commandLine, stdin);
-//			}
+			output += processWcInStdin(stdin, options);
+//			output += builtWcString(null, options);
 
 		} else {
-			String[] filenames = getFilenames(args);
-			for (int i = 0; i < filenames.length; i++) {
+			for (int i = 0; i < args.length; i++) {
 				resetStates();
-				processWcInFile(filename);
-				output += builtWcString(filenames[i], options);
+				output += processWcInFile(args[i], options) + "\n";
 			}
 			
-			output += buildTotalString(options);
-//			if (options[0]) { // -m
-//				countStr += printCharacterCountInFile(commandLine) + " ";
-//			} 
-//			if (options[1]) { // -w
-//				countStr += printWordCountInFile(commandLine) + " ";
-//			}
-//			if (options[2]) { // -l
-//				countStr += printNewlineCountInFile(commandLine);
-//			}
+			if (args.length > 1) {
+				output += buildTotalString(options);
+			}
+	
 		}
 		
 		return output;
 	}
 
-	private void processWcInStdin(InputStream stdin) {
+	private String processWcInStdin(InputStream stdin, boolean[] flags) {
 		BufferedInputStream is = new BufferedInputStream(stdin);
 		byte[] c = new byte[1024];
 	    int readChars = 0;
@@ -235,50 +271,87 @@ public class WcApplication implements Wc {
 			}
 			is.close();
 			stdin.reset();
-//			this.isCountProcessed = true;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void processWcInFile(String filename) {
-		BufferedReader reader;
-		try {
-			reader = new BufferedReader(new FileReader(filename));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				this.charCount += line.getBytes().length;
-				this.lineCount++;
-				String[] parts = line.replaceAll("\\s+", " ").split(" ");
-				for (int i = 0; i < parts.length; i++) {
-					if (parts[i].length() > 0) {
-						this.wordCount += 1;
-					}
-				}
-			}
-			reader.close();
-			this.lineCount -= 1;
-			this.charCount += this.lineCount;
-//			this.isCountProcessed = true;
+			
+			this.charCountTotal += this.charCount;
+			this.wordCountTotal += this.wordCount;
+			this.lineCountTotal += this.lineCount;
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
-		this.charCountTotal += this.charCount;
-		this.wordCountTotal += this.wordCount;
-		this.lineCountTotal += this.lineCount;
+		return builtWcString(null, flags);
+	}
+	
+	private int countLines(String filename) throws IOException {
+	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        boolean empty = true;
+	        while ((readChars = is.read(c)) != -1) {
+	            empty = false;
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	        }
+	        return (count == 0 && !empty) ? 1 : count;
+	    } finally {
+	        is.close();
+	    }
+	}
+
+	private String processWcInFile(String filename, boolean[] flags) {
+		BufferedReader reader;
+		try {
+			if (isFileValid(filename)) {
+				reader = new BufferedReader(new FileReader(filename));
+				String line;
+				while ((line = reader.readLine()) != null) {
+					this.charCount += line.getBytes().length;
+					String[] parts = line.replaceAll("\\s+", " ").split(" ");
+					for (int i = 0; i < parts.length; i++) {
+						if (parts[i].length() > 0) {
+							this.wordCount += 1;
+						}
+					}
+				}
+				reader.close();
+				this.lineCount = countLines(filename);
+				this.charCount += this.lineCount;
+				
+				this.charCountTotal += this.charCount;
+				this.wordCountTotal += this.wordCount;
+				this.lineCountTotal += this.lineCount;
+				
+			} else {
+				return "wc: " + filename + " Invalid file or directory";
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return builtWcString(filename, flags);
+	}
+	
+	private boolean isFileValid(String args) {
+		File file = new File(args);
+	    return file.exists() && file.isFile();
 	}
 
 	private String[] getFilenames(String[] args) {
 		ArrayList<String> fileList = new ArrayList<String>();
+		int file_index = -1;
 		for (int i = 0; i < args.length; i++) {
-			File file = new File(args[i]);
-			if (file.exists() && file.isFile()) {
-				fileList.add(args[i]);
+			if (args[i].indexOf("-") != 0) {
+				fileList.add(args[i].trim());
 			}
 		}
-		String[] filenames = null;
-		return fileList.toArray(filenames);
+		return fileList.toArray(new String[fileList.size()]);
 	}
 
 	private String buildTotalString(boolean[] options) {
@@ -313,11 +386,9 @@ public class WcApplication implements Wc {
 		if (options[2]) {
 			output.append("       " + this.lineCount);
 		}
-		if (filename == null) {
-			output.append("\n");
-		} else {
-			output.append(" " + filename + "\n");
-		}
+		if (filename != null) {
+			output.append(" " + filename);
+		} 
 		return output.toString();
 	}
 	
@@ -345,16 +416,23 @@ public class WcApplication implements Wc {
 	 * @param args String[] command line arguments
 	 * @return boolean true if file is valid, false otherwise
 	 */
-	private boolean containsFileDirectory(String[] args) {		
-		for (int i = 0; i < args.length; i++) {
-			File file = new File(args[i]);
-			boolean containsFile = file.exists() && file.isFile();
-			if (containsFile) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	private boolean containsFileDirectory(String[] args) {	
+//		for (int i = 0; i < args.length; i++) {
+//			if (args[i].indexOf("-") == -1) {
+//				return true;
+//			}
+////			File file = new File(args[i]);
+////			
+////			boolean fileExist = file.exists();
+////			boolean fileIsFile = file.isFile();
+////			
+////			boolean containsFile = file.exists() && file.isFile();
+////			if (containsFile) {
+////				return true;
+////			}
+//		}
+//		return false;
+//	}
 
 	/**
 	 * Retrieves the filename of file to be read
