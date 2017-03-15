@@ -11,11 +11,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.app.Wc;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
 /**
