@@ -93,6 +93,210 @@ public class WcApplication implements Wc {
 		}
 	}
 	
+	/**
+		 * Checks if the file provided is valid
+		 * @param args String[] command line arguments
+		 * @return boolean true if file is valid, false otherwise
+		 */
+	//	private boolean containsFileDirectory(String[] args) {	
+	//		for (int i = 0; i < args.length; i++) {
+	//			if (args[i].indexOf("-") == -1) {
+	//				return true;
+	//			}
+	////			File file = new File(args[i]);
+	////			
+	////			boolean fileExist = file.exists();
+	////			boolean fileIsFile = file.isFile();
+	////			
+	////			boolean containsFile = file.exists() && file.isFile();
+	////			if (containsFile) {
+	////				return true;
+	////			}
+	//		}
+	//		return false;
+	//	}
+	
+		/**
+		 * Retrieves the filename of file to be read
+		 * @param args String[] command line arguments
+		 * @return String filename
+		 */
+	//	private String getFilename(String args) {
+	//		if (this.filename == null) {
+	//			String[] parts = args.split(" ");
+	//			return parts[parts.length - 1];
+	//		} else {
+	//			return this.filename;
+	//		}
+	//	}
+		
+		/**
+		 * Store character count, word count and line count read from file
+		 * in private variables
+		 * @param args String containing command and arguments
+		 */
+	//	private void processCountInFile(String input) {
+	//		if (this.isCountProcessed) {
+	//			return;
+	//		}
+	//		String filename = getFilename(input);
+	//		BufferedReader reader;
+	//		try {
+	//			reader = new BufferedReader(new FileReader(filename));
+	//			String line;
+	//			while ((line = reader.readLine()) != null) {
+	//				this.charCount += line.getBytes().length;
+	//				this.lineCount++;
+	//				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+	//				for (int i = 0; i < parts.length; i++) {
+	//					if (parts[i].length() > 0) {
+	//						this.wordCount += 1;
+	//					}
+	//				}
+	//			}
+	//			reader.close();
+	//			this.lineCount -= 1;
+	//			this.charCount += this.lineCount;
+	//			this.isCountProcessed = true;
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
+	
+		/**
+		 * Store character count, word count and line count read from input stream
+		 * in private variables
+		 * @param stdin InputStream containing content
+		 */
+	//	private void processCountInStdin(InputStream stdin) {
+	//		if (this.isCountProcessed) {
+	//			return;
+	//		}
+	//		BufferedInputStream is = new BufferedInputStream(stdin);
+	//		byte[] c = new byte[1024];
+	//	    int readChars = 0;
+	//		try {
+	//			while ((readChars = is.read(c)) != -1) {
+	//				String line = new String(c, 0, readChars);
+	//				this.charCount += line.length();
+	//				String[] parts = line.replaceAll("\\s+", " ").split(" ");
+	//				
+	//				for (int i = 0; i < parts.length; i++) {
+	//					if (parts[i].length() > 0) {
+	//						this.wordCount++;
+	//					}
+	//				}
+	//				
+	//				int pos = -1;
+	//				while ((pos = line.indexOf("\n")) != -1) {
+	//					this.lineCount++;
+	//					line = line.substring(pos + 1);
+	//				}
+	//			}
+	//			is.close();
+	//			stdin.reset();
+	////			this.isCountProcessed = true;
+	//		} catch (IOException e) {
+	//			e.printStackTrace();
+	//		}
+	//	}
+	
+		/**
+		 * Returns string containing the character count in file
+		 * @param args String containing command and arguments
+		 */
+		@Override
+		public String printCharacterCountInFile(String args) {
+			return parseAndEvaluate(args, null);
+	//		processCountInFile(args);
+	//		return String.valueOf(this.charCount);
+		}
+
+	/**
+		 * Returns string containing the word count in file
+		 * @param args String containing command and arguments
+		 */
+		@Override
+		public String printWordCountInFile(String args) {
+			return parseAndEvaluate(args, null);
+	//		processCountInFile(args);
+	//		return String.valueOf(this.wordCount);
+		}
+
+	/**
+		 * Returns string containing the newline count in file
+		 * @param args String containing command and arguments
+		 */
+		@Override
+		public String printNewlineCountInFile(String args) {
+			return parseAndEvaluate(args, null);
+	//		processCountInFile(args);
+	//		return String.valueOf(this.lineCount);
+		}
+
+	/**
+		 * Returns string containing all counts in file
+		 * @param args String containing command and arguments
+		 */
+		@Override
+		public String printAllCountsInFile(String args) {
+			return parseAndEvaluate(args, null);
+	//		processCountInFile(args);
+	//		return this.charCount + " " + 
+	//				this.wordCount + " " +
+	//				this.lineCount;
+		}
+
+	/**
+		 * Returns string containing the character count in Stdin
+		 * @param args String containing command and arguments
+		 * @param stdin InputStream containing Stdin
+		 */
+		@Override
+		public String printCharacterCountInStdin(String args, InputStream stdin) {
+			return parseAndEvaluate(args, stdin);
+	//		processCountInStdin(stdin);
+	//		return String.valueOf(this.charCount);
+		}
+
+	/**
+		 * Returns string containing the word count in Stdin
+		 * @param args String containing command and arguments
+		 * @param stdin InputStream containing Stdin
+		 */
+		@Override
+		public String printWordCountInStdin(String args, InputStream stdin) {
+			return parseAndEvaluate(args, stdin);
+	//		processCountInStdin(stdin);
+	//		return String.valueOf(this.wordCount);
+		}
+
+	/**
+		 * Returns string containing the newline count in Stdin
+		 * @param args String containing command and arguments
+		 * @param stdin InputStream containing Stdin
+		 */
+		@Override
+		public String printNewlineCountInStdin(String args, InputStream stdin) {
+			return parseAndEvaluate(args, stdin);
+	//		processCountInStdin(stdin);
+	//		return String.valueOf(this.lineCount);
+		}
+
+	/**
+		 * Returns string containing all counts in Stdin
+		 * @param args String containing command and arguments
+		 * @param stdin InputStream containing Stdin
+		 */
+		@Override
+		public String printAllCountsInStdin(String args, InputStream stdin) { 
+			return parseAndEvaluate(args, stdin);
+	//		processCountInStdin(stdin);
+	//		return this.charCount + " " + 
+	//				this.wordCount + " " + 
+	//				this.lineCount;
+		}
+
 	private String[] getFiles(String[] args) {
 		int fileIndexStart = -1;
 		for (int i = 0; i < args.length; i++) {
@@ -346,17 +550,6 @@ public class WcApplication implements Wc {
 	    return file.exists() && file.isFile();
 	}
 
-	private String[] getFilenames(String[] args) {
-		ArrayList<String> fileList = new ArrayList<String>();
-		int file_index = -1;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].indexOf("-") != 0) {
-				fileList.add(args[i].trim());
-			}
-		}
-		return fileList.toArray(new String[fileList.size()]);
-	}
-
 	private String buildTotalString(boolean[] options) {
 		StringBuilder output = new StringBuilder();
 		if (options[0]) {
@@ -522,102 +715,6 @@ public class WcApplication implements Wc {
 //		}
 //	}
 
-	/**
-	 * Returns string containing the character count in file
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printCharacterCountInFile(String args) {
-		return parseAndEvaluate(args, null);
-//		processCountInFile(args);
-//		return String.valueOf(this.charCount);
-	}
-
-	/**
-	 * Returns string containing the word count in file
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printWordCountInFile(String args) {
-		return parseAndEvaluate(args, null);
-//		processCountInFile(args);
-//		return String.valueOf(this.wordCount);
-	}
-
-	/**
-	 * Returns string containing the newline count in file
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printNewlineCountInFile(String args) {
-		return parseAndEvaluate(args, null);
-//		processCountInFile(args);
-//		return String.valueOf(this.lineCount);
-	}
-
-	/**
-	 * Returns string containing all counts in file
-	 * @param args String containing command and arguments
-	 */
-	@Override
-	public String printAllCountsInFile(String args) {
-		return parseAndEvaluate(args, null);
-//		processCountInFile(args);
-//		return this.charCount + " " + 
-//				this.wordCount + " " +
-//				this.lineCount;
-	}
-	
-	/**
-	 * Returns string containing the character count in Stdin
-	 * @param args String containing command and arguments
-	 * @param stdin InputStream containing Stdin
-	 */
-	@Override
-	public String printCharacterCountInStdin(String args, InputStream stdin) {
-		return parseAndEvaluate(args, stdin);
-//		processCountInStdin(stdin);
-//		return String.valueOf(this.charCount);
-	}
-
-	/**
-	 * Returns string containing the word count in Stdin
-	 * @param args String containing command and arguments
-	 * @param stdin InputStream containing Stdin
-	 */
-	@Override
-	public String printWordCountInStdin(String args, InputStream stdin) {
-		return parseAndEvaluate(args, stdin);
-//		processCountInStdin(stdin);
-//		return String.valueOf(this.wordCount);
-	}
-
-	/**
-	 * Returns string containing the newline count in Stdin
-	 * @param args String containing command and arguments
-	 * @param stdin InputStream containing Stdin
-	 */
-	@Override
-	public String printNewlineCountInStdin(String args, InputStream stdin) {
-		return parseAndEvaluate(args, stdin);
-//		processCountInStdin(stdin);
-//		return String.valueOf(this.lineCount);
-	}
-
-	/**
-	 * Returns string containing all counts in Stdin
-	 * @param args String containing command and arguments
-	 * @param stdin InputStream containing Stdin
-	 */
-	@Override
-	public String printAllCountsInStdin(String args, InputStream stdin) { 
-		return parseAndEvaluate(args, stdin);
-//		processCountInStdin(stdin);
-//		return this.charCount + " " + 
-//				this.wordCount + " " + 
-//				this.lineCount;
-	}
-	
 	private String parseAndEvaluate(String args, InputStream stdin) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
