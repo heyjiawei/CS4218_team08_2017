@@ -105,11 +105,17 @@ public class WcApplication implements Wc {
 			}
 		}
 		
-		ArrayList<String> filenames = new ArrayList<String>();
-		for (int i = fileIndexStart; i < args.length; i++) {
-			filenames.add(args[i]);
+		if (fileIndexStart > -1) {
+			ArrayList<String> filenames = new ArrayList<String>();
+			for (int i = fileIndexStart; i < args.length; i++) {
+				filenames.add(args[i]);
+			}
+			return filenames.toArray(new String[filenames.size()]);
+			
+		} else {
+			return new String[0];
 		}
-		return filenames.toArray(new String[filenames.size()]);
+		
 	}
 
 	private boolean[] getFlags(String[] args) throws WcException {
@@ -229,6 +235,7 @@ public class WcApplication implements Wc {
 								InputStream stdin, boolean isStdin) {
 		String output = "";
 		if (isStdin) {
+			resetStates();
 			output += processWcInStdin(stdin, options);
 //			output += builtWcString(null, options);
 
@@ -270,7 +277,6 @@ public class WcApplication implements Wc {
 				}
 			}
 			is.close();
-			stdin.reset();
 			
 			this.charCountTotal += this.charCount;
 			this.wordCountTotal += this.wordCount;

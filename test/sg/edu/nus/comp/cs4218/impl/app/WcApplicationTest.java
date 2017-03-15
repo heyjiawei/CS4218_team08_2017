@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,8 +32,6 @@ public class WcApplicationTest {
 			FILE_SEPARATOR, FILE_SEPARATOR);
 	private static final String MWLFILE_NONEWLINEENDING = String.format("test_inputs%swc%s3_lines.txt", 
 			FILE_SEPARATOR, FILE_SEPARATOR);
-	private static final String MWLDIRECTORYFILE = String.format("test_inputs%swc%stesting_wc_folder%swc test.txt", 
-			FILE_SEPARATOR, FILE_SEPARATOR, FILE_SEPARATOR);
 	private static final String EMPTYFILE = String.format("test_inputs%swc%sempty.txt", 
 			FILE_SEPARATOR, FILE_SEPARATOR);
 	private static final String SINGLEWORD = String.format("test_inputs%swc%ssingleWord.txt", 
@@ -58,6 +57,21 @@ public class WcApplicationTest {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+	
+	@Test
+	public void testNullStdout() throws WcException {
+		String[] args = {"-l", MWLFILE_NONEWLINEENDING};
+		thrown.expect(WcException.class);
+		thrown.expectMessage("wc: No output stream provided\n");
+		wcApp.run(args, in, null);
+	}
+	
+	@Test
+	public void testNullStdinNullArgs() throws WcException {
+		thrown.expect(WcException.class);
+		thrown.expectMessage("wc: No input provided\n");
+		wcApp.run(null, null, out);
 	}
 	
 	@Test
@@ -98,7 +112,7 @@ public class WcApplicationTest {
 	}
 
 	@Test
-	public void testPrintAllCountsInFile() throws WcException {
+	public void testPrintAllCountsInFileInRun() throws WcException {
 		String[] args = {"-L", "-M", "-W", MWLFILE_NONEWLINEENDING};
 		wcApp.run(args, in, out);
 		String expected = String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR);
@@ -106,7 +120,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test 
-	public void testPrintWcOfEmptyFile() throws WcException {
+	public void testPrintWcOfEmptyFileInRun() throws WcException {
 		String[] args = {"-L", "-M", "-W", EMPTYFILE};
 		wcApp.run(args, in, out);
 		String expected = String.format("       0       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR);
@@ -123,7 +137,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testNoFlagMultiFile() throws WcException {
+	public void testNoFlagMultiFileInRun() throws WcException {
 		String[] args = {EMPTYFILE, MWLFILE_NONEWLINEENDING};
 		wcApp.run(args, in, out);
 		String expected = String.format("       0       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR) + 
@@ -133,7 +147,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testJoinedOptionMultiFile() throws WcException {
+	public void testJoinedOptionMultiFileInRun() throws WcException {
 		String[] args = {"-ml", EMPTYFILE, MWLFILE_NONEWLINEENDING};
 		wcApp.run(args, in, out);
 		String expected = String.format("       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR) + 
@@ -162,7 +176,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testWcWithRepeativeSingleFlags() {
+	public void testWcWithRepeativeSingleFlagsInFile() {
 		String results = wcApp.printWordCountInFile(String.format("-w -w %s", MWLFILE));
 		String expected = String.format("       6 %s%s", MWLFILE, LINE_SEPARATOR);
 		assertEquals(expected, results);
@@ -177,7 +191,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testWcWithDuplicateFlags() {
+	public void testWcWithDuplicateFlagsInFile() {
 		String results = wcApp.printWordCountInFile(String.format("-wwwwwwwwwwww %s", MWLFILE));
 		String expected = String.format("       6 %s%s", MWLFILE, LINE_SEPARATOR);
 		assertEquals(expected, results);
@@ -192,7 +206,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testWcWithDifferentFlagOrders() throws WcException {
+	public void testWcWithDifferentFlagOrdersInFileInRun() throws WcException {
 		String[] args1 = { "-wlm", MWLFILE };
 		wcApp.run(args1, in, out);
 		String output1 = out.toString();
@@ -208,7 +222,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testInvalidFlagInRun() throws WcException {
+	public void testInvalidFlagInFileInRun() throws WcException {
 		String[] args = { "-x", MWLFILE };
 		thrown.expect(WcException.class);
 		thrown.expectMessage("wc: Invalid Flag\n");
@@ -216,7 +230,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testWcWithMixValidAndInvalidFlagsInRun() throws WcException {
+	public void testWcWithMixValidAndInvalidFlagsInFileInRun() throws WcException {
 		String[] args = { "-mxl", MWLFILE };
 		thrown.expect(WcException.class);
 		thrown.expectMessage("wc: Invalid Flag\n");
@@ -224,7 +238,7 @@ public class WcApplicationTest {
 	}
 	
 	@Test
-	public void testInvalidFlagPosition() throws WcException {
+	public void testInvalidFlagPositionInFileInRun() throws WcException {
 		String[] args = { "-m", MWLFILE, "-l" };
 		wcApp.run(args, null, out);
 		String expected = String.format("       30 %s%s", MWLFILE, LINE_SEPARATOR) +
@@ -270,126 +284,112 @@ public class WcApplicationTest {
 						String.format("       59       12       5 total%s", LINE_SEPARATOR);
 		assertEquals(expected, results);
 	}
-//	
-//	@Test
-//	public void testPrintCharacterCountInStdin() {
-//		in = new ByteArrayInputStream("4 lines\n\n6 words\n\n31 characters".getBytes());
-//		String count = wcApp.printCharacterCountInStdin("-m wc_test.txt", in);
-//		assertEquals("31", count);
-//	}
-//	
-//	@Test
-//	public void testPrintWordCountInStdin() {
-//		in = new ByteArrayInputStream("4 lines\n\n6 words\n\n31 characters".getBytes());
-//		String count = wcApp.printWordCountInStdin("-m wc_test.txt", in);
-//		assertEquals("6", count);
-//	}
-//	
-//	@Test
-//	public void testPrintNewlineCountInStdin() {
-//		in = new ByteArrayInputStream("4 lines\n\n6 words\n\n31 characters".getBytes());
-//		String count = wcApp.printNewlineCountInStdin("-m wc_test.txt", in);
-//		assertEquals("4", count);
-//	}
-//
-//	@Test
-//	public void testPrintAllCountsInStdin() {
-//		in = new ByteArrayInputStream("4 lines\n\n6 words\n\n31 characters".getBytes());
-//		String count = wcApp.printAllCountsInStdin("-m wc_test.txt", in);
-//		assertEquals("31 6 4", count);
-//	}
-//	
-//	@Test
-//	public void testDisjointedAllOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"-wl", "-m", "wc_test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31 6 4\n", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testNoOptionSimpleFile() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"wc_test.txt"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("31 6 4\n", new String(byteArray));
-//	}
-//
-//	@Test
-//	public void testDisjointedAllOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"-wm", "-l"}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("33 6 2\n", new String(byteArray));
-//	}
-//	
-//	@Test
-//	public void testNoOptionStdin() throws AbstractApplicationException {
-//		in = new ByteArrayInputStream("1 newline of code,\n x characters\n".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{}, in, out);
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		
-//		assertEquals("33 6 2\n", new String(byteArray));
-//		
-//	}
-//	
-//	@Test
-//	public void testReadFromDir() {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		try {
-//			wcApp.run(new String[]{"-lmw", "testing_wc_folder/wc file.txt"}, in, out);
-//		} catch (AbstractApplicationException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		assertEquals("31 6 4\n", new String(byteArray));
-//	}
 	
-//	@Test 
-//	public void testEmptyFileWc() {
-//		
-//	}
+	@Test
+	public void testPrintCharacterCountInStdin() {
+		String count = wcApp.printCharacterCountInStdin("-m", in);
+		String expected = String.format("       30%s", LINE_SEPARATOR);
+		assertEquals(expected, count);
+	}
 	
-//
-//	@Test
-//	public void testRepeatedOptions() {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		try {
-//			wcApp.run(new String[]{"-mm", "testing_wc_folder/wc file.txt"}, in, out);
-//		} catch (AbstractApplicationException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] byteArray = ((ByteArrayOutputStream) out).toByteArray();
-//		assertEquals("31\n", new String(byteArray));
-//	}
-//
-//	@Test (expected = WcException.class)
-//	public void testThrowNoStdinInputProvidedException() throws Exception {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{""}, in, out);
-//	}
-//	
-//	@Test (expected = WcException.class)
-//	public void testThrowInvalidFileNameException() throws Exception {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"this"}, in, out);
-//	}
-//	
-//	@Test (expected = WcException.class)
-//	public void testThrowInvalidOptionException() throws Exception {
-//		in = new ByteArrayInputStream("".getBytes());
-//		out = new ByteArrayOutputStream();
-//		wcApp.run(new String[]{"-lm -c", "wc_test.txt"}, in, out);
-//	}
+	@Test
+	public void testPrintWordCountInStdin() {
+		String count = wcApp.printWordCountInStdin("-w", in);
+		String expected = String.format("       6%s", LINE_SEPARATOR);
+		assertEquals(expected, count);
+	}
+	
+	@Test
+	public void testPrintNewlineCountInStdin() {
+		String count = wcApp.printWordCountInStdin("-l", in);
+		String expected = String.format("       3%s", LINE_SEPARATOR);
+		assertEquals(expected, count);
+	}
+
+	@Test
+	public void testPrintAllCountsInStdin() {
+		String count = wcApp.printAllCountsInStdin("-m -w -l", in);
+		String expected = String.format("       30       6       3%s", LINE_SEPARATOR);
+		assertEquals(expected, count);
+	}
+	
+	@Test
+	public void testDisjointedAllOptionStdin() throws WcException {
+		wcApp.run(new String[]{"-wl", "-m"}, in, out);
+		String expected = String.format("       30       6       3%s", LINE_SEPARATOR);
+		assertEquals(expected, out.toString());
+	}
+	
+	@Test
+	public void testNoOptionStdin() throws WcException {
+		wcApp.run(new String[]{}, in, out);
+		String expected = String.format("       30       6       3%s", LINE_SEPARATOR);
+		assertEquals(expected, out.toString());
+	}
+	
+	@Test
+	public void testRepeativeSingleFlagsStdinInRun() throws WcException {
+		String[] args = {"-w", "-w", "-W"};
+		wcApp.run(args, in, out);
+		String expected = String.format("       6%s", LINE_SEPARATOR);
+		assertEquals(expected, out.toString());
+	}
+	
+	@Test
+	public void testDuplicateFlagsStdin() {
+		String results = wcApp.printWordCountInStdin("-wwwwwwwwwwww", in);
+		String expected = String.format("       6%s", LINE_SEPARATOR);
+		assertEquals(expected, results);
+	}
+	
+	@Test
+	public void testDuplicateFlagsStdinInRun() throws WcException {
+		String[] args = {"-wwWwwwwww"};
+		wcApp.run(args, in, out);
+		String expected = String.format("       6%s", LINE_SEPARATOR);
+		assertEquals(expected, out.toString());
+	}
+	
+	@Test
+	public void testDifferentFlagOrdersStdinInRun() throws WcException, FileNotFoundException {
+		String[] args1 = { "-wlm"};
+		wcApp.run(args1, in, out);
+		String output1 = out.toString();
+		System.out.flush();
+		out = new ByteArrayOutputStream();
+		in = new FileInputStream(MWLFILE);
+		String[] args2 = { "-lmw"};
+		wcApp.run(args2, in, out);
+		String output2 = out.toString();
+		String expected = String.format("       30       6       3%s", LINE_SEPARATOR);
+		
+		assertEquals(output1.toString(), output2.toString());
+		assertEquals(expected, output1);
+	}
+	
+	@Test
+	public void testInvalidFlagStdinInRun() throws WcException {
+		String[] args = { "-x"};
+		thrown.expect(WcException.class);
+		thrown.expectMessage("wc: Invalid Flag\n");
+		wcApp.run(args, in, out);
+	}
+	
+	@Test
+	public void testWcWithMixValidAndInvalidFlagsInRun() throws WcException {
+		String[] args = { "-mxl"};
+		thrown.expect(WcException.class);
+		thrown.expectMessage("wc: Invalid Flag\n");
+		wcApp.run(args, in, out);
+	}
+	
+	@Test
+	public void testEmptyStdinInRun() throws WcException, FileNotFoundException {
+		String[] args = { "-mwl"};
+		in = new FileInputStream(EMPTYFILE);
+		thrown.expect(WcException.class);
+		thrown.expectMessage("wc: Invalid File or Input stream empty\n");
+		wcApp.run(args, in, out);
+	}
+	
 }
