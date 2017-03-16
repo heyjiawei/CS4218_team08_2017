@@ -7,16 +7,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,78 +32,10 @@ public class SedApplicationTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-		File folder = new File("test_inputs" + FS + "sed" + FS);
-		File originalFolder = new File("test_inputs" + FS + "sed_original" + FS);
-		File[] listOfFiles = folder.listFiles();
-		
-		for (int i = 0; i < listOfFiles.length; i++) {
-			copyFiles(originalFolder, folder);
-		}
-		
-		try{
-		    PrintWriter writer = new PrintWriter("sed_test.txt", "UTF-8");
-		    writer.println("sunday monday tuesday");
-		    writer.print("happyday sad day all-day $100 000 000");
-		    writer.close();
-		    
-		    writer = new PrintWriter("sed_test_replace_first.txt", "UTF-8");
-		    writer.println("sunshine monday tuesday");
-		    writer.print("happyshine sad day all-day $100 000 000");
-		    writer.close();
-		    
-		    writer = new PrintWriter("sed_test_replace_all.txt", "UTF-8");
-		    writer.println("sunnight monnight tuesnight");
-		    writer.print("happynight sad night all-night $100 000 000");
-		    writer.close();
-		    
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void copyFiles(File sourceLocation , File targetLocation)
-		    throws IOException {
-
-        if (sourceLocation.isDirectory()) {
-            if (!targetLocation.exists()) {
-                targetLocation.mkdir();
-            }
-            File[] files = sourceLocation.listFiles();
-            for(File file:files){
-                InputStream in = new FileInputStream(file);
-                OutputStream out = new FileOutputStream(targetLocation+FS+file.getName());
-
-                // Copy the bits from input stream to output stream
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                in.close();
-                out.close();
-            }            
-        }
-    }
-	
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-		new File("sed_test.txt").delete();
-		new File("sed_test_replace_first.txt").delete();
-		new File("sed_test_replace_all.txt").delete();
-	
-	}
-
 	@Before
 	public void setUp() throws Exception {
 		sedApp = new SedApplication();
 		out = new ByteArrayOutputStream();
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test
@@ -125,6 +51,16 @@ public class SedApplicationTest {
 	@Test
 	public void testSedWithEmptyArgument() throws SedException {
 		String args[] = {};
+		in = new ByteArrayInputStream("".getBytes());
+		thrown.expect(SedException.class);
+		thrown.expectMessage("sed: No replacement detected" + NEWLINE);
+		sedApp.run(args, in, out);
+		// "error on sed command - fails to throw exception with empty args";
+	}
+	
+	@Test
+	public void testSedWithLength1EmptyArgument() throws SedException {
+		String args[] = {""};
 		in = new ByteArrayInputStream("".getBytes());
 		thrown.expect(SedException.class);
 		thrown.expectMessage("sed: No replacement detected" + NEWLINE);
@@ -241,7 +177,6 @@ public class SedApplicationTest {
 		thrown.expect(SedException.class);
 		thrown.expectMessage("sed: Incorrect number of args" + NEWLINE);
 		sedApp.run(args, in, out);
-		assertEquals(expected, out.toString());
 	}
 
 	@Test
@@ -473,6 +408,46 @@ public class SedApplicationTest {
 		String expected = NEWLINE + NEWLINE + NEWLINE;
 		sedApp.run(args, in, out);
 		assertEquals(expected, out.toString());
+	}
+	
+	@Test
+	public void testReplaceFirstSubStringInFile() throws SedException {
+		in = null;
+		String cmd = "s|o{2,3}d*|r| " + TWO_LINE_FILE_PATH;
+		String output = sedApp.replaceFirstSubStringInFile(cmd);
+		String expected = "Hey, gr to know <you>!" + NEWLINE + 
+				"This is a small file consists of {1+1+0} lines."+ NEWLINE + 
+				"/* Hope this helps */ # no new line here" + NEWLINE;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testReplaceAllSubstringsInFile() throws SedException {
+		String cmd = "s|.||g " + TWO_LINE_FILE_PATH;
+		in = null;
+		String expected = NEWLINE + NEWLINE + NEWLINE;
+		String output = sedApp.replaceAllSubstringsInFile(cmd);
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testReplaceFirstSubStringFromStdin() throws SedException, FileNotFoundException {
+		String cmd = "s|o{2,3}d*|r|";
+		in = new FileInputStream(TWO_LINE_FILE_PATH);
+		String output = sedApp.replaceFirstSubStringFromStdin(cmd, in);
+		String expected = "Hey, gr to know <you>!" + NEWLINE + 
+				"This is a small file consists of {1+1+0} lines."+ NEWLINE + 
+				"/* Hope this helps */ # no new line here" + NEWLINE;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testReplaceAllSubstringsInStdin() throws SedException, FileNotFoundException {
+		String cmd = "s|.||g";
+		in = new FileInputStream(TWO_LINE_FILE_PATH);
+		String output = sedApp.replaceAllSubstringsInStdin(cmd, in);
+		String expected = NEWLINE + NEWLINE + NEWLINE;
+		assertEquals(expected, output);
 	}
 //	
 //  Unable to match quotes

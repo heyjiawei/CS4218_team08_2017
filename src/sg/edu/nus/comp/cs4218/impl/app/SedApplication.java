@@ -9,15 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.app.Sed;
 import sg.edu.nus.comp.cs4218.exception.SedException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.Parser;
 
 /**
  * Copies input file (or input stream) to stdout performing string replacement. 
@@ -337,25 +334,6 @@ public class SedApplication implements Sed {
 //	}
 
 	/**
-	 * Checks if the provided input stream is empty
-	 * @param stdin InputStream. The input for the command is read from this
-	 *  		InputStream if no files are specified.
-	 * @return boolean true if input stream is empty, false otherwise
-	 */
-	private boolean isInputStreamEmpty(InputStream stdin) {
-		try {
-			if (stdin.available() > 0) {
-				return false;
-			} else {
-				return true;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-
-	/**
 	 * Checks if the file provided is valid
 	 * @param args String[] command line arguments
 	 * @return boolean true if file is valid, false otherwise
@@ -569,7 +547,7 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidReplacement(String args) {
-		return "sed: Invalid replacement string\n";
+		return parseAndEvaluate(args, null);
 	}
 
 	/**
@@ -578,21 +556,18 @@ public class SedApplication implements Sed {
 	 */
 	@Override
 	public String replaceSubstringWithInvalidRegex(String args) {
-		return "sed: Invalid regex pattern\n";
+		return parseAndEvaluate(args, null);
 	}
 
 	private String parseAndEvaluate(String args, InputStream stdin) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Parser parser = new Parser();
 		try {
 			SedApplication app = new SedApplication();
-			Vector<String> parsed = parser.parseCallCommand(args);
-			
 			String[] splittedArguments = args == null ?
 					new String[0] : args.split("\\s+");
 			app.run(splittedArguments, stdin, out);
 			return out.toString();
-		} catch (SedException | ShellException e) {
+		} catch (SedException e) {
 			return e.getMessage();
 		}
 	}
