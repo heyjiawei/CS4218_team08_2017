@@ -9,12 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Calendar;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.Environment;
@@ -23,11 +20,12 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
-	private final String FS = File.separator;
+	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
-	private final String catTestFilesPath = "test_inputs" + FS + "cat" + FS;
-	private final String sedTestFilePath = "test_inputs" + FS + "sed" + FS + "two-lines.txt";
+	private final String catTestFilesPath = "test_inputs" + FILE_SEPARATOR + "cat" + FILE_SEPARATOR;
+	private final String sedTestFilePath = "test_inputs" + FILE_SEPARATOR + "sed" + FILE_SEPARATOR + "two-lines.txt";
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
@@ -129,6 +127,63 @@ public class IntegrationTest {
 		output = outputStream.toString();
 		assertEquals(parentPath.toString() + newLine, output);
 	}
+	
+	@Test
+	public void testPipeCalGrep() {
+		String cmd = "cal | grep \\d";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = "     March 2017" + newLine +
+						"          1  2  3  4" + newLine +
+						" 5  6  7  8  9 10 11" + newLine +
+						"12 13 14 15 16 17 18" + newLine +
+						"19 20 21 22 23 24 25" + newLine +
+						"26 27 28 29 30 31" + newLine;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testPipeCatGrep() {
+		String cmd = "cat "+ sedTestFilePath + " | grep Hope";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = "/* Hope this helps */ # no new line here" + newLine;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testPipeDateGrep() {
+		String cmd = "date | grep :";
+		output = shell.pipeTwoCommands(cmd);
+		Calendar cal = Calendar.getInstance();
+		assertEquals(cal.getTime() + newLine, output);
+	}
+	
+	@Test
+	public void testHeadGrepSed() {
+		String cmd = "head " + catTestFilesPath + 
+				"lorem_ipsum_separated_by_empty_lines.txt | grep lorem | sed s.lorem.LOREM.g";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = "Neque porro quisquam est, qui doLOREM ipsum quia "
+						+ "dolor sit amet, consectetur, adipisci velit, sed quia "
+						+ "non numquam eius modi tempora incidunt ut labore et"
+						+ " dolore magnam aliquam quaerat voluptatem." 
+						+ newLine 
+						+ "Quis autem vel eum iure reprehenderit qui in ea voluptate "
+						+ "velit esse quam nihil molestiae consequatur, vel illum qui "
+						+ "doLOREM eum fugiat quo voluptas nulla pariatur?"
+						+ newLine;
+		assertEquals(expected, output);
+	}
+	
+	@Test
+	public void testTailGrepWc() {
+		String cmd = "tail " + catTestFilesPath + 
+				"lorem_ipsum_separated_by_empty_lines.txt | grep \\? | wc -l";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = "       2" + newLine;
+		assertEquals(expected, output);
+	}
+	
+	
 	
 	/**
 	 * Converts the file found at the given input file path string to
