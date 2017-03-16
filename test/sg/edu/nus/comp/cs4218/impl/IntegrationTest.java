@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -21,9 +22,10 @@ import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class IntegrationTest {
-
+	private final String FS = File.separator;
 	private ByteArrayOutputStream outputStream;
-	private final String catTestFilesPath = "test_inputs/cat/";
+	private final String catTestFilesPath = "test_inputs" + FS + "cat" + FS;
+	private final String sedTestFilePath = "test_inputs" + FS + "sed" + FS + "two-lines.txt";
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
@@ -40,11 +42,35 @@ public class IntegrationTest {
 	}
 	
 	@Test
-	public void testCommandSubstitutionAndPipe() throws AbstractApplicationException, ShellException {
+	public void testCommandSubstitutionPipeEchoWc() throws AbstractApplicationException, ShellException {
 		String cmd = "echo `echo cat | wc -m`";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
 		assertEquals("       4" + newLine, output);
+	}
+	
+	@Test
+	public void testCommandSubstitutionPwdEcho() throws AbstractApplicationException, ShellException {
+		String cmd = "echo `pwd`";
+		shell.parseAndEvaluate(cmd, outputStream);
+		output = outputStream.toString();
+		assertEquals(Environment.currentDirectory + newLine, output);
+	}
+	
+	@Test
+	public void testCommandSubstitutionPwdWcNegative() throws AbstractApplicationException, ShellException {
+		String cmd = "wc `pwd`";
+		shell.parseAndEvaluate(cmd, outputStream);
+		output = outputStream.toString();
+		assertEquals("wc: " + Environment.currentDirectory + " Invalid file or directory" + newLine, output);
+	}
+	
+	@Test
+	public void testPipeSedWc() throws AbstractApplicationException, ShellException {
+		String cmd = "sort " + sedTestFilePath + " | wc";
+		shell.parseAndEvaluate(cmd, outputStream);
+		output = outputStream.toString();
+		assertEquals("       113       24       2" + newLine, output);
 	}
 	
 	@Test

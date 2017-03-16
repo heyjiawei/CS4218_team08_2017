@@ -389,6 +389,8 @@ public class ShellImpl implements Shell {
 			absApp = new WcApplication();
 		} else if (("cal").equalsIgnoreCase(app)) {
 			absApp = new CalApplication();
+		} else if (("sort").equalsIgnoreCase(app)) {
+			absApp = new SortApplication();
 		} else { // invalid command
 			throw new ShellException(app + ": " + EXP_INVALID_APP);
 		}
