@@ -5,37 +5,24 @@ import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.EchoException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class EchoApplicationTest {
 
-	private InputStream inputStream = null;
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+	private final InputStream inputStream = null;
 	private ByteArrayOutputStream outputStream;
 	private EchoApplication echoApplication;
 	private final String lineSeparator = System.getProperty("line.separator");
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
 		echoApplication = new EchoApplication();
 		outputStream = new ByteArrayOutputStream();
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test(expected = EchoException.class)

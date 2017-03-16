@@ -13,12 +13,15 @@ import org.junit.Test;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class CdApplicationTest {
 	
-	private InputStream inputStream = null;
-	private ByteArrayOutputStream outputStream = null;
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+	private final InputStream inputStream = null;
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+	private final ByteArrayOutputStream outputStream = null;
 	private CdApplication cdApplication;
-	private final String testFilesPath = "test_inputs/cd/";
+	private static final String TEST_FILES_PATH = "test_inputs/cd/";
 	private final String initialWorkingDirectory = Environment.currentDirectory;
 
 	@Before
@@ -40,7 +43,7 @@ public class CdApplicationTest {
 	@Test
 	public void testRelativePathValidDirectory() throws CdException {
 		String currentDirectoryFilePath = initialWorkingDirectory;
-		String validDirectoryRelativePath = testFilesPath +
+		String validDirectoryRelativePath = TEST_FILES_PATH +
 				"validDirectory";
 		String[] args = {validDirectoryRelativePath};
 		cdApplication.run(args, inputStream, outputStream);
@@ -52,7 +55,7 @@ public class CdApplicationTest {
 	@Test
 	public void testAbsolutePathValidDirectory() throws CdException {
 		String currentDirectoryFilePath = Environment.currentDirectory;
-		String validDirectoryRelativePath = testFilesPath +
+		String validDirectoryRelativePath = TEST_FILES_PATH +
 				"validDirectory";
 		String validDirectoryAbsolutePath = currentDirectoryFilePath +
 				File.separator + validDirectoryRelativePath;
@@ -82,7 +85,7 @@ public class CdApplicationTest {
 	
 	@Test(expected = CdException.class)
 	public void testValidPathButNotDirectory() throws CdException {
-		String invalidDirectoryRelativePath = testFilesPath +
+		String invalidDirectoryRelativePath = TEST_FILES_PATH +
 				"not_a_directory.txt";
 		String[] args = {invalidDirectoryRelativePath};
 		cdApplication.run(args, inputStream, outputStream);
@@ -96,7 +99,7 @@ public class CdApplicationTest {
 	
 	@Test(expected = CdException.class)
 	public void testThrowWhenPathStringNonexistent() throws CdException {
-		String nonexistentPath = testFilesPath + "nonexistent";
+		String nonexistentPath = TEST_FILES_PATH + "nonexistent";
 		String[] args = {nonexistentPath};
 		cdApplication.run(args, inputStream, outputStream);
 	}

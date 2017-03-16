@@ -43,6 +43,7 @@ public class CatApplication implements Application {
 	 *             If the file(s) specified do not exist or are unreadable.
 	 */
 	@Override
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws CatException {
 		if (stdout == null) {
@@ -61,45 +62,50 @@ public class CatApplication implements Application {
 				throw new CatException("Exception Caught");
 			}
 		} else {
-			int numOfFiles = args.length;
+			catFiles(args, stdout);
+		}
+	}
 
-			Path filePath;
-			ArrayList<Path> filePathList = new ArrayList<Path>(numOfFiles);
-			Path currentDir = Paths.get(Environment.currentDirectory);
-			boolean isFileReadable = false;
+	@SuppressWarnings("PMD.PreserveStackTrace")
+	private void catFiles(String[] args, OutputStream stdout) throws CatException {
+		int numOfFiles = args.length;
 
-			for (int i = 0; i < numOfFiles; i++) {
-				filePath = currentDir.resolve(args[i]);
-				try {
-					isFileReadable = checkIfFileIsReadable(filePath);
-				} catch (CatException e) {
-					// Try to continue to print any valid files
-					if (numOfFiles > 1) {
-						continue;
-					} else {
-						throw e;
-					}
-				}
-				if (isFileReadable) {
-					filePathList.add(filePath);
+		Path filePath;
+		ArrayList<Path> filePathList = new ArrayList<Path>(numOfFiles);
+		Path currentDir = Paths.get(Environment.currentDirectory);
+		boolean isFileReadable = false;
+
+		for (int i = 0; i < numOfFiles; i++) {
+			filePath = currentDir.resolve(args[i]);
+			try {
+				isFileReadable = checkIfFileIsReadable(filePath);
+			} catch (CatException e) {
+				// Try to continue to print any valid files
+				if (numOfFiles > 1) {
+					continue;
+				} else {
+					throw e;
 				}
 			}
+			if (isFileReadable) {
+				filePathList.add(filePath);
+			}
+		}
 
-			// file could be read. perform cat command
-			if (filePathList.size() != 0) {
-				for (int j = 0; j < filePathList.size(); j++) {
-					try {
-						byte[] byteFileArray = Files
-								.readAllBytes(filePathList.get(j));
-						stdout.write(byteFileArray);
-					} catch (IOException e) {
-						throw new CatException(
-								"Could not read from file or "
-								+ "could not write to output stream");
-					}
+		// file could be read. perform cat command
+		if (filePathList.isEmpty()) {
+			throw new CatException("No valid input files provided.");
+		} else {
+			for (int j = 0; j < filePathList.size(); j++) {
+				try {
+					byte[] byteFileArray = Files
+							.readAllBytes(filePathList.get(j));
+					stdout.write(byteFileArray);
+				} catch (IOException e) {
+					throw new CatException(
+							"Could not read from file or "
+							+ "could not write to output stream");
 				}
-			} else {
-				throw new CatException("No valid input files provided.");
 			}
 		}
 	}

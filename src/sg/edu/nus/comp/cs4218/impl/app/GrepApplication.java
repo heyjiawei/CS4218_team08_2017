@@ -16,11 +16,13 @@ import sg.edu.nus.comp.cs4218.app.Grep;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 public class GrepApplication implements Grep {
-	
+
+	private final String NEW_LINE = System.getProperty("line.separator");
+
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws GrepException {
 		if (args.length == 0) {
-			throw new GrepException("Invalid Command\n");
+			throw new GrepException("Invalid Command");
 		}
 		
 		if (stdout == null) {
@@ -29,7 +31,7 @@ public class GrepApplication implements Grep {
 		
 		String output = "";
 		if (!containsPattern(args)) {
-			throw new GrepException("No pattern provided\n");
+			throw new GrepException("No pattern provided");
 		} 
 		
 		if (args.length >= 2) {
@@ -48,13 +50,8 @@ public class GrepApplication implements Grep {
 		}
 	}
 	
-	private boolean containsPattern(String[] args) {
-		if (args.length == 0 ||
-			(args.length >= 1 && (args[0] == null || args[0].isEmpty()))) {
-			return false;
-		} else {
-			return true;
-		}
+	private boolean containsPattern(String... args) {
+		return args.length != 0 && args[0] != null && !args[0].isEmpty();
 	}
 
 	@Override
@@ -62,22 +59,24 @@ public class GrepApplication implements Grep {
 		return parseAndEvaluate(args, stdin);
 	}
 
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private String grepStdin(String args[], InputStream stdin) throws GrepException {
 		if (isInputStreamEmpty(stdin)) {
-			throw new GrepException("Inputstream empty\n");
+			throw new GrepException("Inputstream empty");
 		}
 		StringBuilder output = new StringBuilder();
 		try {
 			Pattern regex = getRegexPattern(args[0]);
-			BufferedReader in = new BufferedReader(new InputStreamReader(stdin));
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
 			String line;
-			while((line = in.readLine()) != null) {
+			while((line = bufferedReader.readLine()) != null) {
 				Matcher matcher = regex.matcher(line);
-			    if (matcher.find()) {
-			    	output.append(line + "\n");
-			    }
+				if (matcher.find()) {
+					output.append(line);
+					output.append(NEW_LINE);
+				}
 			}
-			in.close();
+			bufferedReader.close();
 		} catch (IOException e) {
 			throw new GrepException(e.getMessage());
 		}
@@ -85,7 +84,7 @@ public class GrepApplication implements Grep {
 		if (output.length() > 0) {
 			return output.toString();
 		} else {
-			return "Pattern Not Found In Stdin!\n";
+			return "Pattern Not Found In Stdin!" + NEW_LINE;
 		}
 	}
 
@@ -114,9 +113,10 @@ public class GrepApplication implements Grep {
 		return parseAndEvaluate(args, null);
 	}
 	
-	private String grepFile(String args[]) throws GrepException {
+	@SuppressWarnings("PMD.PreserveStackTrace")
+	private String grepFile(String... args) throws GrepException {
 		if (args.length <= 1) {
-			throw new GrepException("Incorrect Arguments\n");
+			throw new GrepException("Incorrect Arguments");
 		}
 		
 		StringBuilder output = new StringBuilder();
@@ -132,19 +132,23 @@ public class GrepApplication implements Grep {
 						Matcher matcher = regex.matcher(line);
 					    if (matcher.find()) {
 					    	if (args.length > 2) {
-					    		output.append(args[i] + ":");
+					    		output.append(args[i]);
+					    		output.append(':');
 					    	} 
-					    	output.append(line + "\n");
+					    	output.append(line);
+					    	output.append(NEW_LINE);
 					    }
 					}
 					reader.close();
 				} else {
-					output.append(args[i] + ":No such file or directory\n");
+					output.append(args[i]);
+					output.append(":No such file or directory");
+					output.append(NEW_LINE);
 				}
 			}
 			
 		} catch (PatternSyntaxException e) {
-			throw new GrepException("Invalid Pattern\n");
+			throw new GrepException("Invalid Pattern");
 		} catch (IOException e) {
 			throw new GrepException(e.getMessage());
 		}
@@ -152,7 +156,7 @@ public class GrepApplication implements Grep {
 		if (output.length() > 0) {
 			return output.toString();
 		} else {
-			return "Pattern Not Found In File!\n";
+			return "Pattern Not Found In File!" + NEW_LINE;
 		}
 	}
 

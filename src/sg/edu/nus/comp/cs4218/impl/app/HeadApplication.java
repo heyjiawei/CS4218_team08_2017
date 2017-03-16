@@ -29,9 +29,10 @@ import sg.edu.nus.comp.cs4218.exception.TailException;
  * </dl>
  * </p>
  */
+@SuppressWarnings("PMD.LongVariable")
 public class HeadApplication implements Application {
 
-	final private int DEFAULT_NUMBER_OF_LINES_TO_PRINT = 10;
+	private static final int DEFAULT_NUMBER_OF_LINES_TO_PRINT = 10;
 
 	/**
 	 * Runs the head application with the specified arguments.
@@ -138,6 +139,7 @@ public class HeadApplication implements Application {
 	 * @throws HeadException
 	 *             If the file is not readable
 	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private void printLinesFromInputStreamToOutputStream(int numberOfLines,
 			InputStream stdin, OutputStream stdout) throws HeadException {
 		if (stdin == null) {
@@ -170,6 +172,7 @@ public class HeadApplication implements Application {
 	 *             If the file is not readable or writing to the output stream
 	 *             fails.
 	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private void printLinesFromFileToOutputStream(int numberOfLines,
 			String filePathString, OutputStream stdout) throws HeadException {
 		Path pathToReadFrom = getReadableFilePath(filePathString);
@@ -207,13 +210,13 @@ public class HeadApplication implements Application {
 		String lineToPrint;
 		String newLine = System.getProperty("line.separator");
 	    for (int i = 0; i < numberOfLines; i++) {
-			if ((lineToPrint = bufferedReader.readLine()) != null) {
+			if ((lineToPrint = bufferedReader.readLine()) == null) {
+				break;
+			} else {
 				if (i != 0) {
 					stdout.write(newLine.getBytes());
 				}
 				stdout.write(lineToPrint.getBytes());
-			} else {
-				break;
 			}
 		}
 	}
@@ -234,10 +237,10 @@ public class HeadApplication implements Application {
 		if (filePathStringTokens.length == 0) {
 			throw new HeadException("No file path provided");
 		}
-		filePathString = filePathStringTokens[0];
+		String filePathToken = filePathStringTokens[0];
 
 		Path currentDir = Paths.get(Environment.currentDirectory);
-		Path filePath = currentDir.resolve(filePathString);
+		Path filePath = currentDir.resolve(filePathToken);
 		Boolean isFileReadable = checkIfFileIsReadable(filePath);
 		if (isFileReadable) {
 			return filePath;

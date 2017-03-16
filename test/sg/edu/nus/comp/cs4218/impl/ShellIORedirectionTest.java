@@ -21,6 +21,7 @@ import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class ShellIORedirectionTest {
 	ByteArrayOutputStream outputStream;
 	private Shell shell;
@@ -33,12 +34,6 @@ public class ShellIORedirectionTest {
 	private static final String TEST_FILE_INPUT = "test_ioredirection/input.txt";
 	private static final String TEST_FILE_INVALID_INPUT = "test_ioredirection/invalid_input.txt";
 	private static final String TEST_FILE_OUTPUT = "test_ioredirection/output.txt";
-	private static final String TEST_FILE_INVALID_OUTPUT = "test_ioredirection/invalid_output.txt";
-
-	static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -62,6 +57,11 @@ public class ShellIORedirectionTest {
 		tempInputFile.delete();
 		File tempFileDir = new File(TEST_FILE_PATH);
 		tempFileDir.delete();
+	}
+
+	static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
 	}
 
 	@Test

@@ -24,7 +24,7 @@ import sg.edu.nus.comp.cs4218.exception.CalException;
  *  9) Args for printCalForMonthYear: month year
  * 10) Args for printCalForMonthYearMondayFirst: -m month year
  */
-
+@SuppressWarnings("deprecation")
 public class CalApplicationTest {
 
 	private static final String NEW_LINE = System.getProperty("line.separator");

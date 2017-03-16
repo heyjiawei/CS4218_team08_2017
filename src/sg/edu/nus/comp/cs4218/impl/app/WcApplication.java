@@ -34,7 +34,9 @@ import sg.edu.nus.comp.cs4218.exception.WcException;
  * </p>
  */
 
+@SuppressWarnings("PMD.GodClass")
 public class WcApplication implements Wc {
+	private static final String TAB = "       ";
 	private int charCount = 0;
 	private int wordCount = 0;
 	private int lineCount = 0;
@@ -79,11 +81,10 @@ public class WcApplication implements Wc {
 		if (filenames.length > 0) {
 			countStr = getWc(filenames, flags, null, false);
 			
-		} else if (stdin != null && !isInputStreamEmpty(stdin)) {
-			countStr = getWc(null, flags, stdin, true) + "\n";
-			
-		} else {
+		} else if (stdin == null || isInputStreamEmpty(stdin)) {
 			throw new WcException("Invalid File or Input stream empty\n");
+		} else {
+			countStr = getWc(null, flags, stdin, true) + "\n";
 		}
 		
 		try {
@@ -297,10 +298,10 @@ public class WcApplication implements Wc {
 	//				this.lineCount;
 		}
 
-	private String[] getFiles(String[] args) {
+	private String[] getFiles(String... args) {
 		int fileIndexStart = -1;
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].indexOf("-") != 0 && args[i].length() > 0) {
+			if (args[i].indexOf('-') != 0 && args[i].length() > 0) {
 				fileIndexStart = i;
 				break;
 			}
@@ -319,38 +320,36 @@ public class WcApplication implements Wc {
 		
 	}
 
-	private boolean[] getFlags(String[] args) throws WcException {
+	private boolean[] getFlags(String... args) throws WcException {
 		boolean[] flags = new boolean[3];
 		for (int i = 0; i < args.length; i++) {
-			if (args[i].indexOf("-") == 0) {
+			if (args[i].indexOf('-') == 0) {
 				flagSeparator(args[i].trim(), flags);
 			} else {
 				break;
 			}
 		}
 		
-		if (flags[0] == false && 
-			flags[1] == false && 
-			flags[2] == false) {
+		if (!(flags[0] || flags[1] || flags[2])) {
 			Arrays.fill(flags, true);
 		}
 		return flags;
 	}
 
-	private void flagSeparator(String str, boolean[] flags) throws WcException {
+	private void flagSeparator(String str, boolean... flags) throws WcException {
 		int dashPosition = str.indexOf('-');
 		int startIndex = dashPosition + 1;
 		while (startIndex > -1 && startIndex < str.length()) {
 			String nextChar = str.substring(startIndex, startIndex + 1);
-			if ("m".equals(nextChar.toLowerCase())) {
+			if ("m".equalsIgnoreCase(nextChar)) {
 				flags[0] = true;
 				startIndex = startIndex + 1;
 				
-			} else if ("w".equals(nextChar.toLowerCase())) {
+			} else if ("w".equalsIgnoreCase(nextChar)) {
 				flags[1] = true;
 				startIndex = startIndex + 1;
 				
-			} else if ("l".equals(nextChar.toLowerCase())) {
+			} else if ("l".equalsIgnoreCase(nextChar)) {
 				flags[2] = true;
 				startIndex = startIndex + 1;
 			
@@ -455,13 +454,13 @@ public class WcApplication implements Wc {
 		return output;
 	}
 
-	private String processWcInStdin(InputStream stdin, boolean[] flags) {
-		BufferedInputStream is = new BufferedInputStream(stdin);
-		byte[] c = new byte[1024];
+	private String processWcInStdin(InputStream stdin, boolean... flags) {
+		BufferedInputStream inputStream = new BufferedInputStream(stdin);
+		byte[] buffer = new byte[1024];
 	    int readChars = 0;
 		try {
-			while ((readChars = is.read(c)) != -1) {
-				String line = new String(c, 0, readChars);
+			while ((readChars = inputStream.read(buffer)) != -1) {
+				String line = new String(buffer, 0, readChars);
 				this.charCount += line.length();
 				String[] parts = line.replaceAll("\\s+", " ").split(" ");
 				
@@ -472,12 +471,12 @@ public class WcApplication implements Wc {
 				}
 				
 				int pos = -1;
-				while ((pos = line.indexOf("\n")) != -1) {
+				while ((pos = line.indexOf('\n')) != -1) {
 					this.lineCount++;
 					line = line.substring(pos + 1);
 				}
 			}
-			is.close();
+			inputStream.close();
 			
 			this.charCountTotal += this.charCount;
 			this.wordCountTotal += this.wordCount;
@@ -491,27 +490,27 @@ public class WcApplication implements Wc {
 	}
 	
 	private int countLines(String filename) throws IOException {
-	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    InputStream inputStream = new BufferedInputStream(new FileInputStream(filename));
 	    try {
-	        byte[] c = new byte[1024];
+	        byte[] buffer = new byte[1024];
 	        int count = 0;
 	        int readChars = 0;
 	        boolean empty = true;
-	        while ((readChars = is.read(c)) != -1) {
+	        while ((readChars = inputStream.read(buffer)) != -1) {
 	            empty = false;
 	            for (int i = 0; i < readChars; ++i) {
-	                if (c[i] == '\n') {
+	                if (buffer[i] == '\n') {
 	                    ++count;
 	                }
 	            }
 	        }
 	        return (count == 0 && !empty) ? 1 : count;
 	    } finally {
-	        is.close();
+	        inputStream.close();
 	    }
 	}
 
-	private String processWcInFile(String filename, boolean[] flags) {
+	private String processWcInFile(String filename, boolean... flags) {
 		BufferedReader reader;
 		try {
 			if (isFileValid(filename)) {
@@ -550,16 +549,19 @@ public class WcApplication implements Wc {
 	    return file.exists() && file.isFile();
 	}
 
-	private String buildTotalString(boolean[] options) {
+	private String buildTotalString(boolean... options) {
 		StringBuilder output = new StringBuilder();
 		if (options[0]) {
-			output.append("       " + this.charCountTotal);
+			output.append(TAB);
+			output.append(this.charCountTotal);
 		}
 		if (options[1]) {
-			output.append("       " + this.wordCountTotal);
+			output.append(TAB);
+			output.append(this.wordCountTotal);
 		}
 		if (options[2]) {
-			output.append("       " + this.lineCountTotal);
+			output.append(TAB);
+			output.append(this.lineCountTotal);
 		}
 		output.append(" total\n");
 		return output.toString();
@@ -571,19 +573,23 @@ public class WcApplication implements Wc {
 		this.lineCount = 0;
 	}
 
-	private String builtWcString(String filename, boolean[] options) {
+	private String builtWcString(String filename, boolean... options) {
 		StringBuilder output = new StringBuilder();
 		if (options[0]) {
-			output.append("       " + this.charCount);
+			output.append(TAB);
+			output.append(this.charCount);
 		}
 		if (options[1]) {
-			output.append("       " + this.wordCount);
+			output.append(TAB);
+			output.append(this.wordCount);
 		}
 		if (options[2]) {
-			output.append("       " + this.lineCount);
+			output.append(TAB);
+			output.append(this.lineCount);
 		}
 		if (filename != null) {
-			output.append(" " + filename);
+			output.append(' ');
+			output.append(filename);
 		} 
 		return output.toString();
 	}
@@ -596,11 +602,7 @@ public class WcApplication implements Wc {
 	 */
 	private boolean isInputStreamEmpty(InputStream stdin) {
 		try {
-			if (stdin.available() > 0) {
-				return false;
-			} else {
-				return true;
-			}
+			return stdin.available() == 0;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

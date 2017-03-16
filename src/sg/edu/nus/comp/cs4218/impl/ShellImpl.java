@@ -22,7 +22,7 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
  * <code>&lt;Pipe&gt; | &lt;Sequence&gt; | &lt;Call&gt;</code>
  * </p>
  */
-
+@SuppressWarnings({ "PMD.LongVariable", "PMD.GodClass", "PMD.PreserveStackTrace" })
 public class ShellImpl implements Shell {
 
 	public static final String EXP_INVALID_APP = "Invalid app.";
@@ -391,6 +391,8 @@ public class ShellImpl implements Shell {
 			absApp = new CalApplication();
 		} else if (("sort").equalsIgnoreCase(app)) {
 			absApp = new SortApplication();
+		} else if (("grep").equalsIgnoreCase(app)) {
+			absApp = new GrepApplication();
 		} else { // invalid command
 			throw new ShellException(app + ": " + EXP_INVALID_APP);
 		}

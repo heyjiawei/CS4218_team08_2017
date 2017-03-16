@@ -4,7 +4,6 @@ package sg.edu.nus.comp.cs4218.impl;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -117,8 +116,8 @@ public final class Parser {
 		ArrayList<String> callCommands = new ArrayList<>();
 		ArrayList<String[]> sequences = new ArrayList<>();
 		boolean finishedParsing = false;
-		Pattern patternPipe = Pattern.compile(this.PATTERN_PIPE),
-				patternSemicolon = Pattern.compile(this.PATTERN_SEMICOLON);
+		Pattern patternPipe = Pattern.compile(Parser.PATTERN_PIPE),
+				patternSemicolon = Pattern.compile(Parser.PATTERN_SEMICOLON);
 		Matcher matcherPipe, matcherSemicolon;
 
 		while (!finishedParsing) {
@@ -178,7 +177,7 @@ public final class Parser {
 		for (int index = 0; index < atoms.size(); index++) {
 			atom = atoms.get(index);
 
-			if (atom.equals("<")) {
+			if ("<".equals(atom)) {
 				if (hasInputRedir) {
 					throw new ShellException(ShellImpl.EXP_MULTIPLE_FILE_REDIR);
 				}
@@ -189,7 +188,7 @@ public final class Parser {
 				}
 
 				hasInputRedir = true;
-			} else if (atom.equals(">")) {
+			} else if (">".equals(atom)) {
 				if (hasOutputRedir) {
 					throw new ShellException(ShellImpl.EXP_MULTIPLE_FILE_REDIR);
 				}

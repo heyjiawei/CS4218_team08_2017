@@ -19,11 +19,12 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
-	private final String FS = File.separator;
+	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
-	private final String catTestFilesPath = "test_inputs" + FS + "cat" + FS;
-	private final String sedTestFilePath = "test_inputs" + FS + "sed" + FS + "two-lines.txt";
+	private final String catTestFilesPath = "test_inputs" + FILE_SEPARATOR + "cat" + FILE_SEPARATOR;
+	private final String sedTestFilePath = "test_inputs" + FILE_SEPARATOR + "sed" + FILE_SEPARATOR + "two-lines.txt";
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");

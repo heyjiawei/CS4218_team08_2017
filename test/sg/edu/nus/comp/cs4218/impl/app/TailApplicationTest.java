@@ -16,13 +16,14 @@ import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.TailException;
 
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class TailApplicationTest {
 
 	private InputStream inputStream;
 	private ByteArrayOutputStream outputStream;
 	private TailApplication tailApplication;
-	private final String testFilesPath = "test_inputs/tail/";
-	private final String newLine = System.getProperty("line.separator");
+	private static final String TEST_FILES_PATH = "test_inputs/tail/";
+	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	@Before
 	public void setUp() throws Exception {
@@ -79,7 +80,7 @@ public class TailApplicationTest {
 
 	@Test(expected = TailException.class)
 	public void testThrowWhenNonexistentFilePathGiven() throws TailException {
-		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
+		String nonexistentFilePath = TEST_FILES_PATH + "nonExistentFilePath";
 		String[] args = {nonexistentFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -97,7 +98,7 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithOneLineWithDefaultOutputLineCount()
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_one_line.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_one_line.txt";
 		String expectedOutputFileString;
 		String[] args = {inputFilePathString};
 		inputStream = null;
@@ -111,8 +112,8 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithMultipleLinesWithDefaultOutputLineCount() 
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
-		String expectedOutputFilePathString = testFilesPath +
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = TEST_FILES_PATH +
 				"last_10_lines_from_lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {inputFilePathString};
@@ -126,7 +127,7 @@ public class TailApplicationTest {
 	
 	@Test(expected = TailException.class)
 	public void testThrowWhenSpecifiedOutputLineCountInvalid() throws TailException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String[] args = {"-5", inputFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -136,7 +137,7 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithZeroSpecifiedOutputLineCount() 
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String[] args = {"0", inputFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -147,7 +148,7 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithLessLinesThanSpecifiedOutputLineCount() 
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"20", inputFilePathString};
 		inputStream = null;
@@ -161,8 +162,8 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithMoreLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
-		String expectedOutputFilePathString = testFilesPath +
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = TEST_FILES_PATH +
 				"last_5_lines_from_lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"5", inputFilePathString};
@@ -177,7 +178,7 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFilePathWithEqualLinesToSpecifiedOutputLineCount()
 			throws TailException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"16", inputFilePathString};
 		inputStream = null;
@@ -191,7 +192,7 @@ public class TailApplicationTest {
 	@Test
 	public void testValidFileSeparatedByEmptyLinesWithDefaultOutputLineCount()
 			throws TailException, IOException {
-		String filePathString = testFilesPath +
+		String filePathString = TEST_FILES_PATH +
 				"lorem_ipsum_separated_by_empty_lines.txt";
 		String fileString;
 		String[] args = {filePathString};
@@ -204,7 +205,7 @@ public class TailApplicationTest {
 	
 	@Test
 	public void testValidEmptyFile() throws TailException, IOException {
-		String filePathString = testFilesPath + "empty.txt";
+		String filePathString = TEST_FILES_PATH + "empty.txt";
 		String fileString;
 		String[] args = {filePathString};
 		inputStream = null;
@@ -217,7 +218,7 @@ public class TailApplicationTest {
 	@Test
 	public void testInputFromStdInWithLessLinesThanDefaultOutputLineCount()
 			throws TailException, IOException {
-		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String threeNewLines = new String(new char[3]).replace("\0", NEW_LINE);
 		String testString = "test string" + threeNewLines + "string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -229,9 +230,9 @@ public class TailApplicationTest {
 	@Test
 	public void testInputFromStdInWithMoreLinesThanDefaultOutputLineCount()
 			throws TailException, IOException {
-		String thirteenNewLines = new String(new char[13]).replace("\0", newLine);
+		String thirteenNewLines = new String(new char[13]).replace("\0", NEW_LINE);
 		String testString = "test string" + thirteenNewLines + "string test";
-		String nineNewLines = new String(new char[9]).replace("\0", newLine);
+		String nineNewLines = new String(new char[9]).replace("\0", NEW_LINE);
 		String expectedOutputString = nineNewLines + "string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -243,9 +244,9 @@ public class TailApplicationTest {
 	@Test
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
-		String sixNewLines = new String(new char[6]).replace("\0", newLine);
+		String sixNewLines = new String(new char[6]).replace("\0", NEW_LINE);
 		String testString = "test string" + sixNewLines + "string test";
-		String fiveNewLines = new String(new char[5]).replace("\0", newLine);
+		String fiveNewLines = new String(new char[5]).replace("\0", NEW_LINE);
 		String expectedOutputString = fiveNewLines + "string test";
 		String[] args = {"6"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -257,7 +258,7 @@ public class TailApplicationTest {
 	@Test
 	public void testInputFromStdInWithLessLinesThanSpecifiedOutputLineCount()
 			throws TailException, IOException {
-		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String threeNewLines = new String(new char[3]).replace("\0", NEW_LINE);
 		String testString = "test string" + threeNewLines + " string test";
 		String[] args = {"20"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -279,7 +280,7 @@ public class TailApplicationTest {
 	@Test
 	public void testOneValidAbsoluteFilePath() throws TailException, IOException {
 		String currentDirectory = System.getProperty("user.dir");
-		String filePathString = testFilesPath + "lorem_ipsum_one_line.txt";
+		String filePathString = TEST_FILES_PATH + "lorem_ipsum_one_line.txt";
 		String absoluteFilePathString = currentDirectory +
 				File.separator + filePathString;
 		String fileString;

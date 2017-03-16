@@ -15,6 +15,7 @@ import sg.edu.nus.comp.cs4218.exception.PwdException;
  * <b>Command format:</b> <code>pwd</code>
  * </p>
  */
+@SuppressWarnings("PMD.LongVariable")
 public class PwdApplication implements Application {
 
 	/**
@@ -31,6 +32,7 @@ public class PwdApplication implements Application {
 	 * @throws PwdException
 	 *             If an I/O exception occurs.
 	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws PwdException {
 		if (stdout == null) {

@@ -14,10 +14,11 @@ import sg.edu.nus.comp.cs4218.app.Sort;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
 
+@SuppressWarnings({ "PMD.LongVariable", "PMD.GodClass" })
 public class SortApplication implements Sort {
 
 	private final String newLine = System.getProperty("line.separator");
-	private final String treatFirstWordAsNumberFlag = "-n";
+	private static final String NUMBER_FLAG = "-n";
 
 	Comparator<String> genericStringComparator = new Comparator<String>() {
 		@Override
@@ -60,58 +61,57 @@ public class SortApplication implements Sort {
 
 	Comparator<String> firstWordAsNumberComparator = new Comparator<String>() {
 		@Override
-		public int compare(String firstString, String secondString) {
-			if (firstString.equals(secondString)) {
+		public int compare(String str1, String str2) {
+			if (str1.equals(str2)) {
 				return 0;
 			}
-			if (firstString.equals("") && !secondString.equals("")) {
+			if ("".equals(str1) && !"".equals(str2)) {
 				return -1;
-			} else if (!firstString.equals("") && secondString.equals("")) {
+			} else if (!"".equals(str1) && "".equals(str2)) {
 				return 1;
 			}
-			Integer firstStringFirstWordAsInteger =
-					getFirstWordOfStringAsInteger(firstString);
-			Integer secondStringFirstWordAsInteger =
-					getFirstWordOfStringAsInteger(secondString);
-			// both strings have numbers as their first words
-			if (firstStringFirstWordAsInteger != null &&
-					secondStringFirstWordAsInteger != null) {
-				int numberComparison = firstStringFirstWordAsInteger.
-						compareTo(secondStringFirstWordAsInteger);
-				// the numbers are the same, compare using the rest of the first word
-				if (numberComparison == 0) {
-					return stringContainingSpecialComparator.compare(firstString, secondString);
+			Integer str1StartWithInteger = getFirstWordOfStringAsInteger(str1);
+			Integer str2StartWithInteger = getFirstWordOfStringAsInteger(str2);
+
+			if (str1StartWithInteger == null) {
+				if (str2StartWithInteger == null) {
+					// both strings do not have numbers as their first words
+					return stringContainingSpecialComparator.compare(str1, str2);
 				} else {
-					return numberComparison;
+					// only the str2 has a number as its first word
+					// special characters go before numbers
+					if (str1.length() > 0 && !isAlphaNumeric(str1.substring(0, 1))) {
+						return -1;
+					} else {
+						return 1;
+					}
 				}
-			// only the first string has a number as its first word
-			} else if (firstStringFirstWordAsInteger != null &&
-					secondStringFirstWordAsInteger == null) {
-				// special characters go before numbers
-				if (secondString.length() > 0 &&
-						!isAlphaNumeric(secondString.substring(0, 1))) {
-					return 1;
-				} else {
-					return -1;
-				}
-			// only the second string has a number as its first word
-			} else if (firstStringFirstWordAsInteger == null &&
-					secondStringFirstWordAsInteger != null) {
-				// special characters go before numbers
-				if (firstString.length() > 0 &&
-						!isAlphaNumeric(firstString.substring(0, 1))) {
-					return -1;
-				} else {
-					return 1;
-				}
-			// both strings do not have numbers as their first words
 			} else {
-				return stringContainingSpecialComparator.compare(firstString, secondString);
+				if (str2StartWithInteger == null) {
+					// only the str1 has a number as its first word
+					// special characters go before numbers
+					if (str2.length() > 0 && !isAlphaNumeric(str2.substring(0, 1))) {
+						return 1;
+					} else {
+						return -1;
+					}
+				} else {
+					// both strings have numbers as their first words
+					int numberComparison = str1StartWithInteger.
+							compareTo(str2StartWithInteger);
+					// the numbers are the same, compare using the rest of the first word
+					if (numberComparison == 0) {
+						return stringContainingSpecialComparator.compare(str1, str2);
+					} else {
+						return numberComparison;
+					}
+				}
 			}
 		}
 	};
 
 	@Override
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
 		if (stdout == null) {
 			throw new SortException("No output stream provided");
@@ -138,7 +138,7 @@ public class SortApplication implements Sort {
 				throw new SortException("First argument provided is null");
 			}
 			// check whether first argument is -n flag
-			if (firstArgument.equals(treatFirstWordAsNumberFlag)) {
+			if (firstArgument.equals(NUMBER_FLAG)) {
 				// assume second argument is filename
 				if (args.length < 2 || args[1] == null) {
 					throw new SortException("No file path provided");
@@ -146,7 +146,7 @@ public class SortApplication implements Sort {
 				try {
 					String toSort = convertFileToString(args[1]);
 					// add flag to get string sorted with first word as number
-					toSort = treatFirstWordAsNumberFlag + newLine + toSort;
+					toSort = NUMBER_FLAG + newLine + toSort;
 					stdout.write(sortAll(toSort).getBytes());
 				} catch (IOException e) {
 					throw new SortException("IOException");
@@ -176,8 +176,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortNumbers(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, genericStringComparator);
 		}
@@ -196,8 +196,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortSimpleNumbers(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, genericStringComparator);
 		}
@@ -211,8 +211,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortCapitalNumbers(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, genericStringComparator);
 		}
@@ -226,8 +226,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortNumbersSpecialChars(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, stringContainingSpecialComparator);
 		}
@@ -236,8 +236,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortSimpleCapitalNumber(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, genericStringComparator);
 		}
@@ -251,8 +251,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortSimpleNumbersSpecialChars(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, stringContainingSpecialComparator);
 		}
@@ -261,8 +261,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortCapitalNumbersSpecialChars(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, stringContainingSpecialComparator);
 		}
@@ -271,8 +271,8 @@ public class SortApplication implements Sort {
 	@Override
 	public String sortAll(String toSort) {
 		if (shouldTreatFirstWordOfLineAsNumber(toSort)) {
-			toSort = removeFirstLineFromString(toSort);
-			return sort(toSort, firstWordAsNumberComparator);
+			String newToSort = removeFirstLineFromString(toSort);
+			return sort(newToSort, firstWordAsNumberComparator);
 		} else {
 			return sort(toSort, stringContainingSpecialComparator);
 		}
@@ -329,7 +329,7 @@ public class SortApplication implements Sort {
 		for (int i = 0; i < firstWord.length(); i++) {
 			String currentCharacter = firstWord.substring(i, i + 1);
 			// detect and handle possible negative number
-			if (i == 0 && currentCharacter.equals("-")) {
+			if (i == 0 && "-".equals(currentCharacter)) {
 				frontPartOfWordAsNumber += currentCharacter;
 				continue;
 			}
@@ -340,8 +340,8 @@ public class SortApplication implements Sort {
 			}
 		}
 		// word does not have number at front part
-		if (frontPartOfWordAsNumber.equals("") ||
-				frontPartOfWordAsNumber.equalsIgnoreCase("-")) {
+		if ("".equals(frontPartOfWordAsNumber) ||
+				"-".equalsIgnoreCase(frontPartOfWordAsNumber)) {
 			return null;
 		} else {
 			return Integer.parseInt(frontPartOfWordAsNumber);
@@ -382,7 +382,7 @@ public class SortApplication implements Sort {
 			return false;
 		}
 		String firstLine = lineArray[0];
-		return firstLine.equals(treatFirstWordAsNumberFlag);
+		return firstLine.equals(NUMBER_FLAG);
 	}
 
 	/**

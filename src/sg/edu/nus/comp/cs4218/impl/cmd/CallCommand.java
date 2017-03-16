@@ -15,8 +15,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.Environment;
@@ -118,64 +116,17 @@ public class CallCommand implements Command {
 		while (cmdIterator.hasNext()) {
 			arg = cmdIterator.next();
 
-			if (arg.equals("<")) {
+			if ("<".equals(arg)) {
 				this.inputStreamS = cmdIterator.next();
-			} else if(arg.equals(">")) {
+			} else if(">".equals(arg)) {
 				this.outputStreamS = cmdIterator.next();
-			} else if (!isAppSet) {
+			} else if (arg.contains("*")) {
+				processGlob(currentDir, argsVector, arg);
+			} else if (isAppSet) {
+				argsVector.add(arg);
+			} else {
 				this.app = arg;
 				isAppSet = true;
-			} else {
-				// perform globbing on the argument
-				if(arg.contains("*")) {
-					PathMatcher matcher;
-					matcher = FileSystems.getDefault().getPathMatcher("glob:" + currentDir + File.separator + arg);
-					// System.out.println("glob:" + currentDir + File.separator + arg);
-					arg = "";
-					Path folder = new File(currentDir).toPath();
-
-					List<File> arrayListFiles = new ArrayList<File>();
-					arrayListFiles = getFileNames(arrayListFiles, folder);
-					File[] listOfFiles = new File[arrayListFiles.size()];
-					listOfFiles = arrayListFiles.toArray(listOfFiles);
-
-					// Sort files by name
-					Arrays.sort(listOfFiles, new Comparator<File>()
-					{
-						@Override
-						public int compare(File f1, File f2) {
-							return ((File) f1).getPath().compareTo(((File) f2).getPath());
-						}
-					});
-
-					for (int i = 0; i < listOfFiles.length; i++) {
-						// ignore hidden files that start with "."
-						if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
-							// match the globbing pattern
-
-							if(matcher.matches(listOfFiles[i].toPath())) {
-								// insert args separated by space
-								// first arg does not have space in front
-								String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
-								argsVector.add(relative);
-							} else {
-							}
-						} else if (listOfFiles[i].isDirectory()) {
-							if(matcher.matches(listOfFiles[i].toPath())) {
-								// insert args separated by space
-								// first arg does not have space in front
-								String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
-								if(relative.endsWith(File.separator)) {
-									relative = relative.substring(0, relative.length() - 1);
-								}
-								argsVector.add(relative);
-							} else {
-							}
-						}
-					}
-				} else {
-					argsVector.add(arg);
-				}
 			}
 		}
 
@@ -185,6 +136,49 @@ public class CallCommand implements Command {
 		}
 
 		this.argsArray = argsVector.toArray(new String[argsVector.size()]);
+	}
+
+	private void processGlob(String currentDir, Vector<String> argsVector, String arg) {
+		// perform globbing on the argument
+		PathMatcher matcher;
+		matcher = FileSystems.getDefault().getPathMatcher("glob:" + currentDir + File.separator + arg);
+		Path folder = new File(currentDir).toPath();
+
+		List<File> arrayListFiles = new ArrayList<File>();
+		arrayListFiles = getFileNames(arrayListFiles, folder);
+		File[] listOfFiles = new File[arrayListFiles.size()];
+		listOfFiles = arrayListFiles.toArray(listOfFiles);
+
+		// Sort files by name
+		Arrays.sort(listOfFiles, new Comparator<File>() {
+			@Override
+			public int compare(File file1, File file2) {
+				return ((File) file1).getPath().compareTo(((File) file2).getPath());
+			}
+		});
+
+		for (int i = 0; i < listOfFiles.length; i++) {
+			// ignore hidden files that start with "."
+			if (listOfFiles[i].isFile() && !listOfFiles[i].getName().startsWith(".")) {
+				// match the globbing pattern
+
+				if(matcher.matches(listOfFiles[i].toPath())) {
+					// insert args separated by space
+					// first arg does not have space in front
+					String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
+					argsVector.add(relative);
+				} else {
+				}
+			} else if (listOfFiles[i].isDirectory() && matcher.matches(listOfFiles[i].toPath())) {
+				// insert args separated by space
+				// first arg does not have space in front
+				String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
+				if(relative.endsWith(File.separator)) {
+					relative = relative.substring(0, relative.length() - 1);
+				}
+				argsVector.add(relative);
+			}
+		}
 	}
 
 	private List<File> getFileNames(List<File> files, Path dir) {

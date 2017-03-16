@@ -30,9 +30,10 @@ import sg.edu.nus.comp.cs4218.exception.TailException;
  * </dl>
  * </p>
  */
+@SuppressWarnings({ "PMD.LongVariable", "PMD.PreserveStackTrace" })
 public class TailApplication implements Application {
 
-	final private int DEFAULT_NUMBER_OF_LINES_TO_PRINT = 10;
+	private static final int DEFAULT_NUMBER_OF_LINES_TO_PRINT = 10;
 
 	/**
 	 * Runs the tail application with the specified arguments.

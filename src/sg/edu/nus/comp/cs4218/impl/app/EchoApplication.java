@@ -32,6 +32,7 @@ public class EchoApplication implements Application {
 	 * @throws EchoException
 	 *             If an I/O exception occurs.
 	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws EchoException {
 		if (args == null) {
