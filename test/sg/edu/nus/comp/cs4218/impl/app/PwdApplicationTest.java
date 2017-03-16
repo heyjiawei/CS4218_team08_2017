@@ -29,7 +29,6 @@ public class PwdApplicationTest {
 	@After
 	public void tearDown() throws Exception {
 		Environment.currentDirectory = initialWorkingDirectory;
-		System.setProperty("user.dir", initialWorkingDirectory);
 	}
 
 	@Test(expected = PwdException.class)

@@ -29,7 +29,6 @@ public class CdApplicationTest {
 	@After
 	public void tearDown() throws Exception {
 		Environment.currentDirectory = initialWorkingDirectory;
-		System.setProperty("user.dir", initialWorkingDirectory);
 	}
 
 	@Test(expected = CdException.class)

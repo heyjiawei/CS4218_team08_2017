@@ -119,7 +119,6 @@ public class CdApplication implements Application {
 			throw new CdException("IOException: Invalid path string");
 		}
 
-		System.setProperty("user.dir", canonicalPathString);
 		Environment.currentDirectory = canonicalPathString;
 	}
 }
