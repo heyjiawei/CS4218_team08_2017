@@ -1,12 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.Before;
@@ -14,11 +14,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 
 public class IntegrationTest {
 
@@ -44,14 +44,14 @@ public class IntegrationTest {
 		String cmd = "echo `echo cat | wc -m`";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
-		assertEquals("4" + newLine, output);
+		assertEquals("       4" + newLine, output);
 	}
 	
 	@Test
 	public void testPipeEchoWc() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | wc";
 		output = shell.pipeTwoCommands(cmd);
-		assertEquals("3 1 1" + newLine, output);
+		assertEquals("       3       1       1" + newLine, output);
 	}
 
 	@Test
@@ -89,4 +89,16 @@ public class IntegrationTest {
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
 
+	@Test
+	public void testPwdAfterCd() throws ShellException, AbstractApplicationException {
+		String currentDirectory = Environment.currentDirectory;
+		Path currentPath = Paths.get(currentDirectory);
+		Path parentPath = currentPath.getParent();
+		String cdCommand = "cd ..";
+		String pwdCommand = "pwd";
+		shell.parseAndEvaluate(cdCommand, outputStream);
+		shell.parseAndEvaluate(pwdCommand, outputStream);
+		output = outputStream.toString();
+		assertEquals(parentPath.toString() + newLine, output);
+	}
 }

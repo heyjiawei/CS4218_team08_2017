@@ -32,7 +32,7 @@ public interface Grep extends Application { // NOPMD - Provided interface
 	 * Returns string when invalid pattern is specified in grep from Stdin
 	 * @param args String containing command and arguments
 	 */
-	public String grepInvalidPatternInStdin(String args);
+	public String grepInvalidPatternInStdin(String args, InputStream stdin);
 
 	
 	/**

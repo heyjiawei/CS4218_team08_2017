@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -40,15 +41,12 @@ public class DateApplication implements Date {
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws DateException {
 		if (stdout == null) {
-			throw new DateException("No output stream provided");
+			throw new DateException("No output stream provided\n");
 		}
-		if (stdin == null) {
-			throw new DateException("No input stream provided");
+		if (args != null && args.length > 0) {
+			throw new DateException("illegal date format\n");
 		}
-		if (args.length > 0) {
-			throw new DateException("illegal date format");
-		}
-		String currentDate = printCurrentDate("date");
+		String currentDate = getDateString();
 		try {
 			stdout.write(currentDate.getBytes());
 		} catch (IOException e) {
@@ -62,9 +60,21 @@ public class DateApplication implements Date {
 	 */
 	@Override
 	public String printCurrentDate(String args) {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		try {
+			DateApplication app = new DateApplication();
+			String[] splittedArguments = args == null ?
+					new String[0] : args.split("\\s+");
+			app.run(splittedArguments, null, out);
+			return out.toString();
+		} catch (DateException e) {
+			return e.getMessage();
+		}
+	}
+	
+	private String getDateString() {
 		DateFormat dateformat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", 
-													Locale.ENGLISH);
-
+				Locale.ENGLISH);
 		java.util.Date currentDate = new java.util.Date();
 		return dateformat.format(currentDate);
 	}
