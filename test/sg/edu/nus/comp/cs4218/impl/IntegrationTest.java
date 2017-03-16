@@ -100,6 +100,17 @@ public class IntegrationTest {
 		assertEquals(firstFileString + secondFileString, output);
 	}
 	
+	@Test
+	public void testSemicolonPwdAfterCd() throws ShellException, AbstractApplicationException {
+		String currentDirectory = Environment.currentDirectory;
+		Path currentPath = Paths.get(currentDirectory);
+		Path parentPath = currentPath.getParent();
+		String command = "cd ..;pwd";
+		shell.parseAndEvaluate(command, outputStream);
+		output = outputStream.toString();
+		assertEquals(parentPath.toString() + newLine, output);
+	}
+	
 	/**
 	 * Converts the file found at the given input file path string to
 	 * a string.
@@ -115,16 +126,4 @@ public class IntegrationTest {
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
 
-	@Test
-	public void testPwdAfterCd() throws ShellException, AbstractApplicationException {
-		String currentDirectory = Environment.currentDirectory;
-		Path currentPath = Paths.get(currentDirectory);
-		Path parentPath = currentPath.getParent();
-		String cdCommand = "cd ..";
-		String pwdCommand = "pwd";
-		shell.parseAndEvaluate(cdCommand, outputStream);
-		shell.parseAndEvaluate(pwdCommand, outputStream);
-		output = outputStream.toString();
-		assertEquals(parentPath.toString() + newLine, output);
-	}
 }
