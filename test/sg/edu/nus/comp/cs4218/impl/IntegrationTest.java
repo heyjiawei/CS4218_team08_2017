@@ -3,12 +3,15 @@ package sg.edu.nus.comp.cs4218.impl;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
@@ -51,4 +54,16 @@ public class IntegrationTest {
 		assertEquals("cd", output);
 	}
 
+	@Test
+	public void testPwdAfterCd() throws ShellException, AbstractApplicationException {
+		String currentDirectory = Environment.currentDirectory;
+		Path currentPath = Paths.get(currentDirectory);
+		Path parentPath = currentPath.getParent();
+		String cdCommand = "cd ..";
+		String pwdCommand = "pwd";
+		shell.parseAndEvaluate(cdCommand, outputStream);
+		shell.parseAndEvaluate(pwdCommand, outputStream);
+		output = outputStream.toString();
+		assertEquals(parentPath.toString() + newLine, output);
+	}
 }
