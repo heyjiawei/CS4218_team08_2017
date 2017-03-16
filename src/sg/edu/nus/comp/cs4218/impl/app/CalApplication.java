@@ -39,6 +39,14 @@ public class CalApplication implements Cal {
 	private Integer month = null;
 	private Integer year = null;
 
+	private Date mockDate = null;
+
+	public CalApplication() {}
+
+	public CalApplication(Date mockDate) {
+		this.mockDate = mockDate;
+	}
+
 	private void reset() {
 		this.startWithMonday = false;
 		this.month = null;
@@ -107,6 +115,9 @@ public class CalApplication implements Cal {
 		if (this.year == null) {
 			if (this.month == null) {
 				Date currentDate = new Date();
+				if (this.mockDate != null) {
+					currentDate = this.mockDate;
+				}
 				this.year = currentDate.getYear() + 1900;
 				this.month = currentDate.getMonth() + 1;
 			} else {
@@ -308,10 +319,9 @@ public class CalApplication implements Cal {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		try {
-			CalApplication cal = new CalApplication();
 			String[] splittedArguments = args == null ?
 					new String[0] : args.split("\\s+");
-			cal.run(splittedArguments, null, out);
+			this.run(splittedArguments, null, out);
 			return out.toString();
 		} catch (CalException e) {
 			return e.getMessage();
