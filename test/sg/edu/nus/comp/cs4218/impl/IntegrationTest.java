@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,16 +31,26 @@ public class IntegrationTest {
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
-	
+	private static String initialDirectory;
 	
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 	
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		initialDirectory = Environment.currentDirectory;
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		shell = new ShellImpl();
 		outputStream = new ByteArrayOutputStream();
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		Environment.currentDirectory = initialDirectory;
 	}
 	
 	@Test
@@ -66,10 +78,17 @@ public class IntegrationTest {
 	}
 	
 	@Test
-	public void testPipeSedWc() throws AbstractApplicationException, ShellException {
+	public void testPipeSortWc() throws AbstractApplicationException, ShellException {
 		String cmd = "sort " + sedTestFilePath + " | wc";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
+		assertEquals("       113       24       2" + newLine, output);
+	}
+	
+	@Test
+	public void testPipeCatWc() throws AbstractApplicationException, ShellException {
+		String cmd = "cat "+ sedTestFilePath + " | wc";
+		output = shell.pipeTwoCommands(cmd);
 		assertEquals("       113       24       2" + newLine, output);
 	}
 	
