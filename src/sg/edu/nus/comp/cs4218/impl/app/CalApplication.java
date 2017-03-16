@@ -9,11 +9,6 @@ import java.util.Date;
 import sg.edu.nus.comp.cs4218.app.Cal;
 import sg.edu.nus.comp.cs4218.exception.CalException;
 
-@SuppressWarnings({
-		"PMD.GodClass",
-		"PMD.PreserveStackTrace",
-		"PMD.FinalFieldCouldBeStatic"
-})
 public class CalApplication implements Cal {
 
 	private final String SPACE_BTW_DATES = " ";
