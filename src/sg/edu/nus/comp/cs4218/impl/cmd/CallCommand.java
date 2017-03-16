@@ -157,7 +157,7 @@ public class CallCommand implements Command {
 								// insert args separated by space
 								// first arg does not have space in front
 								String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
-								arg += arg == "" ? relative : " " + relative;
+								argsVector.add(relative);
 							} else {
 							}
 						} else if (listOfFiles[i].isDirectory()) {
@@ -168,14 +168,14 @@ public class CallCommand implements Command {
 								if(relative.endsWith(File.separator)) {
 									relative = relative.substring(0, relative.length() - 1);
 								}
-								arg += arg == "" ? relative : " " + relative;
+								argsVector.add(relative);
 							} else {
 							}
 						}
 					}
+				} else {
+					argsVector.add(arg);
 				}
-				// System.out.println("arg: " + arg);
-				argsVector.add(arg);
 			}
 		}
 

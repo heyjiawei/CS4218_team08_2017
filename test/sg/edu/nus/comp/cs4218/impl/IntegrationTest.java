@@ -3,6 +3,11 @@ package sg.edu.nus.comp.cs4218.impl;
 import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,14 +16,19 @@ import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.app.CatApplication;
 
 public class IntegrationTest {
 
-	ByteArrayOutputStream outputStream;
+	private ByteArrayOutputStream outputStream;
+	private final String catTestFilesPath = "test_inputs/cat/";
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
+	
+	
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -49,6 +59,34 @@ public class IntegrationTest {
 		String cmd = "echo \"cd\" | head | tail";
 		output = shell.pipeMultipleCommands(cmd);
 		assertEquals("cd", output);
+	}
+	
+	@Test
+	public void testGlobbingWithCat() throws CatException, IOException {
+		String firstFilePathString = catTestFilesPath + "lorem_ipsum_short.txt";
+		String secondFilePathString = catTestFilesPath + "lorem_ipsum_short_two.txt";
+		String cmd = "cat " + catTestFilesPath + "lorem_ipsum_short*";
+		output = shell.pipeMultipleCommands(cmd);
+		String firstFileString;
+		String secondFileString;
+		firstFileString = convertFileToString(firstFilePathString);
+		secondFileString = convertFileToString(secondFilePathString);
+		assertEquals(firstFileString + secondFileString, output);
+	}
+	
+	/**
+	 * Converts the file found at the given input file path string to
+	 * a string.
+	 * 
+	 * @param filePathString
+	 *            The path to the file, represented as a string
+	 * @return The string that the file has been converted to
+	 * @throws IOException
+	 *             If there is an error reading the file
+	 */
+	private String convertFileToString(String filePathString) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(filePathString));
+		return new String(encoded, StandardCharsets.UTF_8);
 	}
 
 }
