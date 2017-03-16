@@ -16,13 +16,15 @@ import org.junit.Test;
 
 import sg.edu.nus.comp.cs4218.exception.HeadException;
 
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class HeadApplicationTest {
+
+	private static final String TEST_FILES_PATH = "test_inputs/head/";
+	private static final String NEW_LINE = System.getProperty("line.separator");
 
 	private InputStream inputStream;
 	private ByteArrayOutputStream outputStream;
 	private HeadApplication headApplication;
-	private final String testFilesPath = "test_inputs/head/";
-	private final String newLine = System.getProperty("line.separator");
 
 	@Before
 	public void setUp() throws Exception {
@@ -87,7 +89,7 @@ public class HeadApplicationTest {
 
 	@Test(expected = HeadException.class)
 	public void testThrowWhenNonexistentFilePathGiven() throws HeadException {
-		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
+		String nonexistentFilePath = TEST_FILES_PATH + "nonExistentFilePath";
 		String[] args = {nonexistentFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -96,7 +98,7 @@ public class HeadApplicationTest {
 
 	@Test(expected = HeadException.class)
 	public void testThrowWhenSpecifiedOutputLineCountInvalid() throws HeadException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String[] args = {"-5", inputFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -106,7 +108,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithOneLineWithDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_one_line.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_one_line.txt";
 		String expectedOutputFileString;
 		String[] args = {inputFilePathString};
 		inputStream = null;
@@ -120,8 +122,8 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithMultipleLinesWithDefaultOutputLineCount() 
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
-		String expectedOutputFilePathString = testFilesPath +
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = TEST_FILES_PATH +
 				"first_10_lines_from_lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {inputFilePathString};
@@ -136,7 +138,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithZeroSpecifiedOutputLineCount() 
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String[] args = {"0", inputFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -147,7 +149,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithLessLinesThanSpecifiedOutputLineCount() 
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"20", inputFilePathString};
 		inputStream = null;
@@ -161,8 +163,8 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithMoreLinesThanSpecifiedOutputLineCount() 
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
-		String expectedOutputFilePathString = testFilesPath +
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = TEST_FILES_PATH +
 				"first_5_lines_from_lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"5", inputFilePathString};
@@ -177,7 +179,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFilePathWithEqualLinesToSpecifiedOutputLineCount()
 			throws HeadException, IOException {
-		String inputFilePathString = testFilesPath + "lorem_ipsum_16_lines.txt";
+		String inputFilePathString = TEST_FILES_PATH + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFileString;
 		String[] args = {"16", inputFilePathString};
 		inputStream = null;
@@ -191,7 +193,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testValidFileSeparatedByEmptyLinesWithDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String filePathString = testFilesPath +
+		String filePathString = TEST_FILES_PATH +
 				"lorem_ipsum_separated_by_empty_lines.txt";
 		String fileString;
 		String[] args = {filePathString};
@@ -204,7 +206,7 @@ public class HeadApplicationTest {
 	
 	@Test
 	public void testValidEmptyFile() throws HeadException, IOException {
-		String filePathString = testFilesPath + "empty.txt";
+		String filePathString = TEST_FILES_PATH + "empty.txt";
 		String fileString;
 		String[] args = {filePathString};
 		inputStream = null;
@@ -217,7 +219,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithLessLinesThanDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String threeNewLines = new String(new char[3]).replace("\0", NEW_LINE);
 		String testString = "test string" + threeNewLines + "string test";
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -229,9 +231,9 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithMoreLinesThanDefaultOutputLineCount()
 			throws HeadException, IOException {
-		String thirteenNewLines = new String(new char[13]).replace("\0", newLine);
+		String thirteenNewLines = new String(new char[13]).replace("\0", NEW_LINE);
 		String testString = "test string" + thirteenNewLines + "string test";
-		String nineNewLines = new String(new char[9]).replace("\0", newLine);
+		String nineNewLines = new String(new char[9]).replace("\0", NEW_LINE);
 		String expectedOutputString = "test string" + nineNewLines;
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -243,9 +245,9 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithMoreLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
-		String sixNewLines = new String(new char[6]).replace("\0", newLine);
+		String sixNewLines = new String(new char[6]).replace("\0", NEW_LINE);
 		String testString = "test string" + sixNewLines + " string test";
-		String fiveNewLines = new String(new char[5]).replace("\0", newLine);
+		String fiveNewLines = new String(new char[5]).replace("\0", NEW_LINE);
 		String expectedOutputString = "test string" + fiveNewLines;
 		String[] args = {"6"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -257,7 +259,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testInputFromStdInWithLessLinesThanSpecifiedOutputLineCount()
 			throws HeadException, IOException {
-		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String threeNewLines = new String(new char[3]).replace("\0", NEW_LINE);
 		String testString = "test string" + threeNewLines + " string test";
 		String[] args = {"20"};
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
@@ -270,9 +272,9 @@ public class HeadApplicationTest {
 	public void testNumberOfLinesFromArgsLinesFromStdIn()
 			throws HeadException, IOException {
 		String[] args = {"4"};
-		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String threeNewLines = new String(new char[3]).replace("\0", NEW_LINE);
 		String expectedOutputString = "test string" + threeNewLines;
-		String testString = expectedOutputString + newLine + " string test";
+		String testString = expectedOutputString + NEW_LINE + " string test";
 		inputStream = new ByteArrayInputStream(testString.getBytes());;
 		outputStream = new ByteArrayOutputStream();
 		headApplication.run(args, inputStream, outputStream);
@@ -292,7 +294,7 @@ public class HeadApplicationTest {
 	@Test
 	public void testOneValidAbsoluteFilePath() throws HeadException, IOException {
 		String currentDirectory = System.getProperty("user.dir");
-		String filePathString = testFilesPath + "lorem_ipsum_one_line.txt";
+		String filePathString = TEST_FILES_PATH + "lorem_ipsum_one_line.txt";
 		String absoluteFilePathString = currentDirectory +
 				File.separator + filePathString;
 		String fileString;

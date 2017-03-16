@@ -17,18 +17,13 @@ import java.nio.file.Paths;
 public class CallCommandTest {
 
 	private CallCommand call;;
-	private ByteArrayInputStream in;
+	private ByteArrayInputStream inputStream;
 	private ByteArrayOutputStream out;
 
 	private static final String TEST_STRING = "test in file";
 	private static final String TEST_FILE_PATH = "test_callcommand";
 	private static final String TEST_FILE_INPUT = "test_callcommand/input.txt";
 	private static final String TEST_FILE_OUTPUT = "test_callcommand/output.txt";
-
-	static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -55,6 +50,11 @@ public class CallCommandTest {
 	public static void tearDownAfterClass() throws Exception {
 		new File(TEST_FILE_INPUT).delete();
 		new File(TEST_FILE_PATH).delete();
+	}
+
+	static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
 	}
 
 	@Test
@@ -117,10 +117,10 @@ public class CallCommandTest {
 			throws AbstractApplicationException, ShellException {
 		call.app = "cat";
 
-		in = new ByteArrayInputStream("test".getBytes());
+		inputStream = new ByteArrayInputStream("test".getBytes());
 		out = new ByteArrayOutputStream();
 
-		call.evaluate(in, out);
+		call.evaluate(inputStream, out);
 
 		assertEquals("test", out.toString());
 	}
@@ -132,10 +132,10 @@ public class CallCommandTest {
 		call.inputStreamS = TEST_FILE_INPUT;
 		call.outputStreamS = TEST_FILE_OUTPUT;
 
-		in = new ByteArrayInputStream("test".getBytes());
+		inputStream = new ByteArrayInputStream("test".getBytes());
 		out = new ByteArrayOutputStream();
 
-		call.evaluate(in, out);
+		call.evaluate(inputStream, out);
 
 		String output = readFile(TEST_FILE_OUTPUT, Charset.defaultCharset());
 		assertEquals("test in file", output);

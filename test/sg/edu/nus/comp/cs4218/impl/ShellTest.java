@@ -56,7 +56,7 @@ public class ShellTest {
 	public void testPipeTwoCommands() throws AbstractApplicationException, ShellException {
 		String cmd = "echo \"cd\" | wc";
 		output = shell.pipeTwoCommands(cmd);
-		assertEquals("3 1 1" + newLine, output);
+		assertEquals("       3       1       1" + newLine, output);
 	}
 
 	@Test

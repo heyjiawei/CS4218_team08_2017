@@ -10,10 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -31,38 +28,28 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 //    the first part of it is an integer (e.g. 34 and 34abc will be recognized as
 //    a number, but abc34 or a34bc will not be recognized). -n has to be specified
 //    by being the first line in the input string.
+@SuppressWarnings("PMD.LongVariable")
 public class SortApplicationTest {
 
+	private static final String ALL_TXT_FILE = "all.txt";
+	private static final String TEST_FILES_PATH = "test_inputs/sort/";
+	private static final String NEW_LINE = System.getProperty("line.separator");
 	private InputStream inputStream;
 	private ByteArrayOutputStream outputStream;
 	private SortApplication sortApplication;
-	private final String testFilesPath = "test_inputs/sort/";
-	private final String newLine = System.getProperty("line.separator");
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
 
 	@Before
 	public void setUp() throws Exception {
 		sortApplication = new SortApplication();
 	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void testSortStringsSimple() throws IOException {
-		String simpleStringsFilePath = testFilesPath + "simple.txt";
-		String sortedSimpleStringsFilePath = testFilesPath + "simple_sorted.txt";
+		String simpleStringsFilePath = TEST_FILES_PATH + "simple.txt";
+		String sortedSimpleStringsFilePath = TEST_FILES_PATH + "simple_sorted.txt";
 		String unsortedString = convertFileToString(simpleStringsFilePath);
 		String sortedString = sortApplication.sortStringsSimple(unsortedString);
 		String sortedSimpleString = convertFileToString(sortedSimpleStringsFilePath);
@@ -77,8 +64,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortStringsCapital() throws IOException {
-		String capitalStringsFilePath = testFilesPath + "capital.txt";
-		String sortedCapitalStringsFilePath = testFilesPath + "capital_sorted.txt";
+		String capitalStringsFilePath = TEST_FILES_PATH + "capital.txt";
+		String sortedCapitalStringsFilePath = TEST_FILES_PATH + "capital_sorted.txt";
 		String unsortedCapitalString = convertFileToString(capitalStringsFilePath);
 		String sortedString = sortApplication.sortStringsCapital(unsortedCapitalString);
 		String sortedCapitalString = convertFileToString(sortedCapitalStringsFilePath);
@@ -93,8 +80,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortNumbers() throws IOException {
-		String numbersFilePath = testFilesPath + "numbers.txt";
-		String sortedNumbersFilePath = testFilesPath + "numbers_sorted.txt";
+		String numbersFilePath = TEST_FILES_PATH + "numbers.txt";
+		String sortedNumbersFilePath = TEST_FILES_PATH + "numbers_sorted.txt";
 		String unsortedNumbersString = convertFileToString(numbersFilePath);
 		String sortedString = sortApplication.sortNumbers(unsortedNumbersString);
 		String sortedNumbersString = convertFileToString(sortedNumbersFilePath);
@@ -103,12 +90,12 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortNumbersTreatFirstWordAsNumber() throws IOException {
-		String numbersFilePath = testFilesPath + "numbers.txt";
-		String sortedNumbersFilePath = testFilesPath + 
+		String numbersFilePath = TEST_FILES_PATH + "numbers.txt";
+		String sortedNumbersFilePath = TEST_FILES_PATH + 
 				"numbers_sorted_treating_first_word_as_number.txt";
 		String unsortedNumbersString = convertFileToString(numbersFilePath);
 		String sortedString = sortApplication.sortNumbers(
-				"-n" + newLine + unsortedNumbersString);
+				"-n" + NEW_LINE + unsortedNumbersString);
 		String sortedNumbersString = convertFileToString(sortedNumbersFilePath);
 		assertEquals(sortedNumbersString, sortedString);
 	}
@@ -121,8 +108,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSpecialChars() throws IOException {
-		String specialFilePath = testFilesPath + "special.txt";
-		String sortedSpecialsFilePath = testFilesPath + "special_sorted.txt";
+		String specialFilePath = TEST_FILES_PATH + "special.txt";
+		String sortedSpecialsFilePath = TEST_FILES_PATH + "special_sorted.txt";
 		String unsortedSpecialString = convertFileToString(specialFilePath);
 		String sortedString = sortApplication.sortSpecialChars(unsortedSpecialString);
 		String sortedSpecialString = convertFileToString(sortedSpecialsFilePath);
@@ -137,8 +124,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleCapital() throws IOException {
-		String simpleCapitalFilePath = testFilesPath + "simple_capital.txt";
-		String sortedSimpleCapitalFilePath = testFilesPath + "simple_capital_sorted.txt";
+		String simpleCapitalFilePath = TEST_FILES_PATH + "simple_capital.txt";
+		String sortedSimpleCapitalFilePath = TEST_FILES_PATH + "simple_capital_sorted.txt";
 		String unsortedSimpleCapitalString = convertFileToString(simpleCapitalFilePath);
 		String sortedString = sortApplication.sortSimpleCapital(unsortedSimpleCapitalString);
 		String sortedSimpleCapitalString = convertFileToString(sortedSimpleCapitalFilePath);
@@ -153,8 +140,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleNumbers() throws IOException {
-		String simpleNumbersFilePath = testFilesPath + "simple_numbers.txt";
-		String sortedSimpleNumbersFilePath = testFilesPath +
+		String simpleNumbersFilePath = TEST_FILES_PATH + "simple_numbers.txt";
+		String sortedSimpleNumbersFilePath = TEST_FILES_PATH +
 				"simple_numbers_sorted.txt";
 		String unsortedSimpleNumbersString = convertFileToString(simpleNumbersFilePath);
 		String sortedString = sortApplication.sortSimpleNumbers(unsortedSimpleNumbersString);
@@ -164,12 +151,12 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleNumbersTreatFirstWordAsNumber() throws IOException {
-		String simpleNumbersFilePath = testFilesPath + "simple_numbers.txt";
-		String sortedSimpleNumbersFilePath = testFilesPath + 
+		String simpleNumbersFilePath = TEST_FILES_PATH + "simple_numbers.txt";
+		String sortedSimpleNumbersFilePath = TEST_FILES_PATH + 
 				"simple_numbers_sorted_treating_first_word_as_number.txt";
 		String unsortedSimpleNumbersString = convertFileToString(simpleNumbersFilePath);
 		String sortedString = sortApplication.sortSimpleNumbers(
-				"-n" + newLine + unsortedSimpleNumbersString);
+				"-n" + NEW_LINE + unsortedSimpleNumbersString);
 		String sortedSimpleNumbersString = convertFileToString(sortedSimpleNumbersFilePath);
 		assertEquals(sortedSimpleNumbersString, sortedString);
 	}
@@ -182,8 +169,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleSpecialChars() throws IOException {
-		String simpleSpecialFilePath = testFilesPath + "simple_special.txt";
-		String sortedSimpleSpecialFilePath = testFilesPath + "simple_special_sorted.txt";
+		String simpleSpecialFilePath = TEST_FILES_PATH + "simple_special.txt";
+		String sortedSimpleSpecialFilePath = TEST_FILES_PATH + "simple_special_sorted.txt";
 		String unsortedSimpleSpecialString = convertFileToString(simpleSpecialFilePath);
 		String sortedString = sortApplication.sortSimpleSpecialChars(
 				unsortedSimpleSpecialString);
@@ -199,8 +186,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortCapitalNumbers() throws IOException {
-		String capitalNumbersFilePath = testFilesPath + "capital_numbers.txt";
-		String sortedCapitalNumbersFilePath = testFilesPath +
+		String capitalNumbersFilePath = TEST_FILES_PATH + "capital_numbers.txt";
+		String sortedCapitalNumbersFilePath = TEST_FILES_PATH +
 				"capital_numbers_sorted.txt";
 		String unsortedCapitalNumbersString = convertFileToString(capitalNumbersFilePath);
 		String sortedString = sortApplication.sortCapitalNumbers(unsortedCapitalNumbersString);
@@ -210,12 +197,12 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortCapitalNumbersTreatFirstWordAsNumber() throws IOException {
-		String capitalNumbersFilePath = testFilesPath + "capital_numbers.txt";
-		String sortedCapitalNumbersFilePath = testFilesPath + 
+		String capitalNumbersFilePath = TEST_FILES_PATH + "capital_numbers.txt";
+		String sortedCapitalNumbersFilePath = TEST_FILES_PATH + 
 				"capital_numbers_sorted_treating_first_word_as_number.txt";
 		String unsortedCapitalNumbersString = convertFileToString(capitalNumbersFilePath);
 		String sortedString = sortApplication.sortCapitalNumbers(
-				"-n" + newLine + unsortedCapitalNumbersString);
+				"-n" + NEW_LINE + unsortedCapitalNumbersString);
 		String sortedCapitalNumbersString = convertFileToString(sortedCapitalNumbersFilePath);
 		assertEquals(sortedCapitalNumbersString, sortedString);
 	}
@@ -228,8 +215,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortCapitalSpecialChars() throws IOException {
-		String capitalSpecialFilePath = testFilesPath + "capital_special.txt";
-		String sortedCapitalSpecialFilePath = testFilesPath +
+		String capitalSpecialFilePath = TEST_FILES_PATH + "capital_special.txt";
+		String sortedCapitalSpecialFilePath = TEST_FILES_PATH +
 				"capital_special_sorted.txt";
 		String unsortedCapitalSpecialString = convertFileToString(capitalSpecialFilePath);
 		String sortedString = sortApplication.sortCapitalSpecialChars(
@@ -247,8 +234,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortNumbersSpecialChars() throws IOException {
-		String numbersSpecialFilePath = testFilesPath + "numbers_special.txt";
-		String sortedNumbersSpecialFilePath = testFilesPath +
+		String numbersSpecialFilePath = TEST_FILES_PATH + "numbers_special.txt";
+		String sortedNumbersSpecialFilePath = TEST_FILES_PATH +
 				"numbers_special_sorted.txt";
 		String unsortedNumbersSpecialString = convertFileToString(numbersSpecialFilePath);
 		String sortedString = sortApplication.sortNumbersSpecialChars(
@@ -260,12 +247,12 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortNumbersSpecialCharsTreatFirstWordAsNumber() throws IOException {
-		String numbersSpecialFilePath = testFilesPath + "numbers_special.txt";
-		String sortedNumbersSpecialFilePath = testFilesPath + 
+		String numbersSpecialFilePath = TEST_FILES_PATH + "numbers_special.txt";
+		String sortedNumbersSpecialFilePath = TEST_FILES_PATH + 
 				"numbers_special_sorted_treating_first_word_as_number.txt";
 		String unsortedNumbersSpecialString = convertFileToString(numbersSpecialFilePath);
 		String sortedString = sortApplication.sortNumbersSpecialChars(
-				"-n" + newLine + unsortedNumbersSpecialString);
+				"-n" + NEW_LINE + unsortedNumbersSpecialString);
 		String sortedNumbersSpecialString = convertFileToString(
 				sortedNumbersSpecialFilePath);
 		assertEquals(sortedNumbersSpecialString, sortedString);
@@ -279,8 +266,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleCapitalNumber() throws IOException{
-		String simpleCapitalNumberFilePath = testFilesPath + "simple_capital_number.txt";
-		String sortedSimpleCapitalNumberFilePath = testFilesPath +
+		String simpleCapitalNumberFilePath = TEST_FILES_PATH + "simple_capital_number.txt";
+		String sortedSimpleCapitalNumberFilePath = TEST_FILES_PATH +
 				"simple_capital_number_sorted.txt";
 		String unsortedSimpleCapitalNumberString =
 				convertFileToString(simpleCapitalNumberFilePath);
@@ -293,13 +280,13 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleCapitalNumberTreatFirstWordAsNumber() throws IOException {
-		String simpleCapitalNumberFilePath = testFilesPath + "simple_capital_number.txt";
-		String sortedSimpleCapitalNumberFilePath = testFilesPath + 
+		String simpleCapitalNumberFilePath = TEST_FILES_PATH + "simple_capital_number.txt";
+		String sortedSimpleCapitalNumberFilePath = TEST_FILES_PATH + 
 				"simple_capital_number_sorted_treating_first_word_as_number.txt";
 		String unsortedSimpleCapitalNumberString =
 				convertFileToString(simpleCapitalNumberFilePath);
 		String sortedString = sortApplication.sortSimpleCapitalNumber(
-				"-n" + newLine + unsortedSimpleCapitalNumberString);
+				"-n" + NEW_LINE + unsortedSimpleCapitalNumberString);
 		String sortedSimpleCapitalNumberString = convertFileToString(
 				sortedSimpleCapitalNumberFilePath);
 		assertEquals(sortedSimpleCapitalNumberString, sortedString);
@@ -313,8 +300,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleCapitalSpecialChars() throws IOException {
-		String simpleCapitalSpecialFilePath = testFilesPath + "simple_capital_special.txt";
-		String sortedSimpleCapitalSpecialFilePath = testFilesPath +
+		String simpleCapitalSpecialFilePath = TEST_FILES_PATH + "simple_capital_special.txt";
+		String sortedSimpleCapitalSpecialFilePath = TEST_FILES_PATH +
 				"simple_capital_special_sorted.txt";
 		String unsortedSimpleCapitalSpecialString =
 				convertFileToString(simpleCapitalSpecialFilePath);
@@ -333,8 +320,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleNumbersSpecialChars() throws IOException {
-		String simpleNumbersSpecialFilePath = testFilesPath + "simple_numbers_special.txt";
-		String sortedSimpleNumbersSpecialFilePath = testFilesPath +
+		String simpleNumbersSpecialFilePath = TEST_FILES_PATH + "simple_numbers_special.txt";
+		String sortedSimpleNumbersSpecialFilePath = TEST_FILES_PATH +
 				"simple_numbers_special_sorted.txt";
 		String unsortedSimpleNumbersSpecialString = convertFileToString(
 				simpleNumbersSpecialFilePath);
@@ -347,13 +334,13 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortSimpleNumbersSpecialTreatFirstWordAsNumber() throws IOException {
-		String simpleNumbersSpecialFilePath = testFilesPath + "simple_numbers_special.txt";
-		String sortedSimpleNumbersSpecialFilePath = testFilesPath +
+		String simpleNumbersSpecialFilePath = TEST_FILES_PATH + "simple_numbers_special.txt";
+		String sortedSimpleNumbersSpecialFilePath = TEST_FILES_PATH +
 				"simple_numbers_special_treat_first_word_as_number_sorted.txt";
 		String unsortedSimpleNumbersSpecialString = convertFileToString(
 				simpleNumbersSpecialFilePath);
 		String sortedString = sortApplication.sortSimpleNumbersSpecialChars(
-				"-n" + newLine + unsortedSimpleNumbersSpecialString);
+				"-n" + NEW_LINE + unsortedSimpleNumbersSpecialString);
 		String sortedSimpleNumbersSpecialString = convertFileToString(
 				sortedSimpleNumbersSpecialFilePath);
 		assertEquals(sortedSimpleNumbersSpecialString, sortedString);
@@ -367,8 +354,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortCapitalNumbersSpecialChars() throws IOException {
-		String capitalNumbersSpecialFilePath = testFilesPath + "capital_numbers_special.txt";
-		String sortedCapitalNumbersSpecialFilePath = testFilesPath +
+		String capitalNumbersSpecialFilePath = TEST_FILES_PATH + "capital_numbers_special.txt";
+		String sortedCapitalNumbersSpecialFilePath = TEST_FILES_PATH +
 				"capital_numbers_special_sorted.txt";
 		String unsortedCapitalNumbersSpecialString = convertFileToString(
 				capitalNumbersSpecialFilePath);
@@ -382,13 +369,13 @@ public class SortApplicationTest {
 	@Test
 	public void testSortCapitalNumbersSpecialCharsTreatFirstWordAsNumber()
 			throws IOException {
-		String capitalNumbersSpecialFilePath = testFilesPath + "capital_numbers_special.txt";
-		String sortedCapitalNumbersSpecialFilePath = testFilesPath +
+		String capitalNumbersSpecialFilePath = TEST_FILES_PATH + "capital_numbers_special.txt";
+		String sortedCapitalNumbersSpecialFilePath = TEST_FILES_PATH +
 				"capital_numbers_special_treat_first_word_as_number_sorted.txt";
 		String unsortedCapitalNumbersSpecialString = convertFileToString(
 				capitalNumbersSpecialFilePath);
 		String sortedString = sortApplication.sortCapitalNumbersSpecialChars(
-				"-n" + newLine + unsortedCapitalNumbersSpecialString);
+				"-n" + NEW_LINE + unsortedCapitalNumbersSpecialString);
 		String sortedCapitalNumbersSpecialString = convertFileToString(
 				sortedCapitalNumbersSpecialFilePath);
 		assertEquals(sortedCapitalNumbersSpecialString, sortedString);
@@ -402,8 +389,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortAll() throws IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH + "all_sorted.txt";
 		String unsortedAllString = convertFileToString(allFilePath);
 		String sortedString = sortApplication.sortAll(unsortedAllString);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
@@ -412,30 +399,30 @@ public class SortApplicationTest {
 
 	@Test
 	public void testSortAllInputSingleNewLine() throws IOException {
-		String sortedString = sortApplication.sortAll(newLine);
-		assertEquals(newLine, sortedString);
+		String sortedString = sortApplication.sortAll(NEW_LINE);
+		assertEquals(NEW_LINE, sortedString);
 	}
 
 	@Test
 	public void testSortAllTreatFirstWordAsNumber() throws IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath +
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH +
 				"all_sorted_treat_first_word_as_number.txt";
 		String unsortedAllString = convertFileToString(allFilePath);
 		String sortedString = sortApplication.sortAll(
-				"-n" + newLine + unsortedAllString);
+				"-n" + NEW_LINE + unsortedAllString);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
 		assertEquals(sortedAllString, sortedString);
 	}
 
 	@Test
 	public void testSortAllMediumLengthSentences() throws IOException {
-		String allFilePath = testFilesPath + "medium_length_sentences.txt";
-		String sortedAllFilePath = testFilesPath +
+		String allFilePath = TEST_FILES_PATH + "medium_length_sentences.txt";
+		String sortedAllFilePath = TEST_FILES_PATH +
 				"medium_length_sentences_sorted.txt";
 		String unsortedAllString = convertFileToString(allFilePath);
 		String sortedString = sortApplication.sortAll(
-				"-n" + newLine + unsortedAllString);
+				"-n" + NEW_LINE + unsortedAllString);
 		String sortedAllString = convertFileToString(sortedAllFilePath);
 		assertEquals(sortedAllString, sortedString);
 	}
@@ -448,8 +435,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testRunUsingFile() throws AbstractApplicationException, IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH + "all_sorted.txt";
 		String[] args = {allFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -461,8 +448,8 @@ public class SortApplicationTest {
 	@Test
 	public void testRunTreatFirstWordAsNumber()
 			throws AbstractApplicationException, IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath +
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH +
 				"all_sorted_treat_first_word_as_number.txt";
 		String[] args = {"-n", allFilePath};
 		inputStream = null;
@@ -474,8 +461,8 @@ public class SortApplicationTest {
 
 	@Test
 	public void testRunUsingStdInput() throws AbstractApplicationException, IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath + "all_sorted.txt";
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH + "all_sorted.txt";
 		String allTestString = convertFileToString(allFilePath);
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(allTestString.getBytes());
@@ -497,10 +484,10 @@ public class SortApplicationTest {
 	@Test
 	public void testRunUsingStdInputTreatFirstWordAsNumber()
 			throws AbstractApplicationException, IOException {
-		String allFilePath = testFilesPath + "all.txt";
-		String sortedAllFilePath = testFilesPath +
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
+		String sortedAllFilePath = TEST_FILES_PATH +
 				"all_sorted_treat_first_word_as_number.txt";
-		String allTestString = "-n" + newLine + convertFileToString(allFilePath);
+		String allTestString = "-n" + NEW_LINE + convertFileToString(allFilePath);
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(allTestString.getBytes());
 		outputStream = new ByteArrayOutputStream();
@@ -512,7 +499,7 @@ public class SortApplicationTest {
 	@Test
 	public void testRunUsingStdInputTreatFirstWordAsNumberNoInput()
 			throws AbstractApplicationException {
-		String allTestString = "-n" + newLine;
+		String allTestString = "-n" + NEW_LINE;
 		String[] args = {};
 		inputStream = new ByteArrayInputStream(allTestString.getBytes());
 		outputStream = new ByteArrayOutputStream();
@@ -522,7 +509,7 @@ public class SortApplicationTest {
 
 	@Test
 	public void testRunThrowWhenStdOutputNull() throws AbstractApplicationException {
-		String allFilePath = testFilesPath + "all.txt";
+		String allFilePath = TEST_FILES_PATH + ALL_TXT_FILE;
 		String[] args = {allFilePath};
 		thrown.expect(SortException.class);
 		thrown.expectMessage("No output stream provided");

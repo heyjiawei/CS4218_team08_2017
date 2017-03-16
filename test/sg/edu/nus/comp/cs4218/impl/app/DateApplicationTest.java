@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -16,13 +17,14 @@ import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.DateException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class DateApplicationTest {
-	private static final SimpleDateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+	private static final String DEFAULT_DATE_FORMAT = "EEE MMM dd HH:mm:ss zzz yyyy";
 	
 	DateApplication dateApp;
 	String printedDate;
-	InputStream in;
-	OutputStream out;
+	InputStream inputStream;
+	OutputStream outputStream;
 	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -34,36 +36,38 @@ public class DateApplicationTest {
 	
 	@Test 
 	public void testNullOutputStream() throws Exception {
-		in = new ByteArrayInputStream("".getBytes());
+		inputStream = new ByteArrayInputStream("".getBytes());
 		thrown.expect(DateException.class);
 		thrown.expectMessage("date: No output stream provided\n");
-		dateApp.run(new String[]{""}, in, null);
+		dateApp.run(new String[]{""}, inputStream, null);
 	}
 	
 	@Test
 	public void testAdditionalArguments() throws Exception {
-		in = new ByteArrayInputStream("".getBytes());
-		out = new ByteArrayOutputStream();
+		inputStream = new ByteArrayInputStream("".getBytes());
+		outputStream = new ByteArrayOutputStream();
 		thrown.expect(DateException.class);
 		thrown.expectMessage("date: illegal date format\n");
-		dateApp.run(new String[]{"date", "today"}, in, out);
+		dateApp.run(new String[]{"date", "today"}, inputStream, outputStream);
 	}
 	
 	@Test
 	public void testDateWithCurrentTimeDate() throws DateException {
-		out = new ByteArrayOutputStream();
-		dateApp.run(null, null, out);
+		SimpleDateFormat dateFormatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
+		outputStream = new ByteArrayOutputStream();
+		dateApp.run(null, null, outputStream);
 		Calendar cal = Calendar.getInstance();
-		assertEquals(DEFAULT_DATE_FORMAT.format(cal.getTime()), out.toString());
+		assertEquals(dateFormatter.format(cal.getTime()), outputStream.toString());
 	}
 
 	@Test
 	public void testDateWithWaitOneSecond() throws DateException, InterruptedException {
-		out = new ByteArrayOutputStream();
-		dateApp.run(null, null, out);
+		SimpleDateFormat dateFormatter = new SimpleDateFormat(DEFAULT_DATE_FORMAT, Locale.ENGLISH);
+		outputStream = new ByteArrayOutputStream();
+		dateApp.run(null, null, outputStream);
 		Thread.sleep(1000);
 		Calendar cal = Calendar.getInstance();
-		assertNotSame(DEFAULT_DATE_FORMAT.format(cal.getTime()), out.toString());
+		assertNotSame(dateFormatter.format(cal.getTime()), outputStream.toString());
 	}
 
 }

@@ -9,14 +9,12 @@ import java.util.Date;
 import sg.edu.nus.comp.cs4218.app.Cal;
 import sg.edu.nus.comp.cs4218.exception.CalException;
 
-@SuppressWarnings({
-		"PMD.GodClass",
-		"PMD.PreserveStackTrace",
-		"PMD.FinalFieldCouldBeStatic"
-})
+@SuppressWarnings({ "PMD.GodClass", "deprecation" })
 public class CalApplication implements Cal {
 
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
 	private final String SPACE_BTW_DATES = " ";
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
 	private final String SPACE_BTW_MONTHS = "  ";
 	// Each row is a week, 7 days has width of 2 space each.
 	private final int WIDTH_OF_MONTH = 14 + 6 * SPACE_BTW_DATES.length() +
@@ -27,6 +25,7 @@ public class CalApplication implements Cal {
 	private final String MONTH_REGEX = "^\\s*((jan(uary)?)|(feb(ruary)?)|" +
 			"(mar(ch)?)|(apr(il)?)|may|june?|july?|(aug(ust)?)|sep(t|tember)?|" +
 			"(oct(ober)?)|(nov(ember)?)|(dec(ember)?)|1[012]|0?[1-9])\\s*$";
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
 	private final String YEAR_REGEX = "^\\s*\\d\\d\\d\\d\\s*$";
 
 	private final String[] MONTH_NAMES = {
@@ -39,6 +38,16 @@ public class CalApplication implements Cal {
 	private Integer month = null;
 	private Integer year = null;
 
+	private Date mockDate = null;
+
+	public CalApplication() {
+		// Default constructor
+	}
+
+	public CalApplication(Date mockDate) {
+		this.mockDate = mockDate;
+	}
+
 	private void reset() {
 		this.startWithMonday = false;
 		this.month = null;
@@ -49,6 +58,7 @@ public class CalApplication implements Cal {
 		return Integer.parseInt(year);
 	}
 
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private Integer parseMonth(String month) throws CalException {
 		try {
 			return Integer.parseInt(month);
@@ -107,6 +117,9 @@ public class CalApplication implements Cal {
 		if (this.year == null) {
 			if (this.month == null) {
 				Date currentDate = new Date();
+				if (this.mockDate != null) {
+					currentDate = this.mockDate;
+				}
 				this.year = currentDate.getYear() + 1900;
 				this.month = currentDate.getMonth() + 1;
 			} else {
@@ -252,6 +265,7 @@ public class CalApplication implements Cal {
 		}
 	}
 
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private void outputWithoutTrailingSpace(String output, OutputStream stdout)
 			throws CalException {
 		try {
@@ -308,10 +322,9 @@ public class CalApplication implements Cal {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		try {
-			CalApplication cal = new CalApplication();
 			String[] splittedArguments = args == null ?
 					new String[0] : args.split("\\s+");
-			cal.run(splittedArguments, null, out);
+			this.run(splittedArguments, null, out);
 			return out.toString();
 		} catch (CalException e) {
 			return e.getMessage();

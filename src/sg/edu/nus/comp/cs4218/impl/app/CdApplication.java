@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.exception.CdException;
  * </dl>
  * </p>
  */
+@SuppressWarnings("PMD.LongVariable")
 public class CdApplication implements Application {
 
 	/**
@@ -109,6 +110,7 @@ public class CdApplication implements Application {
 	 *            The string representing the path to change the working
 	 *            directory to
 	 */
+	@SuppressWarnings("PMD.PreserveStackTrace")
 	private void changeWorkingDirectoryAndUpdateEnvironment(
 			String newWorkingDirectoryPathString) throws CdException {
 		// get the canonical string
@@ -119,7 +121,6 @@ public class CdApplication implements Application {
 			throw new CdException("IOException: Invalid path string");
 		}
 
-		System.setProperty("user.dir", canonicalPathString);
 		Environment.currentDirectory = canonicalPathString;
 	}
 }

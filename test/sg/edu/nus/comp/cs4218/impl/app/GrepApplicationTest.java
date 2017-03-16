@@ -26,7 +26,7 @@ import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
  * 5) Args for grepFromMultipleFiles: pattern, file, file, ...
  * 6) Args for grepFromStdin: pattern (Stdin will be parsed from run)
  */
-
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class GrepApplicationTest {
 	private static final String FILESEPARATOR = File.separator;
 	private static final String STDINFILE = String.format("test_inputs%sgrep%sgreptestdoc.txt", FILESEPARATOR,
@@ -49,9 +49,9 @@ public class GrepApplicationTest {
 	private static final String HIEPATTERN = "hie";
 	private static final String NOMATCHSTDIN = "Pattern Not Found In Stdin!\n";
 	private static final String FILEDIRECTORYDONOTEXIST = "No such file or directory\n";
-	private static final String NOPATTERN = "grep: No pattern provided\n";
-	private static final String INVALIDPATTERN = "grep: Invalid Pattern\n";
-	private static final String INVALIDCMD = "grep: Invalid Command\n";
+	private static final String NOPATTERN = "grep: No pattern provided";
+	private static final String INVALIDPATTERN = "grep: Invalid Pattern";
+	private static final String INVALIDCMD = "grep: Invalid Command";
 	private GrepApplication grepApp;
 	private String[] args;
 	private FileInputStream stdin;
@@ -384,7 +384,7 @@ public class GrepApplicationTest {
 	}
 	
 	@Test
-	public void InvalidgrepNoPatternMultipleFileFromRun() throws GrepException {
+	public void invalidgrepNoPatternMultipleFileFromRun() throws GrepException {
 		args = new String[3];
 		args[0] = "";
 		args[1] = fileName;

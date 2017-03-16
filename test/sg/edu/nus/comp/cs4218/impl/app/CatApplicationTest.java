@@ -20,12 +20,13 @@ import org.junit.rules.ExpectedException;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class CatApplicationTest {
 
 	private InputStream inputStream;
 	private ByteArrayOutputStream outputStream;
 	private CatApplication catApplication;
-	private final String testFilesPath = "test_inputs/cat/";
+	private static final String TEST_FILES_PATH = "test_inputs/cat/";
 	private final String newLine = System.getProperty("line.separator");
 
 	@Rule
@@ -82,7 +83,7 @@ public class CatApplicationTest {
 
 	@Test
 	public void testThrowWhenNonexistentFilePathGiven() throws CatException {
-		String nonexistentFilePath = testFilesPath + "nonExistentFilePath";
+		String nonexistentFilePath = TEST_FILES_PATH + "nonExistentFilePath";
 		String[] args = {nonexistentFilePath};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -94,7 +95,7 @@ public class CatApplicationTest {
 
 	@Test
 	public void testProvideOneValidFilePath() throws CatException, IOException {
-		String filePathString = testFilesPath + "lorem_ipsum_short.txt";
+		String filePathString = TEST_FILES_PATH + "lorem_ipsum_short.txt";
 		String fileString;
 		String[] args = {filePathString};
 		inputStream = null;
@@ -106,8 +107,8 @@ public class CatApplicationTest {
 
 	@Test
 	public void testProvideTwoValidFilePaths() throws CatException, IOException {
-		String firstFilePathString = testFilesPath + "lorem_ipsum_short.txt";
-		String secondFilePathString = testFilesPath + "lorem_ipsum_short_two.txt";
+		String firstFilePathString = TEST_FILES_PATH + "lorem_ipsum_short.txt";
+		String secondFilePathString = TEST_FILES_PATH + "lorem_ipsum_short_two.txt";
 		String firstFileString;
 		String secondFileString;
 		String[] args = {firstFilePathString, secondFilePathString};
@@ -123,8 +124,8 @@ public class CatApplicationTest {
 	@Test
 	public void testPrintValidWhenProvideOneValidAndOneNonExistentFilePath()
 			throws CatException, IOException {
-		String firstFilePathString = testFilesPath + "nonexistent_file.txt";
-		String secondFilePathString = testFilesPath + "lorem_ipsum_short.txt";
+		String firstFilePathString = TEST_FILES_PATH + "nonexistent_file.txt";
+		String secondFilePathString = TEST_FILES_PATH + "lorem_ipsum_short.txt";
 		String[] args = {firstFilePathString, secondFilePathString};
 		inputStream = null;
 		outputStream = new ByteArrayOutputStream();
@@ -136,7 +137,7 @@ public class CatApplicationTest {
 	@Test
 	public void testValidFileWithMultipleLines()
 			throws CatException, IOException {
-		String filePathString = testFilesPath + "lorem_ipsum_two_lines.txt";
+		String filePathString = TEST_FILES_PATH + "lorem_ipsum_two_lines.txt";
 		String fileString;
 		String[] args = {filePathString};
 		inputStream = null;
@@ -149,7 +150,7 @@ public class CatApplicationTest {
 	@Test
 	public void testValidFileSeparatedByEmptyLines()
 			throws CatException, IOException {
-		String filePathString = testFilesPath +
+		String filePathString = TEST_FILES_PATH +
 				"lorem_ipsum_separated_by_empty_lines.txt";
 		String fileString;
 		String[] args = {filePathString};
@@ -162,7 +163,7 @@ public class CatApplicationTest {
 	
 	@Test
 	public void testValidEmptyFile() throws CatException, IOException {
-		String filePathString = testFilesPath + "empty.txt";
+		String filePathString = TEST_FILES_PATH + "empty.txt";
 		String fileString;
 		String[] args = {filePathString};
 		inputStream = null;
@@ -196,7 +197,7 @@ public class CatApplicationTest {
 	@Test
 	public void testOneValidAbsoluteFilePath() throws CatException, IOException {
 		String currentDirectory = Environment.currentDirectory;
-		String filePathString = testFilesPath + "lorem_ipsum_short.txt";
+		String filePathString = TEST_FILES_PATH + "lorem_ipsum_short.txt";
 		String absoluteFilePathString = currentDirectory +
 				File.separator + filePathString;
 		String fileString;

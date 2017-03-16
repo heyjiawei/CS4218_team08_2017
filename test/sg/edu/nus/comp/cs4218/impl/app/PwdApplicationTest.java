@@ -13,9 +13,11 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.exception.PwdException;
 
+@SuppressWarnings("PMD.LongVariable")
 public class PwdApplicationTest {
 
-	private InputStream inputStream = null;
+	@SuppressWarnings("PMD.FinalFieldCouldBeStatic")
+	private final InputStream inputStream = null;
 	private ByteArrayOutputStream outputStream = null;
 	private PwdApplication pwdApplication;
 	private final String initialWorkingDirectory = Environment.currentDirectory;
@@ -29,7 +31,6 @@ public class PwdApplicationTest {
 	@After
 	public void tearDown() throws Exception {
 		Environment.currentDirectory = initialWorkingDirectory;
-		System.setProperty("user.dir", initialWorkingDirectory);
 	}
 
 	@Test(expected = PwdException.class)
