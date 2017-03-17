@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +10,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.TailException;
 import sg.edu.nus.comp.cs4218.impl.app.*;
 import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 
@@ -368,6 +370,7 @@ public class ShellImpl implements Shell {
 	public static void runApp(String app, String[] argsArray,
 			InputStream inputStream, OutputStream outputStream)
 			throws AbstractApplicationException, ShellException {
+		String[] argumentArray = argsArray;
 		Application absApp = null;
 		if (("cat").equalsIgnoreCase(app)) {// cat [FILE]...
 			absApp = new CatApplication();
@@ -378,12 +381,14 @@ public class ShellImpl implements Shell {
 		} else if (("date").equalsIgnoreCase(app)) {
 			absApp = new DateApplication();
 		} else if (("head").equalsIgnoreCase(app)) {// head [OPTIONS] [FILE]
+			argumentArray = removeMinusNArgument(argumentArray);
 			absApp = new HeadApplication();
 		} else if (("pwd").equalsIgnoreCase(app)) {
 			absApp = new PwdApplication();
 		} else if (("sed").equalsIgnoreCase(app)) {
 			absApp = new SedApplication();
 		} else if (("tail").equalsIgnoreCase(app)) {// tail [OPTIONS] [FILE]
+			argumentArray = removeMinusNArgument(argumentArray);
 			absApp = new TailApplication();
 		} else if (("wc").equalsIgnoreCase(app)) {
 			absApp = new WcApplication();
@@ -396,7 +401,7 @@ public class ShellImpl implements Shell {
 		} else { // invalid command
 			throw new ShellException(app + ": " + EXP_INVALID_APP);
 		}
-		absApp.run(argsArray, inputStream, outputStream);
+		absApp.run(argumentArray, inputStream, outputStream);
 	}
 
 	/**
@@ -559,6 +564,25 @@ public class ShellImpl implements Shell {
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 			}
+		}
+	}
+
+	/**
+	 * Takes in an array and removes the first element if the first element is
+	 * "-n" and the second element is numeric.
+	 *
+	 * @param argumentArray
+	 *            The array of arguments
+	 * @return The processed array, possibly with first element "-n" removed
+	 */
+	private static String[] removeMinusNArgument(String... argumentArray) {
+		// check whether it starts with -n NUMBER_OF_LINES
+		if (argumentArray.length > 1 && argumentArray[0].equals("-n") &&
+				argumentArray[1].matches("[0-9]+")) {
+			// remove the -n
+			return Arrays.copyOfRange(argumentArray, 1, argumentArray.length);
+		} else {
+			return argumentArray;
 		}
 	}
 }
