@@ -213,6 +213,32 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipeSortToHead() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "all.txt";
+		String allOutputFilePathString = sortTestFilesPath +
+				"all_sorted.txt";
+		String cmd = "sort " + inputFilePathString + " | head -n 1";
+		output = shell.pipeTwoCommands(cmd);
+		String allOutput = convertFileToString(allOutputFilePathString);
+		String[] allOutputTokens = allOutput.split(newLine);
+		String firstLine = allOutputTokens[0];
+		assertEquals(firstLine, output);
+	}
+
+	@Test
+	public void testPipeSortToTail() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "all.txt";
+		String allOutputFilePathString = sortTestFilesPath +
+				"all_sorted.txt";
+		String cmd = "sort " + inputFilePathString + " | tail -n 1";
+		output = shell.pipeTwoCommands(cmd);
+		String allOutput = convertFileToString(allOutputFilePathString);
+		String[] allOutputTokens = allOutput.split(newLine);
+		String lastLine = allOutputTokens[allOutputTokens.length - 1];
+		assertEquals(lastLine, output);
+	}
+
+	@Test
 	public void testPipeDateToCat() throws IOException, AbstractApplicationException,
 		ShellException {
 		String cmd0 = DATE;
