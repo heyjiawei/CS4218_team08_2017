@@ -24,9 +24,11 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class IntegrationTest {
 	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
-	private final String catTestFilesPath = "test_inputs" + FILE_SEPARATOR + "cat" + FILE_SEPARATOR;
-	private final String sedTestFilePath = "test_inputs" + FILE_SEPARATOR + "sed" + FILE_SEPARATOR + "two-lines.txt";
-	private final String tailTestFilesPath = "test_inputs" + FILE_SEPARATOR + "tail" + FILE_SEPARATOR;
+	private final String testInputFilesPath = "test_inputs" + FILE_SEPARATOR;
+	private final String catTestFilesPath = testInputFilesPath + "cat" + FILE_SEPARATOR;
+	private final String sedTestFilePath = testInputFilesPath + "sed" + FILE_SEPARATOR + "two-lines.txt";
+	private final String tailTestFilesPath = testInputFilesPath + "tail" + FILE_SEPARATOR;
+	private final String headTestFilesPath = testInputFilesPath + "head" + FILE_SEPARATOR;
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
@@ -164,6 +166,17 @@ public class IntegrationTest {
 		String expectedOutputFilePathString = tailTestFilesPath +
 				"last_5_lines_from_lorem_ipsum_16_lines.txt";
 		String cmd = "cat " + inputFilePathString + " | tail -n 5";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = convertFileToString(expectedOutputFilePathString);
+		assertEquals(expected, output);
+	}
+
+	@Test
+	public void testPipeHeadToCat() throws IOException {
+		String inputFilePathString = headTestFilesPath + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = headTestFilesPath +
+				"first_5_lines_from_lorem_ipsum_16_lines.txt";
+		String cmd = "cat " + inputFilePathString + " | head -n 5";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
