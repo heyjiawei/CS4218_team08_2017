@@ -22,6 +22,8 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 @SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
+	private static final String DATE = "date";
+	private static final String CAT = "cat ";
 	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
 	private final String testInputFilesPath = "test_inputs" + FILE_SEPARATOR;
@@ -89,7 +91,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeCatWc() throws AbstractApplicationException, ShellException {
-		String cmd = "cat " + sedTestFilePath + " | wc";
+		String cmd = CAT + sedTestFilePath + " | wc";
 		output = shell.pipeTwoCommands(cmd);
 		assertEquals("       113       24       2" + newLine, output);
 	}
@@ -112,7 +114,7 @@ public class IntegrationTest {
 	public void testGlobbingWithCat() throws CatException, IOException {
 		String firstFilePathString = catTestFilesPath + "lorem_ipsum_short.txt";
 		String secondFilePathString = catTestFilesPath + "lorem_ipsum_short_two.txt";
-		String cmd = "cat " + catTestFilesPath + "lorem_ipsum_short*";
+		String cmd = CAT + catTestFilesPath + "lorem_ipsum_short*";
 		output = shell.pipeMultipleCommands(cmd);
 		String firstFileString;
 		String secondFileString;
@@ -147,7 +149,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeCatGrep() {
-		String cmd = "cat "+ sedTestFilePath + " | grep Hope";
+		String cmd = CAT+ sedTestFilePath + " | grep Hope";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = "/* Hope this helps */ # no new line here" + newLine;
 		assertEquals(expected, output);
@@ -166,7 +168,7 @@ public class IntegrationTest {
 		String inputFilePathString = tailTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = tailTestFilesPath +
 				"last_5_lines_from_lorem_ipsum_16_lines.txt";
-		String cmd = "cat " + inputFilePathString + " | tail -n 5";
+		String cmd = CAT + inputFilePathString + " | tail -n 5";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
@@ -177,7 +179,7 @@ public class IntegrationTest {
 		String inputFilePathString = headTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = headTestFilesPath +
 				"first_5_lines_from_lorem_ipsum_16_lines.txt";
-		String cmd = "cat " + inputFilePathString + " | head -n 5";
+		String cmd = CAT + inputFilePathString + " | head -n 5";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
@@ -212,7 +214,7 @@ public class IntegrationTest {
 	@Test
 	public void testPipeDateToCat() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | cat";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -225,7 +227,7 @@ public class IntegrationTest {
 	@Test
 	public void testPipeDateToHead() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | head -n 1";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -238,7 +240,7 @@ public class IntegrationTest {
 	@Test
 	public void testPipeDateToTail() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | tail -n 1";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -251,7 +253,7 @@ public class IntegrationTest {
 	@Test
 	public void testPipeDateToWc() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | wc";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
