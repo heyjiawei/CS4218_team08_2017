@@ -37,6 +37,7 @@ import sg.edu.nus.comp.cs4218.exception.SedException;
  * </p>
  */
 
+@SuppressWarnings("PMD.GodClass")
 public class SedApplication implements Sed {
 	private String delimiter = null;
 
@@ -60,6 +61,7 @@ public class SedApplication implements Sed {
 	 *
 	 */
 	@Override
+	@SuppressWarnings("PMD.ExcessiveMethodLength") // This is only here because of the commented code
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws SedException {
 		if (args == null) {
 			throw new SedException("Null args\n");
@@ -84,27 +86,24 @@ public class SedApplication implements Sed {
 //		}
 //		commandLine = commandLine.trim();
 		this.delimiter = getDelimiter(args);
-		if (hasSufficientDelimiter(args[0]) == false) {
+		if (!hasSufficientDelimiter(args[0])) {
 			throw new SedException("Unterminated Expression\n");
 		}
 //		String[] expressionParts = split(args[0], this.delimiter);
-		if (isValidRegex(args[0]) == false) {
+		if (!isValidRegex(args[0])) {
 			throw new SedException("Invalid regex pattern\n");
 		}
-		if (isValidReplacement(args[0]) == false) {
+		if (!isValidReplacement(args[0])) {
 			throw new SedException("Invalid replacement string\n");
 		}
 		boolean replaceAll = isReplaceAll(args[0]);
 		String output = "";
 		if (args.length == 2) {
 			output = replaceStringInFile(args, replaceAll);
-		} else if (stdin != null 
-//				&& 
-//				isInputStreamEmpty(stdin) == false
-				) {
-			output = replaceStringInStdin(args, stdin, replaceAll);
-		} else {
+		} else if (stdin == null) {
 			throw new SedException("Unknown Error\n");
+		} else {
+			output = replaceStringInStdin(args, stdin, replaceAll);
 		}
 //		if (hasSufficientDelimiter(args[0]) &&
 //			isValidRegex(args[0]) && 
@@ -154,16 +153,16 @@ public class SedApplication implements Sed {
 		String output = "";
 		String line = "";
 		
-		BufferedInputStream is = new BufferedInputStream(stdin);
-		byte[] c = new byte[1024];
+		BufferedInputStream inputStream = new BufferedInputStream(stdin);
+		byte[] buffer = new byte[1024];
         int readChars = 0;
 		try {
 			String[] expressionParts = split(args[0], this.delimiter);
 			Pattern pattern = Pattern.compile(expressionParts[1]);
 			String replacement = expressionParts[2];
 			
-			while ((readChars = is.read(c)) != -1) {
-				line = new String(c, 0, readChars);
+			while ((readChars = inputStream.read(buffer)) != -1) {
+				line = new String(buffer, 0, readChars);
 				String[] parts = line.split("\n");
 				
 				for (int i = 0; i < parts.length; i++) {
@@ -181,7 +180,7 @@ public class SedApplication implements Sed {
 //					output = output.substring(0, output.length()-1);
 //				}
 			}
-			is.close();
+			inputStream.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -195,7 +194,7 @@ public class SedApplication implements Sed {
 	
 	private String replaceStringInFile(String[] args, boolean replaceAll) throws SedException {
 		String filename = args[args.length - 1];
-		if (isFileValid(filename) == false) {
+		if (!isFileValid(filename)) {
 			throw new SedException("Invalid File\n");
 		}
 		
@@ -203,7 +202,7 @@ public class SedApplication implements Sed {
 		String line;
 		
 		BufferedReader reader;
-		char[] c = new char[1024];
+		char[] buffer = new char[1024];
 		int readChars = 0;
 		try {
 			String[] expressionParts = split(args[0], this.delimiter);
@@ -211,8 +210,8 @@ public class SedApplication implements Sed {
 			String replacement = expressionParts[2];
 			
 			reader = new BufferedReader(new FileReader(filename));
-			while ((readChars = reader.read(c)) != -1) {
-				line = new String(c, 0, readChars);
+			while ((readChars = reader.read(buffer)) != -1) {
+				line = new String(buffer, 0, readChars);
 				String[] parts = line.split("\n");
 				
 				for (int i = 0; i < parts.length; i++) {
@@ -268,11 +267,7 @@ public class SedApplication implements Sed {
 			tmpStr = tmpStr.substring(delimiterIndex + 1);
 		}
 		
-		if (delimiterCount == 3) {
-			return true;
-		} else {
-			return false;
-		}
+		return delimiterCount == 3;
 	}
 
 	/**
@@ -292,12 +287,7 @@ public class SedApplication implements Sed {
 //		} catch (PatternSyntaxException e) {
 //			return false;
 //		}
-		if (replacement.contains(this.delimiter)) {
-			return false;
-		} else {
-			return true;
-		}
-		
+		return !replacement.contains(this.delimiter);
 	}
 
 	/**
@@ -361,7 +351,7 @@ public class SedApplication implements Sed {
 	 * @return sets delimiter and returns delimiter
 	 * @throws SedException if delimiter character is any of the following: [\n\\s\\\r\t]
 	 */
-	private String getDelimiter(String[] args) throws SedException {
+	private String getDelimiter(String... args) throws SedException {
 		int indexOfS = args[0].indexOf('s');
 		if ((indexOfS == 0) && 
 			args[0].length() >= 2) {
@@ -391,16 +381,16 @@ public class SedApplication implements Sed {
 		parts.add("s");
 		while ((pos = expression.indexOf(delimiter)) != -1) {
 			nextPos = expression.indexOf(delimiter, pos + 1);
-			if (nextPos != -1) {
-				parts.add(expression.substring(pos + 1, nextPos));
-				expression = expression.substring(nextPos);
-			} else {
+			if (nextPos == -1) {
 				if (expression.length() == 1 && expression.equals(this.delimiter)) {
 					parts.add("");
 				} else if (expression.length() > 1) {
 					parts.add(expression.substring(1));
 				}
 				break;
+			} else {
+				parts.add(expression.substring(pos + 1, nextPos));
+				expression = expression.substring(nextPos);
 			}
 		}
 		return parts.toArray(new String[parts.size()]);
