@@ -249,6 +249,21 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipeDateToWc() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = "date";
+		String cmd1 = "date | wc";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String dateResult = outputStream.toString();
+		int wordCount = dateResult.split("\\s+").length;
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals("       " + dateResult.getBytes().length + "       " + wordCount +
+				"       0\n", pipedResult);
+	}
+
+	@Test
 	public void testHeadGrepSed() {
 		String cmd = "head " + catTestFilesPath + 
 				"lorem_ipsum_separated_by_empty_lines.txt | grep lorem | sed s.lorem.LOREM.g";
