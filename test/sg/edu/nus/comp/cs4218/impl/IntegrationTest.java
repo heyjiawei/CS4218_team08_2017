@@ -223,6 +223,19 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipeDateToHead() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = "date";
+		String cmd1 = "date | head -n 1";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String dateResult = outputStream.toString();
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals(dateResult, pipedResult);
+	}
+
+	@Test
 	public void testHeadGrepSed() {
 		String cmd = "head " + catTestFilesPath + 
 				"lorem_ipsum_separated_by_empty_lines.txt | grep lorem | sed s.lorem.LOREM.g";
