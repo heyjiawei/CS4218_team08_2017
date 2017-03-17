@@ -22,6 +22,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 @SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
+	private static final String SORT = "sort ";
 	private static final String DATE = "date";
 	private static final String PWD = "pwd";
 	private static final String CAT = "cat ";
@@ -84,7 +85,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeSortWc() throws AbstractApplicationException, ShellException {
-		String cmd = "sort " + sedTestFilePath + " | wc";
+		String cmd = SORT + sedTestFilePath + " | wc";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
 		assertEquals("       113       24       2" + newLine, output);
@@ -206,7 +207,7 @@ public class IntegrationTest {
 		String inputFilePathString = sortTestFilesPath + "all.txt";
 		String expectedOutputFilePathString = sortTestFilesPath +
 				"all_sorted.txt";
-		String cmd = "sort " + inputFilePathString + " | cat";
+		String cmd = SORT + inputFilePathString + " | cat";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
@@ -217,7 +218,7 @@ public class IntegrationTest {
 		String inputFilePathString = sortTestFilesPath + "all.txt";
 		String allOutputFilePathString = sortTestFilesPath +
 				"all_sorted.txt";
-		String cmd = "sort " + inputFilePathString + " | head -n 1";
+		String cmd = SORT + inputFilePathString + " | head -n 1";
 		output = shell.pipeTwoCommands(cmd);
 		String allOutput = convertFileToString(allOutputFilePathString);
 		String[] allOutputTokens = allOutput.split(newLine);
@@ -230,7 +231,7 @@ public class IntegrationTest {
 		String inputFilePathString = sortTestFilesPath + "all.txt";
 		String allOutputFilePathString = sortTestFilesPath +
 				"all_sorted.txt";
-		String cmd = "sort " + inputFilePathString + " | tail -n 1";
+		String cmd = SORT + inputFilePathString + " | tail -n 1";
 		output = shell.pipeTwoCommands(cmd);
 		String allOutput = convertFileToString(allOutputFilePathString);
 		String[] allOutputTokens = allOutput.split(newLine);
