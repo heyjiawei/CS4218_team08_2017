@@ -17,13 +17,24 @@ import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.WcException;
 
-@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
+/*
+ * Assumptions: 
+ * 1) run function will call the correct functions with the correct 
+ * inputs in the correct order separated by a space
+ * 2) Run function will take inputs directly from shell unordered
+ * 3) Args for run: unordered consisting of [flags or options] and [file]...
+ * 4) Args for Interface functions: [flags or options] and [file]...
+ * 5) All Args passed do not contain command 'wc' in front
+ * 6) Filenames will not be surrounded with quotes (i.e. ‘, “ “, “””)
+ */
+
+//@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class WcApplicationTest {
 	private static final String FILE_SEPARATOR = File.separator;
 	private static final String LINE_SEPARATOR = System.lineSeparator();
 	private static final String MWLFILE = String.format("test_inputs%swc%swc_test.txt", 
 			FILE_SEPARATOR, FILE_SEPARATOR);
-	private static final String MWLFILE_NONEWLINEENDING = String.format("test_inputs%swc%s3_lines.txt", 
+	private static final String MWLFILE_NONEWLINE = String.format("test_inputs%swc%s3_lines.txt", 
 			FILE_SEPARATOR, FILE_SEPARATOR);
 	private static final String EMPTYFILE = String.format("test_inputs%swc%sempty.txt", 
 			FILE_SEPARATOR, FILE_SEPARATOR);
@@ -50,7 +61,7 @@ public class WcApplicationTest {
 	
 	@Test
 	public void testNullStdout() throws WcException {
-		String[] args = {"-l", MWLFILE_NONEWLINEENDING};
+		String[] args = {"-l", MWLFILE_NONEWLINE};
 		thrown.expect(WcException.class);
 		thrown.expectMessage("wc: No output stream provided\n");
 		wcApp.run(args, inputStream, null);
@@ -72,9 +83,9 @@ public class WcApplicationTest {
 	
 	@Test
 	public void testPrintNewlineCountInFileInRun() throws WcException {
-		String[] args = {"-l", MWLFILE_NONEWLINEENDING};
+		String[] args = {"-l", MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
-		String expected = String.format("       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR);
+		String expected = String.format("       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
@@ -87,9 +98,9 @@ public class WcApplicationTest {
 	
 	@Test
 	public void testPrintCharacterCountInFileInRun() throws WcException {
-		String[] args = {"-M", MWLFILE_NONEWLINEENDING};
+		String[] args = {"-M", MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
-		String expected = String.format("       29 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR);
+		String expected = String.format("       29 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
@@ -102,9 +113,9 @@ public class WcApplicationTest {
 
 	@Test
 	public void testPrintAllCountsInFileInRun() throws WcException {
-		String[] args = {"-L", "-M", "-W", MWLFILE_NONEWLINEENDING};
+		String[] args = {"-L", "-M", "-W", MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
-		String expected = String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR);
+		String expected = String.format("       29       6       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
@@ -118,48 +129,48 @@ public class WcApplicationTest {
 	
 	@Test
 	public void testPrintCharCountInMultiFile() {
-		String results = wcApp.printCharacterCountInFile(String.format("-m %s %s", MWLFILE, MWLFILE_NONEWLINEENDING));
+		String results = wcApp.printCharacterCountInFile(String.format("-m %s %s", MWLFILE, MWLFILE_NONEWLINE));
 		String expected = String.format("       30 %s%s", MWLFILE, LINE_SEPARATOR) + 
-						String.format("       29 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+						String.format("       29 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 						String.format("       59 total%s", LINE_SEPARATOR);
 		assertEquals(expected, results);
 	}
 	
 	@Test
 	public void testNoFlagMultiFileInRun() throws WcException {
-		String[] args = {EMPTYFILE, MWLFILE_NONEWLINEENDING};
+		String[] args = {EMPTYFILE, MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
 		String expected = String.format("       0       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR) + 
-				String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+				String.format("       29       6       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 				String.format("       29       6       2 total%s", LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
 	@Test
 	public void testJoinedOptionMultiFileInRun() throws WcException {
-		String[] args = {"-ml", EMPTYFILE, MWLFILE_NONEWLINEENDING};
+		String[] args = {"-ml", EMPTYFILE, MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
 		String expected = String.format("       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR) + 
-				String.format("       29       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+				String.format("       29       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 				String.format("       29       2 total%s", LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
 	@Test
 	public void testDisjointedAllOptionMultiFileInRun() throws WcException {
-		String[] args = {"-mL", "-w", EMPTYFILE, MWLFILE_NONEWLINEENDING};
+		String[] args = {"-mL", "-w", EMPTYFILE, MWLFILE_NONEWLINE};
 		wcApp.run(args, inputStream, out);
 		String expected = String.format("       0       0       0 %s%s", EMPTYFILE, LINE_SEPARATOR) + 
-				String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+				String.format("       29       6       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 				String.format("       29       6       2 total%s", LINE_SEPARATOR);
 		assertEquals(expected, out.toString());
 	}
 	
 	@Test
 	public void testDisjointedAllOptionMultiFile() {
-		String results = wcApp.printAllCountsInFile(String.format("-Lm -w %s %s", MWLFILE, MWLFILE_NONEWLINEENDING));
+		String results = wcApp.printAllCountsInFile(String.format("-Lm -w %s %s", MWLFILE, MWLFILE_NONEWLINE));
 		String expected = String.format("       30       6       3 %s%s", MWLFILE, LINE_SEPARATOR) + 
-						String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+						String.format("       29       6       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 						String.format("       59       12       5 total%s", LINE_SEPARATOR);
 		assertEquals(expected, results);
 	}
@@ -265,9 +276,9 @@ public class WcApplicationTest {
 	
 	@Test 
 	public void testFileThenOptionCommandArgPrintNewlineCountInFile() {
-		String results = wcApp.printNewlineCountInFile(String.format("%s %s -Lm -w ", MWLFILE, MWLFILE_NONEWLINEENDING));
+		String results = wcApp.printNewlineCountInFile(String.format("%s %s -Lm -w ", MWLFILE, MWLFILE_NONEWLINE));
 		String expected = String.format("       30       6       3 %s%s", MWLFILE, LINE_SEPARATOR) + 
-						String.format("       29       6       2 %s%s", MWLFILE_NONEWLINEENDING, LINE_SEPARATOR) + 
+						String.format("       29       6       2 %s%s", MWLFILE_NONEWLINE, LINE_SEPARATOR) + 
 						"wc: -Lm Invalid file or directory\n" + 
 						"wc: -w Invalid file or directory\n" +
 						String.format("       59       12       5 total%s", LINE_SEPARATOR);

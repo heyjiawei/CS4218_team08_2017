@@ -14,11 +14,47 @@ import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.app.Grep;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.exception.SedException;
+
+/**
+ * Copies input file (or input stream) to stdout performing string replacement.
+ * For each line containing a match to a specified pattern (in JAVA format),
+ * replaces the matched substring with the specified string.
+ * 
+ * <p>
+ * <b>Command format:</b> <code>grep PATTERN [FILE]...</code>
+ * <dl>
+ * <dt>PATTERN</dt>
+ * <dd>specifies a regular expression in JAVA format.</dd>
+ * </dl>
+ * <dl>
+ * <dt>FILE</dt>
+ * <dd>the name of the file(s). If no files are specified, use stdin.</dd>
+ * </dl>
+ * </p>
+ */
 
 public class GrepApplication implements Grep {
 
 	private final String NEW_LINE = System.getProperty("line.separator");
 
+	/**
+	 * Runs the grep application with the specified arguments.
+	 * 
+	 * @param args
+	 *            Array of arguments for the application. Each array element is
+	 *            the path to a file. If no files are specified stdin is used.
+	 * @param stdin
+	 *            An InputStream. The input for the command is read from this
+	 *            InputStream if no files are specified.
+	 * @param stdout
+	 *            An OutputStream. The output of the command is written to this
+	 *            OutputStream.
+	 * 
+	 * @throws SedException
+	 *             
+	 *
+	 */
 	@Override
 	public void run(String[] args, InputStream stdin, OutputStream stdout) throws GrepException {
 		if (args.length == 0) {
@@ -50,19 +86,26 @@ public class GrepApplication implements Grep {
 		}
 	}
 	
+	/**
+	 * Check if args contains a Pattern segment
+	 * @param args
+	 * @return true if it does, false otherwise
+	 */
 	private boolean containsPattern(String... args) {
 		return args.length != 0 && args[0] != null && !args[0].isEmpty();
 	}
 
-	@Override
-	public String grepFromStdin(String args, InputStream stdin) {
-		return parseAndEvaluate(args, stdin);
-	}
-
+	/**
+	 * Perform Grep on stdin
+	 * @param args Array containing expression to grep
+	 * @param stdin InputStream
+	 * @return String with expression
+	 * @throws GrepException
+	 */
 	@SuppressWarnings("PMD.PreserveStackTrace")
 	private String grepStdin(String args[], InputStream stdin) throws GrepException {
 		if (isInputStreamEmpty(stdin)) {
-			throw new GrepException("Inputstream empty");
+			throw new GrepException("Inputstream empty + NEW_LINE");
 		}
 		StringBuilder output = new StringBuilder();
 		try {
@@ -88,31 +131,12 @@ public class GrepApplication implements Grep {
 		}
 	}
 
-	private Pattern getRegexPattern(String args) throws PatternSyntaxException {
-		return Pattern.compile(args);
-	}
-
-	private boolean isInputStreamEmpty(InputStream stdin) {
-		try {
-			if (stdin.available() > 0) {
-				return false;
-			} 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return true;
-	}
-	
-	private boolean isFileValid(String args) {
-		File file = new File(args);
-	    return file.exists() && file.isFile();
-	}
-
-	@Override
-	public String grepFromOneFile(String args) {
-		return parseAndEvaluate(args, null);
-	}
-	
+	/**
+	 * Performs grep on provided files
+	 * @param args Array containing expression and filenames
+	 * @return String containing grep expression
+	 * @throws GrepException
+	 */
 	@SuppressWarnings("PMD.PreserveStackTrace")
 	private String grepFile(String... args) throws GrepException {
 		if (args.length <= 1) {
@@ -160,21 +184,97 @@ public class GrepApplication implements Grep {
 		}
 	}
 
+	/**
+	 * Retrieves regex pattern object
+	 * @param args String containing regex expression
+	 * @return Pattern object
+	 * @throws PatternSyntaxException if an invalid regex is provided
+	 */
+	private Pattern getRegexPattern(String args) throws PatternSyntaxException {
+		return Pattern.compile(args);
+	}
+
+	/**
+	 * Checks if input stream is readable
+	 * @param stdin InputStream
+	 * @return boolean true if readable, false otherwise
+	 */
+	private boolean isInputStreamEmpty(InputStream stdin) {
+		try {
+			if (stdin.available() > 0) {
+				return false;
+			} 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks if provided filename is a file and an existing file as well
+	 * @param args filename
+	 * @return true if is file and file exists, false otherwise
+	 */
+	private boolean isFileValid(String args) {
+		File file = new File(args);
+	    return file.exists() && file.isFile();
+	}
+
+	/**
+	 * Returns string containing lines which match the specified pattern in
+	 * Stdin
+	 * @param args String containing command and arguments
+	 * @param stdin InputStream containing stdin
+	 */
+	@Override
+	public String grepFromStdin(String args, InputStream stdin) {
+		return parseAndEvaluate(args, stdin);
+	}
+
+	/**
+	 * Returns string containing lines which match the specified pattern in the
+	 * given file
+	 * @param args  String containing command and arguments
+	 */
+	@Override
+	public String grepFromOneFile(String args) {
+		return parseAndEvaluate(args, null);
+	}
+
+	/**
+	 * Returns string containing lines which match the specified pattern in the
+	 * given files
+	 * @param args  String containing command and arguments
+	 */
 	@Override
 	public String grepFromMultipleFiles(String args) {
 		return parseAndEvaluate(args, null);
 	}
 
+	/**
+	 * Returns string when invalid pattern is specified in grep from Stdin
+	 * @param args String containing command and arguments
+	 */
 	@Override
 	public String grepInvalidPatternInStdin(String args, InputStream stdin) {
 		return parseAndEvaluate(args, stdin);
 	}
 
+	/**
+	 * Returns string when invalid pattern is specified in grep from file
+	 * @param args String containing command and arguments
+	 */
 	@Override
 	public String grepInvalidPatternInFile(String args) {
 		return parseAndEvaluate(args, null);
 	}
 	
+	/**
+	 * Parses command line args from interface to run function
+	 * @param args String command line arguments without 'grep ' in front
+	 * @param stdin InputStream
+	 * @return String containing grepped expression
+	 */
 	private String parseAndEvaluate(String args, InputStream stdin) {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 

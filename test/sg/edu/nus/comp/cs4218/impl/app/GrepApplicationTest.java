@@ -24,7 +24,10 @@ import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
  * 3) Args for run: unordered consisting of pattern and files
  * 4) Args for grepFromOneFile: pattern, file
  * 5) Args for grepFromMultipleFiles: pattern, file, file, ...
- * 6) Args for grepFromStdin: pattern (Stdin will be parsed from run)
+ * 6) Args for grepFromStdin: pattern (Stdin must be externally provided)
+ * 7) All Args passed do not contain command 'grep' in front
+ * 8) Pattern will not be surrounded with quotes (i.e. ‘, “ “, “””)
+ * 9) Filenames will not be surrounded with quotes (i.e. ‘, “ “, “””)
  */
 @SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class GrepApplicationTest {
