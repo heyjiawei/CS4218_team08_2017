@@ -29,6 +29,7 @@ public class IntegrationTest {
 	private final String sedTestFilePath = testInputFilesPath + "sed" + FILE_SEPARATOR + "two-lines.txt";
 	private final String tailTestFilesPath = testInputFilesPath + "tail" + FILE_SEPARATOR;
 	private final String headTestFilesPath = testInputFilesPath + "head" + FILE_SEPARATOR;
+	private final String sortTestFilesPath = testInputFilesPath + "sort" + FILE_SEPARATOR;
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
@@ -88,7 +89,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeCatWc() throws AbstractApplicationException, ShellException {
-		String cmd = "cat "+ sedTestFilePath + " | wc";
+		String cmd = "cat " + sedTestFilePath + " | wc";
 		output = shell.pipeTwoCommands(cmd);
 		assertEquals("       113       24       2" + newLine, output);
 	}
@@ -187,6 +188,17 @@ public class IntegrationTest {
 		String cmd = "pwd | cat";
 		output = shell.pipeTwoCommands(cmd);
 		assertEquals(Environment.currentDirectory + newLine, output);
+	}
+
+	@Test
+	public void testPipeSortToCat() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "all.txt";
+		String expectedOutputFilePathString = sortTestFilesPath +
+				"all_sorted.txt";
+		String cmd = "sort " + inputFilePathString + " | cat";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = convertFileToString(expectedOutputFilePathString);
+		assertEquals(expected, output);
 	}
 
 	@Test
