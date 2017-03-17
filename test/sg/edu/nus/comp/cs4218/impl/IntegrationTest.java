@@ -378,6 +378,40 @@ public class IntegrationTest {
 		assertEquals(expected, output);
 	}
 
+	@Test
+	public void testCalCatHeadTail() throws IOException, AbstractApplicationException,
+			ShellException {
+		String cmd = "cal `cat " + catTestFilesPath + "cal_arg.txt` " +
+				"`head -n 1 " + headTestFilesPath + "months.txt` " +
+				"`tail -n 1 " + tailTestFilesPath + "years.txt`";
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd, outputStream);
+		String expected = "    January 2016" + newLine +
+				"Mo Tu We Th Fr Sa Su" + newLine +
+				"             1  2  3" + newLine +
+				" 4  5  6  7  8  9 10" + newLine +
+				"11 12 13 14 15 16 17" + newLine +
+				"18 19 20 21 22 23 24" + newLine +
+				"25 26 27 28 29 30 31" + newLine;
+		assertEquals(expected, outputStream.toString());
+	}
+
+	@Test
+	public void testCalEcho() throws IOException, AbstractApplicationException,
+			ShellException {
+		String cmd = "cal `echo -m` `echo jan` `echo 2016`";
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd, outputStream);
+		String expected = "    January 2016" + newLine +
+				"Mo Tu We Th Fr Sa Su" + newLine +
+				"             1  2  3" + newLine +
+				" 4  5  6  7  8  9 10" + newLine +
+				"11 12 13 14 15 16 17" + newLine +
+				"18 19 20 21 22 23 24" + newLine +
+				"25 26 27 28 29 30 31" + newLine;
+		assertEquals(expected, outputStream.toString());
+	}
+
 	/**
 	 * Converts the file found at the given input file path string to
 	 * a string.
