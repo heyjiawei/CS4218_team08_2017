@@ -26,6 +26,7 @@ public class IntegrationTest {
 	private ByteArrayOutputStream outputStream;
 	private final String catTestFilesPath = "test_inputs" + FILE_SEPARATOR + "cat" + FILE_SEPARATOR;
 	private final String sedTestFilePath = "test_inputs" + FILE_SEPARATOR + "sed" + FILE_SEPARATOR + "two-lines.txt";
+	private final String tailTestFilesPath = "test_inputs" + FILE_SEPARATOR + "tail" + FILE_SEPARATOR;
 	private Shell shell;
 	private String output;
 	private final String newLine = System.getProperty("line.separator");
@@ -156,7 +157,18 @@ public class IntegrationTest {
 		Calendar cal = Calendar.getInstance();
 		assertEquals(cal.getTime() + newLine, output);
 	}
-	
+
+	@Test
+	public void testPipeTailToCat() throws IOException {
+		String inputFilePathString = tailTestFilesPath + "lorem_ipsum_16_lines.txt";
+		String expectedOutputFilePathString = tailTestFilesPath +
+				"last_5_lines_from_lorem_ipsum_16_lines.txt";
+		String cmd = "cat " + inputFilePathString + " | tail -n 5";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = convertFileToString(expectedOutputFilePathString);
+		assertEquals(expected, output);
+	}
+
 	@Test
 	public void testHeadGrepSed() {
 		String cmd = "head " + catTestFilesPath + 
@@ -182,9 +194,7 @@ public class IntegrationTest {
 		String expected = "       2" + newLine;
 		assertEquals(expected, output);
 	}
-	
-	
-	
+
 	/**
 	 * Converts the file found at the given input file path string to
 	 * a string.
