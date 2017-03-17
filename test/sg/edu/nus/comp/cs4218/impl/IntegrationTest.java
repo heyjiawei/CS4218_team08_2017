@@ -161,7 +161,7 @@ public class IntegrationTest {
 	}
 
 	@Test
-	public void testPipeTailToCat() throws IOException {
+	public void testPipeCatToTail() throws IOException {
 		String inputFilePathString = tailTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = tailTestFilesPath +
 				"last_5_lines_from_lorem_ipsum_16_lines.txt";
@@ -172,7 +172,7 @@ public class IntegrationTest {
 	}
 
 	@Test
-	public void testPipeHeadToCat() throws IOException {
+	public void testPipeCatToHead() throws IOException {
 		String inputFilePathString = headTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = headTestFilesPath +
 				"first_5_lines_from_lorem_ipsum_16_lines.txt";
@@ -180,6 +180,13 @@ public class IntegrationTest {
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
+	}
+
+	@Test
+	public void testPipePwdToCat() throws IOException {
+		String cmd = "pwd | cat";
+		output = shell.pipeTwoCommands(cmd);
+		assertEquals(Environment.currentDirectory + newLine, output);
 	}
 
 	@Test
