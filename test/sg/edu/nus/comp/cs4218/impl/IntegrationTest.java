@@ -23,6 +23,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 @SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
 	private static final String DATE = "date";
+	private static final String PWD = "pwd";
 	private static final String CAT = "cat ";
 	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
@@ -238,6 +239,19 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipePwdToHead() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = PWD;
+		String cmd1 = PWD + " | head -n 1";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String pwdResult = outputStream.toString();
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals(pwdResult, pipedResult + newLine);
+	}
+
+	@Test
 	public void testPipeDateToTail() throws IOException, AbstractApplicationException,
 		ShellException {
 		String cmd0 = DATE;
@@ -248,6 +262,19 @@ public class IntegrationTest {
 		shell.parseAndEvaluate(cmd1, outputStream);
 		String pipedResult = outputStream.toString();
 		assertEquals(dateResult, pipedResult);
+	}
+
+	@Test
+	public void testPipePwdToTail() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = PWD;
+		String cmd1 = PWD + " | tail -n 1";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String pwdResult = outputStream.toString();
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals(pwdResult, pipedResult + newLine);
 	}
 
 	@Test
