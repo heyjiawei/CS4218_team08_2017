@@ -266,6 +266,17 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testCommandSubstitutionEchoSort() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "numbers.txt";
+		String expectedOutputFilePathString = sortTestFilesPath +
+				"numbers_sorted.txt";
+		String cmd = "echo `sort " + inputFilePathString + "`";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = convertFileToString(expectedOutputFilePathString);
+		assertEquals(expected + newLine, output);
+	}
+
+	@Test
 	public void testHeadGrepSed() {
 		String cmd = "head " + catTestFilesPath + 
 				"lorem_ipsum_separated_by_empty_lines.txt | grep lorem | sed s.lorem.LOREM.g";
