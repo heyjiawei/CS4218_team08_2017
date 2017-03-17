@@ -191,6 +191,14 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipeEchoToCat() throws IOException {
+		String testString = "test string!";
+		String cmd = "echo " + testString + "| cat";
+		output = shell.pipeTwoCommands(cmd);
+		assertEquals(testString + newLine, output);
+	}
+
+	@Test
 	public void testPipeSortToCat() throws IOException {
 		String inputFilePathString = sortTestFilesPath + "all.txt";
 		String expectedOutputFilePathString = sortTestFilesPath +
