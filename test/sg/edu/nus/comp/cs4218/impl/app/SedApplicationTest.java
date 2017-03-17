@@ -28,7 +28,7 @@ import sg.edu.nus.comp.cs4218.exception.SedException;
  * 6) Expression will not be surrounded with quotes (i.e. ‘, “ “, “””)
  * 7) Filenames will not be surrounded with quotes (i.e. ‘, “ “, “””)
  */
-
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class SedApplicationTest {
 	private static final String FILESEPARATOR = File.separator;
 	private static final String NEWLINE = System.lineSeparator();

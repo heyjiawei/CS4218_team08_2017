@@ -28,7 +28,7 @@ import sg.edu.nus.comp.cs4218.exception.WcException;
  * 6) Filenames will not be surrounded with quotes (i.e. ‘, “ “, “””)
  */
 
-//@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
+@SuppressWarnings({ "PMD.LongVariable", "PMD.AvoidDuplicateLiterals" })
 public class WcApplicationTest {
 	private static final String FILE_SEPARATOR = File.separator;
 	private static final String LINE_SEPARATOR = System.lineSeparator();
