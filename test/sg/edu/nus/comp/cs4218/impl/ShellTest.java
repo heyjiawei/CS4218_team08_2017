@@ -49,7 +49,6 @@ public class ShellTest {
 		String cmd = "echo `echo `echo cat` cat`";
 		output = shell.performCommandSubstitution(cmd);
 		assertEquals("shell: Invalid syntax encountered near echo cat` cat` ", output);
-		
 	}
 	
 	@Test

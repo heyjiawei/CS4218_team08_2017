@@ -22,6 +22,10 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 @SuppressWarnings("PMD.LongVariable")
 public class IntegrationTest {
+	private static final String SORT = "sort ";
+	private static final String DATE = "date";
+	private static final String PWD = "pwd";
+	private static final String CAT = "cat ";
 	private final String FILE_SEPARATOR = File.separator;
 	private ByteArrayOutputStream outputStream;
 	private final String testInputFilesPath = "test_inputs" + FILE_SEPARATOR;
@@ -81,7 +85,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeSortWc() throws AbstractApplicationException, ShellException {
-		String cmd = "sort " + sedTestFilePath + " | wc";
+		String cmd = SORT + sedTestFilePath + " | wc";
 		shell.parseAndEvaluate(cmd, outputStream);
 		output = outputStream.toString();
 		assertEquals("       113       24       2" + newLine, output);
@@ -89,7 +93,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeCatWc() throws AbstractApplicationException, ShellException {
-		String cmd = "cat " + sedTestFilePath + " | wc";
+		String cmd = CAT + sedTestFilePath + " | wc";
 		output = shell.pipeTwoCommands(cmd);
 		assertEquals("       113       24       2" + newLine, output);
 	}
@@ -112,7 +116,7 @@ public class IntegrationTest {
 	public void testGlobbingWithCat() throws CatException, IOException {
 		String firstFilePathString = catTestFilesPath + "lorem_ipsum_short.txt";
 		String secondFilePathString = catTestFilesPath + "lorem_ipsum_short_two.txt";
-		String cmd = "cat " + catTestFilesPath + "lorem_ipsum_short*";
+		String cmd = CAT + catTestFilesPath + "lorem_ipsum_short*";
 		output = shell.pipeMultipleCommands(cmd);
 		String firstFileString;
 		String secondFileString;
@@ -147,7 +151,7 @@ public class IntegrationTest {
 	
 	@Test
 	public void testPipeCatGrep() {
-		String cmd = "cat "+ sedTestFilePath + " | grep Hope";
+		String cmd = CAT + sedTestFilePath + " | grep Hope";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = "/* Hope this helps */ # no new line here" + newLine;
 		assertEquals(expected, output);
@@ -166,7 +170,7 @@ public class IntegrationTest {
 		String inputFilePathString = tailTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = tailTestFilesPath +
 				"last_5_lines_from_lorem_ipsum_16_lines.txt";
-		String cmd = "cat " + inputFilePathString + " | tail -n 5";
+		String cmd = CAT + inputFilePathString + " | tail -n 5";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
@@ -177,7 +181,7 @@ public class IntegrationTest {
 		String inputFilePathString = headTestFilesPath + "lorem_ipsum_16_lines.txt";
 		String expectedOutputFilePathString = headTestFilesPath +
 				"first_5_lines_from_lorem_ipsum_16_lines.txt";
-		String cmd = "cat " + inputFilePathString + " | head -n 5";
+		String cmd = CAT + inputFilePathString + " | head -n 5";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
@@ -203,16 +207,42 @@ public class IntegrationTest {
 		String inputFilePathString = sortTestFilesPath + "all.txt";
 		String expectedOutputFilePathString = sortTestFilesPath +
 				"all_sorted.txt";
-		String cmd = "sort " + inputFilePathString + " | cat";
+		String cmd = SORT + inputFilePathString + " | cat";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = convertFileToString(expectedOutputFilePathString);
 		assertEquals(expected, output);
 	}
 
 	@Test
+	public void testPipeSortToHead() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "all.txt";
+		String allOutputFilePathString = sortTestFilesPath +
+				"all_sorted.txt";
+		String cmd = SORT + inputFilePathString + " | head -n 1";
+		output = shell.pipeTwoCommands(cmd);
+		String allOutput = convertFileToString(allOutputFilePathString);
+		String[] allOutputTokens = allOutput.split(newLine);
+		String firstLine = allOutputTokens[0];
+		assertEquals(firstLine, output);
+	}
+
+	@Test
+	public void testPipeSortToTail() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "all.txt";
+		String allOutputFilePathString = sortTestFilesPath +
+				"all_sorted.txt";
+		String cmd = SORT + inputFilePathString + " | tail -n 1";
+		output = shell.pipeTwoCommands(cmd);
+		String allOutput = convertFileToString(allOutputFilePathString);
+		String[] allOutputTokens = allOutput.split(newLine);
+		String lastLine = allOutputTokens[allOutputTokens.length - 1];
+		assertEquals(lastLine, output);
+	}
+
+	@Test
 	public void testPipeDateToCat() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | cat";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -225,7 +255,7 @@ public class IntegrationTest {
 	@Test
 	public void testPipeDateToHead() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | head -n 1";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -236,9 +266,22 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipePwdToHead() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = PWD;
+		String cmd1 = PWD + " | head -n 1";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String pwdResult = outputStream.toString();
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals(pwdResult, pipedResult + newLine);
+	}
+
+	@Test
 	public void testPipeDateToTail() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | tail -n 1";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -249,9 +292,22 @@ public class IntegrationTest {
 	}
 
 	@Test
+	public void testPipePwdToTail() throws IOException, AbstractApplicationException,
+		ShellException {
+		String cmd0 = PWD;
+		String cmd1 = PWD + " | tail -n 1";
+		shell.parseAndEvaluate(cmd0, outputStream);
+		String pwdResult = outputStream.toString();
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd1, outputStream);
+		String pipedResult = outputStream.toString();
+		assertEquals(pwdResult, pipedResult + newLine);
+	}
+
+	@Test
 	public void testPipeDateToWc() throws IOException, AbstractApplicationException,
 		ShellException {
-		String cmd0 = "date";
+		String cmd0 = DATE;
 		String cmd1 = "date | wc";
 		shell.parseAndEvaluate(cmd0, outputStream);
 		String dateResult = outputStream.toString();
@@ -261,6 +317,17 @@ public class IntegrationTest {
 		String pipedResult = outputStream.toString();
 		assertEquals("       " + dateResult.getBytes().length + "       " + wordCount +
 				"       0\n", pipedResult);
+	}
+
+	@Test
+	public void testCommandSubstitutionEchoSort() throws IOException {
+		String inputFilePathString = sortTestFilesPath + "numbers.txt";
+		String expectedOutputFilePathString = sortTestFilesPath +
+				"numbers_sorted.txt";
+		String cmd = "echo `sort " + inputFilePathString + "`";
+		output = shell.pipeTwoCommands(cmd);
+		String expected = convertFileToString(expectedOutputFilePathString);
+		assertEquals(expected + newLine, output);
 	}
 
 	@Test
@@ -281,12 +348,69 @@ public class IntegrationTest {
 	}
 	
 	@Test
+	public void testPipeTailToSed() {
+		String cmd = "tail " + catTestFilesPath +
+				"lorem_ipsum_separated_by_empty_lines.txt | sed s.lorem.LOREM.g";
+		String threeNewLines = new String(new char[3]).replace("\0", newLine);
+		String sixNewLines = new String(new char[6]).replace("\0", newLine);
+		output = shell.pipeTwoCommands(cmd);
+		String expected = "Neque porro quisquam est, qui doLOREM ipsum quia "
+						+ "dolor sit amet, consectetur, adipisci velit, sed quia "
+						+ "non numquam eius modi tempora incidunt ut labore et"
+						+ " dolore magnam aliquam quaerat voluptatem." 
+						+ threeNewLines
+						+ "Ut enim ad minima veniam, quis nostrum exercitationem "
+						+ "ullam corporis suscipit laboriosam, nisi ut aliquid ex ea "
+						+ "commodi consequatur? "
+						+ sixNewLines
+						+ "Quis autem vel eum iure reprehenderit qui in ea voluptate "
+						+ "velit esse quam nihil molestiae consequatur, vel illum qui "
+						+ "doLOREM eum fugiat quo voluptas nulla pariatur?"
+						+ newLine;
+		assertEquals(expected, output);
+	}
+
+	@Test
 	public void testTailGrepWc() {
 		String cmd = "tail " + catTestFilesPath + 
 				"lorem_ipsum_separated_by_empty_lines.txt | grep \\? | wc -l";
 		output = shell.pipeTwoCommands(cmd);
 		String expected = "       2" + newLine;
 		assertEquals(expected, output);
+	}
+
+	@Test
+	public void testCalCatHeadTail() throws IOException, AbstractApplicationException,
+			ShellException {
+		String cmd = "cal `cat " + catTestFilesPath + "cal_arg.txt` " +
+				"`head -n 1 " + headTestFilesPath + "months.txt` " +
+				"`tail -n 1 " + tailTestFilesPath + "years.txt`";
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd, outputStream);
+		String expected = "    January 2016" + newLine +
+				"Mo Tu We Th Fr Sa Su" + newLine +
+				"             1  2  3" + newLine +
+				" 4  5  6  7  8  9 10" + newLine +
+				"11 12 13 14 15 16 17" + newLine +
+				"18 19 20 21 22 23 24" + newLine +
+				"25 26 27 28 29 30 31" + newLine;
+		assertEquals(expected, outputStream.toString());
+	}
+
+	@Test
+	public void testCalEcho() throws IOException, AbstractApplicationException,
+			ShellException {
+		String cmd = "cal `echo -m` `echo jan` `echo 2016`";
+		outputStream.reset();
+		shell.parseAndEvaluate(cmd, outputStream);
+		String expected = "    January 2016" + newLine +
+				"Mo Tu We Th Fr Sa Su" + newLine +
+				"             1  2  3" + newLine +
+				" 4  5  6  7  8  9 10" + newLine +
+				"11 12 13 14 15 16 17" + newLine +
+				"18 19 20 21 22 23 24" + newLine +
+				"25 26 27 28 29 30 31" + newLine;
+		assertEquals(expected, outputStream.toString());
 	}
 
 	/**

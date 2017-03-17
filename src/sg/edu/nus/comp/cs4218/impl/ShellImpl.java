@@ -331,8 +331,10 @@ public class ShellImpl implements Shell {
 
 				ByteArrayOutputStream outByte = (ByteArrayOutputStream) bqOutputStream;
 				byte[] byteArray = outByte.toByteArray();
-				String bqResult = new String(byteArray).replace("\n", "")
-						.replace("\r", "");
+				String bqResult = new String(byteArray);
+				String newLine = System.getProperty("line.separator");
+				bqResult = (bqResult.endsWith(newLine)) ?
+						bqResult.substring(0, bqResult.lastIndexOf(newLine)) : bqResult;
 
 				// replace substring of back quote with result
 				replacedStr = replacedStr.replace("`" + bqStr + "`",
