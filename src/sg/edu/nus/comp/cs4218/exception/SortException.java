@@ -5,6 +5,6 @@ public class SortException extends AbstractApplicationException {
 	private static final long serialVersionUID = 3894758187716957490L;
 
 	public SortException(String message) {
-		super("cd: " + message);
+		super("sort: " + message);
 	}
 }
