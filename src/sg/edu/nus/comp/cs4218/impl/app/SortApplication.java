@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -504,7 +505,10 @@ public class SortApplication implements Sort {
 	 * @throws IOException
 	 *             If there is an error reading the file
 	 */
-	private String convertFileToString(String filePathString) throws IOException {
+	private String convertFileToString(String filePathString) throws IOException, SortException {
+		if (!new File(filePathString).exists()) {
+			throw new SortException("File " + filePathString + " does not exist.");
+		}
 		byte[] encoded = Files.readAllBytes(Paths.get(filePathString));
 		return new String(encoded, StandardCharsets.UTF_8);
 	}
