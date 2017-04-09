@@ -35,6 +35,9 @@ public class PwdApplication implements Application {
 	@SuppressWarnings("PMD.PreserveStackTrace")
 	public void run(String[] args, InputStream stdin, OutputStream stdout)
 			throws PwdException {
+		if (args != null && args.length > 0) {
+			throw new PwdException("Pwd does not accept arguments.");
+		}
 		if (stdout == null) {
 			throw new PwdException("No output stream provided");
 		}
