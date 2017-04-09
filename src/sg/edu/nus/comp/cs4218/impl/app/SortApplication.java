@@ -358,7 +358,7 @@ public class SortApplication implements Sort {
 	 * @return The string with the first line removed, if any.
 	 */
 	private String removeFirstLineFromString(String string) {
-		String[] toSortArray = string.split(newLine);
+		String[] toSortArray = string.split(newLine, -1);
 		if (toSortArray.length < 2) {
 			return "";
 		}
