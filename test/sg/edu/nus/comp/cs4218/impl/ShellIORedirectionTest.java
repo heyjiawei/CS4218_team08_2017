@@ -33,6 +33,7 @@ public class ShellIORedirectionTest {
 	private static final String TEST_FILE_PATH = "test_ioredirection/";
 	private static final String TEST_FILE_INPUT = "test_ioredirection/input.txt";
 	private static final String TEST_FILE_INVALID_INPUT = "test_ioredirection/invalid_input.txt";
+	private static final String TEST_FILE_INVALID_OUTPUT = "test_ioredirection/invalid_output.txt";
 	private static final String TEST_FILE_OUTPUT = "test_ioredirection/output.txt";
 
 	@Rule
@@ -113,6 +114,17 @@ public class ShellIORedirectionTest {
 		assertEquals("shell: Invalid syntax encountered near >", output);
 	}
 
+	@Test
+	public void testRedirectOutputWithInvalidFile() throws AbstractApplicationException, ShellException {
+		String cmd = "cat "  + TEST_FILE_INPUT + " > " + TEST_FILE_INVALID_OUTPUT;
+
+//		thrown.expect(ShellException.class);
+//		thrown.expectMessage("No such file or directory");
+		shell.parseAndEvaluate(cmd, outputStream);
+		output = outputStream.toString();
+		assertEquals("", output);
+	}
+	
 	@Test
 	public void testRedirectInputWithInvalidFile() throws AbstractApplicationException, ShellException {
 		String cmd = "cat"  + " < " + TEST_FILE_INVALID_INPUT;

@@ -141,6 +141,7 @@ public class CallCommand implements Command {
 	private void processGlob(String currentDir, Vector<String> argsVector, String arg) {
 		// perform globbing on the argument
 		PathMatcher matcher;
+		Boolean matched = false;
 		matcher = FileSystems.getDefault().getPathMatcher("glob:" + currentDir + File.separator + arg);
 		Path folder = new File(currentDir).toPath();
 
@@ -167,7 +168,7 @@ public class CallCommand implements Command {
 					// first arg does not have space in front
 					String relative = new File(currentDir).toURI().relativize(new File(listOfFiles[i].getAbsolutePath()).toURI()).getPath();
 					argsVector.add(relative);
-				} else {
+					matched = true;
 				}
 			} else if (listOfFiles[i].isDirectory() && matcher.matches(listOfFiles[i].toPath())) {
 				// insert args separated by space
@@ -177,7 +178,13 @@ public class CallCommand implements Command {
 					relative = relative.substring(0, relative.length() - 1);
 				}
 				argsVector.add(relative);
+				matched = true;
 			}
+		}
+		
+		// if no match, use back original arg for individual app to handle invalid path
+		if(matched == false) {
+			argsVector.add(arg);
 		}
 	}
 

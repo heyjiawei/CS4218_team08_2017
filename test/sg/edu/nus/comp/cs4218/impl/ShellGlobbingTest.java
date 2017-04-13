@@ -157,6 +157,6 @@ public class ShellGlobbingTest {
 
 		output = shell.globOneFile(cmd);
 
-		assertEquals("" + NEW_LINE, output);
+		assertEquals(".*" + NEW_LINE, output);
 	}
 }
