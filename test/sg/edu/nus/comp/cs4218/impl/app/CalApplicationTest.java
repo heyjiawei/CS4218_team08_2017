@@ -147,6 +147,7 @@ public class CalApplicationTest {
 
 	@Test
 	public void printCalendarWithoutInputsFromRun() throws CalException {
+		calendarApp = new CalApplication(new Date(2017 - 1900, 2, 1));
 		args = new String[0];
 		calendarApp.run(args, null, System.out);
 		System.out.flush();
@@ -156,11 +157,13 @@ public class CalApplicationTest {
 	// Needs to change every month as it prints the current month values
 	@Test
 	public void printCalendarWithoutInputs() {
+		calendarApp = new CalApplication(new Date(2017 - 1900, 2, 1));
 		assertEquals(MARCHSUNOUTPUT, calendarApp.printCal(null));
 	}
 
 	@Test
 	public void printCalendarMondayWithoutInputsFromRun() throws CalException {
+		calendarApp = new CalApplication(new Date(2017 - 1900, 2, 1));
 		args = new String[1];
 		args[0] = "-m";
 		calendarApp.run(args, null, System.out);
