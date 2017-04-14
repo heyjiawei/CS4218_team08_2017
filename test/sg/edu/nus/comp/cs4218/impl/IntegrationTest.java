@@ -140,12 +140,13 @@ public class IntegrationTest {
 	public void testPipeCalGrep() {
 		String cmd = "cal | grep \\d";
 		output = shell.pipeTwoCommands(cmd);
-		String expected = "     March 2017" + newLine +
-						"          1  2  3  4" + newLine +
-						" 5  6  7  8  9 10 11" + newLine +
-						"12 13 14 15 16 17 18" + newLine +
-						"19 20 21 22 23 24 25" + newLine +
-						"26 27 28 29 30 31" + newLine;
+		String expected = "     April 2017" + newLine +
+						"                   1" + newLine +
+						" 2  3  4  5  6  7  8" + newLine +
+						" 9 10 11 12 13 14 15" + newLine +
+						"16 17 18 19 20 21 22" + newLine +
+						"23 24 25 26 27 28 29" + newLine +
+						"30" + newLine;
 		assertEquals(expected, output);
 	}
 	
