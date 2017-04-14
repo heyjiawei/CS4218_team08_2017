@@ -140,7 +140,7 @@ public class ShellIORedirectionTest {
 
 		output = shell.redirectInputWithException(cmd);
 
-		assertEquals("cat: Could not read file", output);
+		assertEquals("cat: This is a directory", output);
 	}
 
 	@Test
@@ -149,7 +149,7 @@ public class ShellIORedirectionTest {
 
 		output = shell.redirectOutputWithException(cmd);
 
-		assertEquals("cat: Could not read file", output);
+		assertEquals("cat: This is a directory", output);
 	}
 
 	@Test

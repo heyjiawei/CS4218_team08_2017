@@ -76,7 +76,10 @@ public class CatApplication implements Application {
 		boolean isFileReadable = false;
 
 		for (int i = 0; i < numOfFiles; i++) {
-			filePath = currentDir.resolve(args[i]);
+			String filePathString = args[i].replaceAll("\\s+", "");
+			filePath = currentDir.resolve(filePathString);
+			// remove spaces from filepath
+			
 			try {
 				isFileReadable = checkIfFileIsReadable(filePath);
 			} catch (CatException e) {
