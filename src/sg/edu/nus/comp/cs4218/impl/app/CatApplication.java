@@ -120,7 +120,6 @@ public class CatApplication implements Application {
 	 *             If the file is not readable
 	 */
 	boolean checkIfFileIsReadable(Path filePath) throws CatException {
-		
 		if (Files.isDirectory(filePath)) {
 			throw new CatException("This is a directory");
 		}
