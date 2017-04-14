@@ -96,7 +96,6 @@ public class Hackathon {
         thrown.expect(PwdException.class);
         thrown.expectMessage("Pwd does not accept arguments.");
         shell.parseAndEvaluate(cmd, outContent);
-        String expected = "";
     }
 
     /**
