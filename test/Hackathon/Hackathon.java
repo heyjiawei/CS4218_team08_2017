@@ -68,7 +68,7 @@ public class Hackathon {
     /**
      * Filename with space are unable to be read correctly.
      */
-    // Invalid test case filed in bug report number 1
+    // Invalid test case filed in bug report number 3
     // @Test
     // public void testEscapeKeyForSpaceNotIdentified() throws AbstractApplicationException, ShellException, IOException {
     //     String expected = "       9 co copy.txt\n";
