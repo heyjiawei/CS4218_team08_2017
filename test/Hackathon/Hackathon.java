@@ -5,7 +5,9 @@ import org.junit.rules.ExpectedException;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.PwdException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.ShellImpl;
 
 import java.io.ByteArrayOutputStream;
@@ -79,8 +81,9 @@ public class Hackathon {
      */
     @Test
     public void testFileNotFound() throws AbstractApplicationException, ShellException, IOException {
-        shell.parseAndEvaluate("sort missing.txt", outContent);
-        assertEquals("sort: open failed: missing.txt: No such file or directory", outContent.toString());
+    	thrown.expect(SortException.class);
+        thrown.expectMessage("File missing.txt does not exist.");
+    	shell.parseAndEvaluate("sort missing.txt", outContent);
     }
 
     /**
@@ -90,10 +93,10 @@ public class Hackathon {
     @Test
     public void testPwdExtraArgs() throws IOException, AbstractApplicationException, ShellException {
         String cmd = "pwd -potato";
-        outContent.reset();
+        thrown.expect(PwdException.class);
+        thrown.expectMessage("Pwd does not accept arguments.");
         shell.parseAndEvaluate(cmd, outContent);
         String expected = "";
-        assertEquals(expected, outContent.toString());
     }
 
     /**
